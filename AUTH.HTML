@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30win - Registro / Login</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        html,
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F0F0F !important;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            font-size: 100%;
+        }
+
+        .tab-active {
+            color: #ffb800;
+            border-bottom: 2px solid #ffb800;
+        }
+
+        .input-bg {
+            background-color: #1a1a1a;
+            border: 1px solid #FFFFFF;
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #ffb800 0%, #ff8a00 100%);
+            color: #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="flex justify-center min-h-screen">
+    <div class="w-full max-w-[450px] p-6 relative min-h-screen border-x-2 border-[#0F0F0F] mx-auto">
+        <!-- Logo -->
+        <div class="flex justify-center mb-8">
+            <img src="/public/assets/30win.avif" alt="30win Logo" class="h-12">
+        </div>
+
+        <!-- Banner -->
+        <div class="mb-6 rounded-xl overflow-hidden shadow-lg">
+            <img src="/public/assets/convideegane.avif" alt="Promo Banner" class="w-full">
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex mb-8 border-b border-[#0F0F0F]">
+            <button id="tabRegister" class="flex-1 py-3 text-lg font-semibold tab-active">Registro</button>
+            <button id="tabLogin" class="flex-1 py-3 text-lg font-semibold text-gray-400">Login</button>
+        </div>
+
+        <!-- Forms -->
+        <div id="formContainer">
+            <!-- Form Registro -->
+            <div id="registerView" class="space-y-4">
+                <div class="space-y-2">
+                    <label class="text-sm text-gray-400">Suporte Número do Celular</label>
+                    <div class="flex items-center input-bg rounded-lg p-3">
+                        <img src="/public/assets/Brazil.png" class="w-6 h-4 mr-2">
+                        <span class="mr-2">+55</span>
+                        <input type="text" id="regPhone" placeholder="Digite o Número do Celular"
+                            class="bg-transparent outline-none w-full text-white">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm text-gray-400">Cadastro de senha</label>
+                    <div class="flex items-center input-bg rounded-lg p-3">
+                        <i class="fas fa-lock text-gray-500 mr-3"></i>
+                        <input type="password" id="regPassword" placeholder="Insira a senha"
+                            class="bg-transparent outline-none w-full text-white">
+                        <i class="fas fa-eye-slash text-gray-500 cursor-pointer"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex items-center input-bg rounded-lg p-3">
+                        <i class="fas fa-lock text-gray-500 mr-3"></i>
+                        <input type="password" id="regConfirm" placeholder="Confirmar senha"
+                            class="bg-transparent outline-none w-full text-white">
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2 py-2">
+                    <input type="checkbox" checked class="accent-green-500 h-5 w-5">
+                    <span class="text-xs text-gray-400">Tenho 18+ anos, li e concordo com <a href="#"
+                            class="text-orange-400">Acordo de Usuário</a></span>
+                </div>
+
+                <button onclick="handleRegister()"
+                    class="w-full btn-primary py-4 rounded-xl text-xl mt-4 shadow-lg shadow-orange-900/20">Registro</button>
+            </div>
+
+            <!-- Form Login (Hidden by default) -->
+            <div id="loginView" class="space-y-4 hidden">
+                <div class="space-y-2">
+                    <label class="text-sm text-gray-400">Número do Celular</label>
+                    <div class="flex items-center input-bg rounded-lg p-3">
+                        <i class="fas fa-phone text-gray-500 mr-3"></i>
+                        <input type="text" id="loginPhone" placeholder="Seu número"
+                            class="bg-transparent outline-none w-full text-white">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm text-gray-400">Senha</label>
+                    <div class="flex items-center input-bg rounded-lg p-3">
+                        <i class="fas fa-lock text-gray-500 mr-3"></i>
+                        <input type="password" id="loginPassword" placeholder="Sua senha"
+                            class="bg-transparent outline-none w-full text-white">
+                    </div>
+                </div>
+
+                <button onclick="handleLogin()"
+                    class="w-full btn-primary py-4 rounded-xl text-xl mt-4 shadow-lg">Entrar</button>
+            </div>
+        </div>
+
+        <!-- Social Login (Removed as per user request) -->
+        <!-- Registration message -->
+        <div class="mt-8 text-center text-gray-500 text-sm mb-20">Bem-vindo à 30win!</div>
+
+        <!-- Sticky Bottom Navigation -->
+        <footer class="fixed bottom-0 left-0 w-full z-50 flex justify-center pointer-events-none">
+            <div
+                class="w-full max-w-[450px] bg-[#1a1a1a] border-t border-[#0F0F0F] py-2 flex items-center justify-around pointer-events-auto">
+                <a href="HOME.HTML" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+                    <div class="text-gray-600 group-hover:text-white transition-colors">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                                stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Começar</span>
+                </a>
+                <a href="OFERTAS.HTML" class="flex flex-col items-center gap-1 group py-1 relative"
+                    style="text-decoration:none;">
+                    <div class="text-gray-600 group-hover:text-white transition-colors">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                    </div>
+                    <span
+                        class="absolute top-0 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#1a1a1a]"></span>
+                    <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Ofertas</span>
+                </a>
+                <a href="SUPORTE.HTML" class="flex flex-col items-center gap-1 group py-1"
+                    style="text-decoration:none;">
+                    <div class="text-gray-600 group-hover:text-white transition-colors">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                    </div>
+                    <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Suporte</span>
+                </a>
+                <!-- Show login ONLY IF auth logic desires. On AUTH page, we just show "Login" marked as active / yellow -->
+                <a href="AUTH.HTML" id="nav-login" class="flex flex-col items-center gap-1 group py-1"
+                    style="text-decoration:none;">
+                    <div class="text-brand-yellow">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                    </div>
+                    <span class="text-[9px] font-medium text-brand-yellow">Login</span>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Conditional Footer Navigation
+        (function () {
+            var token = localStorage.getItem('30win_token');
+            var loginBtn = document.getElementById('nav-login');
+            var perfilBtn = document.getElementById('nav-perfil');
+            if (!token) {
+                if (loginBtn) loginBtn.style.display = 'flex';
+                if (perfilBtn) perfilBtn.style.display = 'none';
+            } else {
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (perfilBtn) perfilBtn.style.display = 'flex';
+            }
+        })();
+
+        // Toggle Tabs
+        document.getElementById('tabRegister').onclick = () => {
+            document.getElementById('registerView').classList.remove('hidden');
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('tabRegister').classList.add('tab-active');
+            document.getElementById('tabLogin').classList.remove('tab-active');
+            document.getElementById('tabLogin').classList.add('text-gray-400');
+        };
+        document.getElementById('tabLogin').onclick = () => {
+            document.getElementById('loginView').classList.remove('hidden');
+            document.getElementById('registerView').classList.add('hidden');
+            document.getElementById('tabLogin').classList.add('tab-active');
+            document.getElementById('tabRegister').classList.remove('tab-active');
+            document.getElementById('tabRegister').classList.add('text-gray-400');
+        };
+
+        const API_URL = 'http://163.245.218.28:3000/api';
+
+        async function handleRegister() {
+            const phone = document.getElementById('regPhone').value;
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const invitedBy = urlParams.get('ref');
+
+            if (password !== confirm) return alert('Senhas não coincidem!');
+
+            try {
+                const res = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password, invitedBy })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Sucesso! Agora faça login.');
+                    document.getElementById('tabLogin').click();
+                } else alert(data.error);
+            } catch (err) { alert('Erro ao registrar.'); }
+        }
+
+        async function handleLogin() {
+            const phone = document.getElementById('loginPhone').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('30win_token', data.token);
+                    localStorage.setItem('30win_user', JSON.stringify(data.user));
+                    window.location.href = '/HOME.HTML';
+                } else alert(data.error);
+            } catch (err) { alert('Erro ao entrar.'); }
+        }
+    </script>
+</body>
+
+</html>

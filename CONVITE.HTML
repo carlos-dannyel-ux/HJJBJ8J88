@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - Bônus de Convite</title>
+    <link rel="icon" type="image/png" href="/public/favicon.ico">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <style>
+        html,
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F0F0F !important;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        .text-brand-yellow {
+            color: #ffcc00;
+        }
+
+        .bg-brand-yellow {
+            background-color: #ffcc00;
+        }
+
+        .border-brand-yellow {
+            border-color: #ffcc00;
+        }
+
+        .reward-card {
+            position: relative;
+            border: 1px solid rgba(255, 204, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .reward-card:active {
+            transform: scale(0.97);
+        }
+
+        .arrow-icon {
+            display: inline-flex;
+            align-items: center;
+            color: #ffcc00;
+        }
+
+        .arrow-icon svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        html {
+            font-size: 100%;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ffdd7c",
+                        "primary-container": "#fecb00",
+                        "surface-container": "#1a1919",
+                        "background": "#0e0e0e",
+                        "surface": "#0e0e0e",
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-[#050505] text-white">
+    <!-- Mobile-First Wrapper -->
+    <div
+        class="max-w-[450px] w-full mx-auto h-[100dvh] bg-[#0f0f0f] relative shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden border-x-2 border-[#0F0F0F]">
+
+        <!-- Header -->
+        <header class="bg-[#141414] px-4 py-3 flex items-center justify-between border-b border-[#0F0F0F] shrink-0">
+            <div class="flex items-center gap-3">
+                <a href="HOME.HTML" class="text-gray-400">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        </path>
+                    </svg>
+                </a>
+                <h1 class="text-base font-bold flex items-center gap-1.5">
+                    BÔNUS DE CONVITE
+                    <span
+                        class="inline-flex items-center justify-center w-5 h-5 rounded-full border border-[#0F0F0F] text-[10px] text-gray-400">①</span>
+                </h1>
+            </div>
+            <a href="#" class="text-brand-yellow text-sm font-medium">Histórico</a>
+        </header>
+
+        <!-- Scrollable Content -->
+        <main class="flex-1 overflow-y-auto pb-24">
+
+            <!-- Convidar amigos + Código -->
+            <section class="px-4 pt-4">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-sm font-semibold text-white">Convidar amigos</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs text-gray-400">Meu código de convite</span>
+                        <span class="text-sm font-bold text-brand-yellow" id="inviteCode">-------</span>
+                        <button class="text-gray-400 hover:text-brand-yellow transition-colors"
+                            onclick="copyInviteCode()">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QR Code + Link + Share -->
+                <div class="bg-[#1a1a1a] rounded-xl p-4 border border-[#0F0F0F]">
+                    <div class="flex gap-4">
+                        <!-- QR Code -->
+                        <div class="shrink-0 flex flex-col items-center gap-2">
+                            <div
+                                class="w-[100px] h-[100px] bg-white rounded-lg p-1.5 flex items-center justify-center overflow-hidden">
+                                <img id="qrCodeImg" src="" alt="QR Code" class="w-full h-full hidden">
+                                <div id="qrLoading"
+                                    class="animate-pulse bg-gray-200 w-full h-full rounded flex items-center justify-center">
+                                    <div
+                                        class="w-6 h-6 border-2 border-brand-yellow border-t-transparent rounded-full animate-spin">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="bg-brand-yellow text-black text-[9px] font-bold px-3 py-1 rounded-md">Salvar
+                                código de..</button>
+                        </div>
+
+                        <!-- Link + Share Icons -->
+                        <div class="flex-1 flex flex-col gap-3">
+                            <!-- Link de convite -->
+                            <div>
+                                <span class="text-[10px] text-gray-400 mb-1 block">Link de convite</span>
+                                <div
+                                    class="flex items-center gap-1.5 bg-[#262626] rounded-lg px-3 py-2 border border-[#0F0F0F]">
+                                    <span id="referralUrlText" class="text-[10px] text-gray-300 truncate flex-1">Gerando
+                                        link...</span>
+                                    <button class="text-gray-400 hover:text-white shrink-0" id="copyUrlBtn">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Share Icons -->
+                            <div class="flex items-center justify-between px-1">
+                                <!-- Partilhar -->
+                                <button onclick="shareLink('native')" class="flex flex-col items-center gap-1">
+                                    <div class="w-10 h-10 rounded-full bg-[#333] flex items-center justify-center">
+                                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-[8px] text-gray-400">Partilhar</span>
+                                </button>
+                                <!-- Facebook -->
+                                <button onclick="shareLink('facebook')" class="flex flex-col items-center gap-1">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                                        <img src="PUBLIC/img_facebook.png" alt="Facebook"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-[8px] text-gray-400">Facebook</span>
+                                </button>
+                                <!-- WhatsApp -->
+                                <button onclick="shareLink('whatsapp')" class="flex flex-col items-center gap-1">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                                        <img src="PUBLIC/img_wa.png" alt="WhatsApp" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-[8px] text-gray-400">WhatsApp</span>
+                                </button>
+                                <!-- Telegram -->
+                                <button onclick="shareLink('telegram')" class="flex flex-col items-center gap-1">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                                        <img src="PUBLIC/img_tg.png" alt="Telegram" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-[8px] text-gray-400">Telegram</span>
+                                </button>
+                                <!-- Instagram -->
+                                <button onclick="shareLink('instagram')" class="flex flex-col items-center gap-1">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                                        <img src="PUBLIC/INSTA.avif" alt="Insta" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-[8px] text-gray-400">Insta</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Subordinados section -->
+            <section class="px-4 pt-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-400">Subordinados válidos <span id="subCount"
+                            class="text-white font-bold">0</span> pessoas</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500">☼</span>
+                        <a href="#" class="text-brand-yellow text-xs font-medium">Detalhes</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Divider -->
+            <div class="px-4 py-3">
+                <div class="border-t border-[#0F0F0F]"></div>
+            </div>
+
+            <!-- Info section -->
+            <section class="px-4 space-y-3">
+                <p class="text-xs text-brand-yellow text-center">O que é o número válido de indicados?</p>
+                <p class="text-[11px] text-gray-300 leading-relaxed">
+                    O subordinado Depósito Total <span class="text-brand-yellow font-bold">≥20</span>，Total de Apostas
+                    Válidas <span class="text-brand-yellow font-bold">≥300</span>
+                </p>
+                <p class="text-[11px] text-gray-400 leading-relaxed">
+                    As apostas válidas para membros de nível inferior não incluem as seguintes plataformas:
+                </p>
+                <p class="text-[11px] text-gray-300 leading-relaxed">
+                    Pescaria: <span class="text-white font-semibold">Baison(Gold Toad Fishing)</span>
+                </p>
+                <p class="text-[11px] text-gray-300 leading-relaxed">
+                    Slots: <span class="text-white font-semibold">WG(Lucky Dog)</span>，<span
+                        class="text-white font-semibold">PP(Gold Train)</span>，<span
+                        class="text-white font-semibold">JDB(Bull Trea...</span> <a href="#"
+                        class="text-brand-yellow font-medium">Mais</a>
+                </p>
+                <p class="text-[11px] text-gray-300 leading-relaxed">
+                    Evento Blockchain: <span class="text-white font-semibold">WG(Circle</span>，<span
+                        class="text-white font-semibold">Double</span>，<span class="text-white font-semibold">Lucky
+                        Dice</span>，... <a href="#" class="text-brand-yellow font-medium">Mais</a>
+                </p>
+            </section>
+
+            <!-- Divider -->
+            <div class="px-4 py-3">
+                <div class="border-t border-[#0F0F0F]"></div>
+            </div>
+
+            <!-- Reward Cards Grid -->
+            <section class="px-4 pb-8">
+                <div class="grid grid-cols-4 gap-2" id="reward-grid">
+                    <!-- Cards will be generated by JS -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer
+            class="absolute bottom-0 w-full bg-[#141414] border-t border-[#0F0F0F] flex items-center justify-around py-3 z-50">
+            <a href="HOME.HTML" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H15C14.4477 21 14 20.5523 14 20V15C14 14.4477 13.5523 14 13 14H11C10.4477 14 10 14.4477 10 15V20C10 20.5523 9.55228 21 9 21H4C3.44772 21 3 20.5523 3 20V10.5Z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Começar</span>
+            </a>
+            <a href="OFERTAS.HTML" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">redeem</span>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Ofertas</span>
+            </a>
+            <a href="SUPORTE.HTML" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">support_agent</span>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Suporte</span>
+            </a>
+            <a href="PERFIL.HTML" id="nav-perfil" class="flex flex-col items-center gap-1 group py-1"
+                style="text-decoration:none;">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">person</span>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Perfil</span>
+            </a>
+            <a href="AUTH.HTML" id="nav-login" class="flex flex-col items-center gap-1"
+                style="text-decoration:none; display:none;">
+                <div class="text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] text-gray-500">Login</span>
+            </a>
+        </footer>
+        <script>
+                (function () {
+                    var token = localStorage.getItem('30win_token');
+                    var loginBtn = document.getElementById('nav-login');
+                    var perfilBtn = document.getElementById('nav-perfil');
+                    if (!token) {
+                        loginBtn.style.display = 'flex';
+                        perfilBtn.style.display = 'none';
+                    }
+                })();
+        </script>
+    </div>
+
+    <script>
+        // Generate reward cards: 1 to 40 people
+        // Reward amounts: 30 per person (1=30, 2=30, 3=30, 4=30, 5=30, 10=150, 15=150, 20=150, 25=Save, 30=30, 40=??)
+        // Based on image: 1p=30, 2p=30, 3p=30, 4p=30, 5p=30, 10p=150, 15p=150, 20p=150, 25p=Save 30, 30p=?, 40p=?, 50p=?, 60p=?
+        // Let's do a simple scale
+        const rewards = [
+            { people: 1, amount: '30,00' },
+            { people: 2, amount: '30,00' },
+            { people: 3, amount: '30,00' },
+            { people: 4, amount: '30,00' },
+            { people: 5, amount: '50,00' },
+            { people: 6, amount: '50,00' },
+            { people: 7, amount: '50,00' },
+            { people: 8, amount: '80,00' },
+            { people: 9, amount: '80,00' },
+            { people: 10, amount: '150,00' },
+            { people: 11, amount: '150,00' },
+            { people: 12, amount: '150,00' },
+            { people: 13, amount: '150,00' },
+            { people: 14, amount: '150,00' },
+            { people: 15, amount: '200,00' },
+            { people: 16, amount: '200,00' },
+            { people: 17, amount: '200,00' },
+            { people: 18, amount: '200,00' },
+            { people: 19, amount: '200,00' },
+            { people: 20, amount: '300,00' },
+            { people: 21, amount: '300,00' },
+            { people: 22, amount: '300,00' },
+            { people: 23, amount: '300,00' },
+            { people: 24, amount: '300,00' },
+            { people: 25, amount: '400,00' },
+            { people: 26, amount: '400,00' },
+            { people: 27, amount: '400,00' },
+            { people: 28, amount: '400,00' },
+            { people: 29, amount: '400,00' },
+            { people: 30, amount: '500,00' },
+            { people: 31, amount: '500,00' },
+            { people: 32, amount: '500,00' },
+            { people: 33, amount: '500,00' },
+            { people: 34, amount: '500,00' },
+            { people: 35, amount: '600,00' },
+            { people: 36, amount: '600,00' },
+            { people: 37, amount: '600,00' },
+            { people: 38, amount: '600,00' },
+            { people: 39, amount: '600,00' },
+            { people: 40, amount: '888,00' },
+        ];
+
+        const grid = document.getElementById('reward-grid');
+
+        rewards.forEach((reward, index) => {
+            const isLast = index === rewards.length - 1;
+            const card = document.createElement('div');
+            card.className = 'flex items-center';
+
+            card.innerHTML = `
+                <div class="reward-card" style="width: 100%;">
+                    <div class="relative" style="width: 100%; aspect-ratio: 172/96;">
+                        <img src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/common/common/event/tghdhb3_s.avif?manualVersion=1&version=917c89aa91" alt="" style="display: block; width: 100%; height: 100%; object-fit: fill;">
+                        <img src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/common/common/event/tghdhb3_s2.avif?manualVersion=1&version=7a80e21505" alt="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; object-fit: contain;">
+                        <img src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/common/common/event/tghdhb3_s1_en.avif?manualVersion=1&version=accd6f21f2" alt="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; object-fit: contain;">
+                        <div style="position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); text-align: center;">
+                            <span class="text-[8px] text-white font-medium" style="text-shadow: 0 1px 3px rgba(0,0,0,0.8);">${reward.people} Pessoas</span>
+                        </div>
+                    </div>
+                    <div class="text-center py-1 bg-[#1a1a1a]">
+                        <span class="text-[10px] font-bold text-brand-yellow">${reward.amount}</span>
+                    </div>
+                </div>
+                ${!isLast ? `
+                <div class="arrow-icon mx-0.5 shrink-0">
+                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 37 35.53">
+                        <g transform="translate(-384.623 -492.905)">
+                            <path d="M4123.423-3236.447a2.236,2.236,0,0,1-1.585-.657,2.24,2.24,0,0,1,0-3.168l13.94-13.94-13.94-13.94a2.241,2.241,0,0,1,0-3.169,2.241,2.241,0,0,1,3.169,0l15.523,15.524a2.239,2.239,0,0,1,0,3.168l-15.523,15.524A2.234,2.234,0,0,1,4123.423-3236.447Z" transform="translate(-3736.559 3764.882)"></path>
+                            <path d="M4123.423-3236.447a2.236,2.236,0,0,1-1.585-.657,2.24,2.24,0,0,1,0-3.168l13.94-13.94-13.94-13.94a2.241,2.241,0,0,1,0-3.169,2.241,2.241,0,0,1,3.169,0l15.523,15.524a2.239,2.239,0,0,1,0,3.168l-15.523,15.524A2.234,2.234,0,0,1,4123.423-3236.447Z" transform="translate(-3719.564 3764.882)"></path>
+                        </g>
+                    </svg>
+                </div>` : ''}
+            `;
+
+            grid.appendChild(card);
+        });
+    </script>
+    <script>
+        const API_URL = 'http://163.245.218.28:3000/api';
+        let currentReferralUrl = '';
+        let currentInviteCode = '';
+
+        async function initConvite() {
+            const token = localStorage.getItem('30win_token');
+            if (!token) {
+                window.location.href = '/AUTH.HTML';
+                return;
+            }
+
+            // Fetch QR and Link
+            try {
+                const resQr = await fetch(`${API_URL}/referral/qr`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const dataQr = await resQr.json();
+                if (dataQr.success) {
+                    document.getElementById('qrCodeImg').src = dataQr.qr;
+                    document.getElementById('qrCodeImg').classList.remove('hidden');
+                    document.getElementById('qrLoading').classList.add('hidden');
+
+                    currentReferralUrl = dataQr.url;
+                    currentInviteCode = dataQr.code;
+
+                    document.getElementById('referralUrlText').innerText = currentReferralUrl;
+                    document.getElementById('inviteCode').innerText = currentInviteCode;
+                }
+            } catch (err) { console.error(err); }
+
+            // Fetch Stats
+            syncReferralStats();
+        }
+
+        async function syncReferralStats() {
+            const token = localStorage.getItem('30win_token');
+            try {
+                const res = await fetch(`${API_URL}/referral/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('subCount').innerText = data.stats.totalSubordinates;
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function copyInviteCode() {
+            if (!currentInviteCode) return;
+            navigator.clipboard.writeText(currentInviteCode).then(() => alert('Código copiado!'));
+        }
+
+        function copyInviteUrl() {
+            if (!currentReferralUrl) return;
+            navigator.clipboard.writeText(currentReferralUrl).then(() => alert('Link copiado!'));
+        }
+
+        function shareLink(platform) {
+            if (!currentReferralUrl) return;
+            const text = encodeURIComponent('Junte-se a mim na 30win! Use meu link para ganhar bônus: ' + currentReferralUrl);
+            const url = encodeURIComponent(currentReferralUrl);
+
+            let shareUrl = '';
+            switch (platform) {
+                case 'whatsapp':
+                    shareUrl = `https://api.whatsapp.com/send?text=${text}`;
+                    break;
+                case 'telegram':
+                    shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'instagram':
+                    alert('Copie o link e cole na sua Bio do Instagram!');
+                    copyInviteUrl();
+                    return;
+                case 'native':
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'Convite 30win',
+                            text: 'Junte-se a mim na 30win!',
+                            url: currentReferralUrl
+                        }).catch(() => {
+                            copyInviteUrl();
+                        });
+                        return;
+                    } else {
+                        copyInviteUrl();
+                        return;
+                    }
+            }
+
+            if (shareUrl) window.open(shareUrl, '_blank');
+        }
+
+        document.getElementById('copyUrlBtn').onclick = copyInviteUrl;
+
+        initConvite();
+    </script>
+</body>
+
+</html>

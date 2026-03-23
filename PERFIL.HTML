@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - Perfil</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            background-color: #0e0e0e;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .headline-font {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html {
+            font-size: 75%;
+        }
+    </style>
+    <script id="tailwind-config">
+        document.addEventListener('DOMContentLoaded', () => {
+            const balanceElement = document.getElementById('balance-value');
+            const refreshBtn = document.getElementById('refresh-balance');
+            const coinSound = document.getElementById('coin-sound');
+
+            let currentBalance = 1250.00;
+            let isAnimating = false;
+
+            function playSound() {
+                if (coinSound) {
+                    coinSound.currentTime = 0;
+                    coinSound.play().catch(e => console.log('Autoplay blocked or audio error:', e));
+                }
+            }
+
+            function animateBalance(target) {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                playSound();
+
+                const duration = 1500;
+                const startValue = currentBalance;
+                const startTime = performance.now();
+
+                function update(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const displayValue = startValue + ((target - startValue) * easeOut);
+
+                    balanceElement.textContent = displayValue.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        currentBalance = target;
+                        isAnimating = false;
+                    }
+                }
+
+                requestAnimationFrame(update);
+            }
+
+            // Auto-update every 5 seconds
+            setInterval(() => {
+                const increment = Math.random() * 15.50;
+                animateBalance(currentBalance + increment);
+            }, 5000);
+
+            // Manual refresh trigger
+            refreshBtn.addEventListener('click', () => {
+                const manualIncrement = 5.00 + (Math.random() * 10);
+                animateBalance(currentBalance + manualIncrement);
+            });
+        });
+    </script>
+    <style>
+        body {
+            min-height: 100dvh;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface antialiased">
+    <!-- Mobile-First Wrapper -->
+    <div
+        class="max-w-[450px] w-full mx-auto h-[100dvh] bg-[#0e0e0e] relative shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden">
+
+        <!-- TopAppBar -->
+        <header
+            class="sticky top-0 w-full flex justify-between items-center px-6 h-16 bg-[#0e0e0e]/70 backdrop-blur-xl z-50 shadow-[0_4px_30px_rgba(0,0,0,0.1)] shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="HOME.HTML" class="hover:opacity-80 transition-opacity active:scale-90"
+                    style="text-decoration: none; color: inherit;">
+                    <span class="material-symbols-outlined text-on-surface">arrow_back_ios</span>
+                </a>
+            </div>
+            <div class="flex items-center gap-5">
+                <a href="SUPORTE.HTML" class="hover:opacity-80 transition-opacity active:scale-90"
+                    style="text-decoration: none; color: inherit;">
+                    <span class="material-symbols-outlined text-on-surface">headset_mic</span>
+                </a>
+                <a href="SUPORTE.HTML" class="hover:opacity-80 transition-opacity active:scale-90"
+                    style="text-decoration: none; color: inherit;">
+                    <span class="material-symbols-outlined text-[#FFB800]"
+                        style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto pt-4 px-4 space-y-6 pb-28">
+            <!-- User Identity Section -->
+            <section class="flex flex-col items-center gap-4">
+                <div class="relative">
+                    <div
+                        class="w-24 h-24 rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden border-2 border-[#262626]">
+                        <img class="w-full h-full object-cover" data-alt="User profile avatar portrait"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBUtLSbDowKY_ciy4YnuSzjZtgoEq1tBAeXTLMrhXm1A_CvWpTbDe8UXjnXKOuP77H8wI0LqxyavF5CmcF9DEei7_99a9Jd1LFJCV9aGbJjjVq_GTxBdC-C5sgxM9SUP-VXcY2kC5ffkFTBfGHgqc_nzWurH9jwNlzP6Q2Q77E6u3d4wUzbaE1tPfwyTfJsnJryNCMzf0i4T0eEx9gzleoQzhyTGpueqeQWV0RMeM9EUvuTXjCksXAbsg9rbEwBPvLKFxF-sGCHA">
+                    </div>
+                    <button
+                        class="absolute bottom-0 right-0 bg-[#FFB800] p-1.5 rounded-full border-2 border-[#0e0e0e] active:scale-90 transition-transform">
+                        <span class="material-symbols-outlined text-black text-sm"
+                            style="font-variation-settings: 'FILL' 1;">edit</span>
+                    </button>
+                </div>
+                <div class="text-center space-y-1">
+                    <div class="flex items-center justify-center gap-2">
+                        <span id="userPhone" class="font-bold text-lg headline-font tracking-tight">Cargando...</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-2">
+                        <span id="userId" class="text-gray-500 text-sm font-medium">ID: --</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Balance Section -->
+            <section class="bg-[#1a1a1a] rounded-2xl p-5 flex flex-col items-center gap-3 border border-white/5">
+                <div class="flex items-center gap-3">
+                    <img alt="BRL" class="w-6 h-4 object-contain"
+                        src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/BRL.avif">
+                    <span
+                        class="text-2xl font-bold headline-font underline decoration-[#FFB800] underline-offset-4 text-[#FFB800]">R$
+                        <span class="" id="userBalance">0,00</span></span>
+                    <button class="active:scale-90 transition-transform" id="refresh-balance">
+                        <svg class="w-6 h-6" height="24" viewBox="0 0 200 180" width="24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="goldRefresh" x1="0%" x2="100%" y1="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FFE500;stop-opacity:1"></stop>
+                                    <stop offset="50%" style="stop-color:#FFB800;stop-opacity:1"></stop>
+                                    <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1"></stop>
+                                </linearGradient>
+                                <filter height="160%" id="refreshShadow" width="160%" x="-30%" y="-30%">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="6"></feGaussianBlur>
+                                    <feOffset dx="0" dy="8" result="offsetblur"></feOffset>
+                                    <feComponentTransfer>
+                                        <feFuncA slope="0.5" type="linear"></feFuncA>
+                                    </feComponentTransfer>
+                                    <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <g filter="url(#refreshShadow)">
+                                <g id="refresh-icon-spin">
+                                    <path d="M145 90 A45 45 0 1 1 131.8 58.2" fill="none" stroke="url(#goldRefresh)"
+                                        stroke-linecap="round" stroke-width="12"></path>
+                                    <path d="M130 35 L155 60 L120 75 Z" fill="url(#goldRefresh)"></path>
+                                    <circle cx="100" cy="90" fill="none" opacity="0.3" r="45" stroke="white"
+                                        stroke-dasharray="10, 150" stroke-width="2"></circle>
+                                    <animateTransform attributeName="transform" attributeType="XML" dur="3s"
+                                        from="0 100 90" repeatCount="indefinite" to="360 100 90" type="rotate">
+                                    </animateTransform>
+                                </g>
+                            </g>
+                            <circle cx="100" cy="90" fill="#262626" r="15"></circle>
+                            <circle cx="100" cy="90" fill="#FFB800" r="8">
+                                <animate attributeName="opacity" dur="1.5s" repeatCount="indefinite" values="1;0.4;1">
+                                </animate>
+                            </circle>
+                            <path d="M70 60 Q100 30 130 60" fill="none" opacity="0.2" stroke="white" stroke-width="1">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-2 gap-4 w-full mt-2">
+                    <button onclick="openWithdrawModal()"
+                        class="flex items-center justify-center gap-3 bg-[#262626] p-4 rounded-xl hover:brightness-110 transition-all active:scale-95 border border-white/5">
+                        <svg class="w-14 h-14" height="56" viewBox="0 0 200 180" width="56"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="goldCash" x1="0%" x2="100%" y1="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FFE500;stop-opacity:1"></stop>
+                                    <stop offset="50%" style="stop-color:#FFB800;stop-opacity:1"></stop>
+                                    <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1"></stop>
+                                </linearGradient>
+                                <linearGradient id="noteDepth" x1="0%" x2="0%" y1="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#8A6400;stop-opacity:1"></stop>
+                                    <stop offset="100%" style="stop-color:#423100;stop-opacity:1"></stop>
+                                </linearGradient>
+                                <filter height="140%" id="cashShadow" width="140%" x="-20%" y="-20%">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="6"></feGaussianBlur>
+                                    <feOffset dx="0" dy="12" result="offsetblur"></feOffset>
+                                    <feComponentTransfer>
+                                        <feFuncA slope="0.6" type="linear"></feFuncA>
+                                    </feComponentTransfer>
+                                    <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <g>
+                                <circle cx="50" cy="130" fill="url(#goldCash)" filter="url(#cashShadow)" r="8">
+                                    <animate attributeName="cy" dur="3s" repeatCount="indefinite" values="130;160;130">
+                                    </animate>
+                                    <animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="1;0;1">
+                                    </animate>
+                                </circle>
+                                <circle cx="160" cy="140" fill="url(#goldCash)" filter="url(#cashShadow)" r="6">
+                                    <animate attributeName="cy" dur="4s" repeatCount="indefinite" values="140;170;140">
+                                    </animate>
+                                    <animate attributeName="opacity" dur="4s" repeatCount="indefinite" values="1;0;1">
+                                    </animate>
+                                </circle>
+                            </g>
+                            <rect fill="url(#noteDepth)" height="65" rx="10" transform="rotate(-5, 105, 97)" width="100"
+                                x="55" y="65"></rect>
+                            <g filter="url(#cashShadow)">
+                                <rect fill="url(#goldCash)" height="70" rx="8" stroke="rgba(255,255,255,0.2)"
+                                    stroke-width="0.5" width="105" x="45" y="55"></rect>
+                                <circle cx="97.5" cy="90" fill="none" opacity="0.3" r="18" stroke="#8A6400"
+                                    stroke-width="1"></circle>
+                                <circle cx="97.5" cy="90" fill="#8A6400" opacity="0.1" r="12"></circle>
+                                <rect fill="#8A6400" height="10" opacity="0.2" rx="2" width="10" x="52" y="62"></rect>
+                                <rect fill="#8A6400" height="10" opacity="0.2" rx="2" width="10" x="133" y="62"></rect>
+                                <rect fill="#8A6400" height="10" opacity="0.2" rx="2" width="10" x="52" y="108"></rect>
+                                <rect fill="#8A6400" height="10" opacity="0.2" rx="2" width="10" x="133" y="108"></rect>
+                                <path d="M50 60 H145" fill="none" opacity="0.4" stroke="white" stroke-linecap="round"
+                                    stroke-width="2">
+                                    <animate attributeName="opacity" dur="2s" repeatCount="indefinite"
+                                        values="0.4;0.8;0.4">
+                                    </animate>
+                                </path>
+                            </g>
+                            <rect fill="#262626" height="70" width="25" x="85" y="55"></rect>
+                            <path d="M85 55 L110 55" opacity="0.3" stroke="white" stroke-width="0.5"></path> <text
+                                fill="#FFB800" font-family="Arial, sans-serif" font-size="8" font-weight="bold"
+                                letter-spacing="1" text-anchor="middle" x="97.5" y="93">VIP</text>
+                            <path d="M45 80 Q70 80 70 55" fill="none" opacity="0.2" stroke="white" stroke-width="1">
+                            </path>
+                        </svg>
+                        <span class="font-bold text-sm">Saques</span>
+                    </button>
+                    <button onclick="openDepositModal()"
+                        class="flex items-center justify-center gap-3 bg-[#262626] p-4 rounded-xl hover:brightness-110 transition-all active:scale-95 border border-[#FFB800]/20">
+                        <svg class="w-14 h-14" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="goldDeep" x1="0%" x2="100%" y1="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1"></stop>
+                                    <stop offset="50%" style="stop-color:#B8860B;stop-opacity:1"></stop>
+                                    <stop offset="100%" style="stop-color:#423100;stop-opacity:1"></stop>
+                                </linearGradient>
+                                <linearGradient id="goldGlass" x1="0%" x2="0%" y1="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FFE500;stop-opacity:0.8"></stop>
+                                    <stop offset="100%" style="stop-color:#FFB800;stop-opacity:0.3"></stop>
+                                </linearGradient>
+                                <filter height="140%" id="softShadow" width="140%" x="-20%" y="-20%">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="5"></feGaussianBlur>
+                                    <feOffset dx="0" dy="10" result="offsetblur"></feOffset>
+                                    <feComponentTransfer>
+                                        <feFuncA slope="0.5" type="linear"></feFuncA>
+                                    </feComponentTransfer>
+                                    <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <g transform="translate(60, 30) rotate(-15)">
+                                <rect fill="#2E7D32" height="30" rx="4" stroke="#1B5E20" stroke-width="1" width="60">
+                                </rect>
+                                <circle cx="30" cy="15" fill="#4CAF50" opacity="0.5" r="8"></circle>
+                                <animateTransform attributeName="transform" dur="3s" repeatCount="indefinite"
+                                    type="translate" values="60,30; 60,15; 60,30"></animateTransform>
+                            </g>
+                            <circle cx="140" cy="50" fill="url(#goldDeep)" filter="url(#softShadow)" r="12">
+                                <animate attributeName="cy" dur="4s" repeatCount="indefinite" values="50;35;50">
+                                </animate>
+                            </circle>
+                            <circle cx="155" cy="70" fill="url(#goldDeep)" filter="url(#softShadow)" r="10">
+                                <animate attributeName="cy" dur="5s" repeatCount="indefinite" values="70;60;70">
+                                </animate>
+                            </circle>
+                            <path d="M40 60 Q40 45 60 45 H140 Q160 45 160 60 V120 Q160 135 140 135 H60 Q40 135 40 120 Z"
+                                fill="#262626"></path>
+                            <path d="M30 70 Q30 55 50 55 H130 Q150 55 150 70 V130 Q150 145 130 145 H50 Q30 145 30 130 Z"
+                                fill="url(#goldGlass)" filter="url(#softShadow)" stroke="rgba(255,255,255,0.2)"
+                                stroke-width="0.5"></path>
+                            <path d="M35 72 Q35 60 55 60 H125" fill="none" opacity="0.4" stroke="white"
+                                stroke-linecap="round" stroke-width="2"></path>
+                            <rect fill="url(#goldDeep)" height="20" rx="5" width="35" x="125" y="90"></rect>
+                            <circle cx="142.5" cy="100" fill="#262626" r="4"></circle>
+                            <path d="M45 65 H135" stroke="rgba(255,215,0,0.3)" stroke-dasharray="3,3" stroke-width="1">
+                            </path>
+                            <path d="M45 135 H135" stroke="rgba(255,215,0,0.3)" stroke-dasharray="3,3" stroke-width="1">
+                            </path>
+                        </svg>
+                        <span class="font-bold text-sm">Depósito</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- VIP Card -->
+            <section
+                class="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-[#ffd700] via-[#ffc107] to-[#e6ac00] shadow-xl">
+                <!-- Background Waves Pattern -->
+                <div class="absolute inset-0 opacity-10 pointer-events-none">
+                    <svg class="w-full h-full" viewBox="0 0 400 200">
+                        <path d="M0 100 Q 100 50 200 100 T 400 100" fill="none" stroke="white" stroke-width="2"></path>
+                        <path d="M0 120 Q 100 70 200 120 T 400 120" fill="none" stroke="white" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <div class="relative z-10 flex items-center justify-between">
+                    <div class="flex flex-col items-center">
+                        <div
+                            class="w-16 h-16 rounded-full bg-surface/30 backdrop-blur-md flex items-center justify-center border-2 border-white/40 mb-2">
+                            <div
+                                class="w-12 h-12 rounded-full bg-[#00ffcc] flex items-center justify-center shadow-inner">
+                                <span class="text-[#0e0e0e] font-black italic text-xl">V0</span>
+                            </div>
+                        </div>
+                        <div class="w-24 h-2 bg-black/20 rounded-full overflow-hidden">
+                            <div class="w-1/4 h-full bg-white"></div>
+                        </div>
+                        <span class="text-[10px] text-black font-bold mt-1">0.00 / 50.00</span>
+                    </div>
+                    <div class="flex flex-col items-end gap-1">
+                        <div class="bg-black/10 px-3 py-1 rounded-full border border-white/20">
+                            <span class="text-black font-bold text-sm">Bônus de Nível 1,00</span>
+                        </div>
+                        <div class="flex items-center gap-1 mt-2">
+                            <span class="text-black text-xs font-bold italic underline">VIP requer Depósito
+                                50,00</span>
+                            <span class="material-symbols-outlined text-black text-sm">chevron_right</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Menu List -->
+            <section class="space-y-4">
+                <!-- Group 1 -->
+                <div class="bg-[#1a1a1a] rounded-2xl divide-y divide-[#262626] overflow-hidden border border-white/5">
+                    <a href="REGISTROS.HTML"
+                        class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
+                            <span class="material-symbols-outlined text-blue-400">assignment</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">Meus Registros</p>
+                            <p class="text-[11px] text-gray-500">Detalhes e relatórios</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-700">chevron_right</span>
+                    </a>
+                    <a href="SAQUES.HTML"
+                        class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
+                            <span class="material-symbols-outlined text-purple-400">credit_card_gear</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">Gestão de saques</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-700">chevron_right</span>
+                    </a>
+                </div>
+                <!-- Group 2 -->
+                <div class="bg-[#1a1a1a] rounded-2xl divide-y divide-[#262626] overflow-hidden border border-white/5">
+                    <a href="CONVITE.HTML"
+                        class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors group text-white no-underline">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
+                            <span class="material-symbols-outlined text-orange-400">group_add</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">Promoção</p>
+                            <p class="text-[11px] text-[#FFB800] font-bold">Convide e ganhe</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-700">chevron_right</span>
+                    </a>
+                    <a href="SEGURANCA.HTML"
+                        class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
+                            <span class="material-symbols-outlined text-green-400">shield</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">Segurança</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-700">chevron_right</span>
+                    </a>
+                    <a href="LOCALIDADE.HTML"
+                        class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
+                            <span class="material-symbols-outlined text-red-400">location_city</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">Encontre-nos</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-700">chevron_right</span>
+                    </a>
+                </div>
+                <!-- Group 3 -->
+                <div class="bg-[#1a1a1a] rounded-2xl divide-y divide-[#262626] overflow-hidden border border-white/5">
+                    <a href="FAQ.HTML"
+                        class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors group text-white no-underline">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
+                            <span class="material-symbols-outlined text-blue-300">quiz</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">FAQ</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-700">chevron_right</span>
+                    </a>
+                    <a href="BONUS.HTML"
+                        class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
+                            <span class="material-symbols-outlined text-yellow-300">featured_seasonal_and_gifts</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">Bônus de Sugestão</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-700">chevron_right</span>
+                    </a>
+                    <a href="DISPOSITIVO.HTML"
+                        class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
+                            <span class="material-symbols-outlined text-cyan-300">devices</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">Faça login no dispositivo</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-700">chevron_right</span>
+                    </a>
+                </div>
+
+                <!-- Sign Out Button -->
+                <button onclick="handleLogout()"
+                    class="w-full p-4 rounded-2xl bg-[#1a1a1a] text-red-500 font-bold text-center hover:bg-[#262626] transition-colors border border-red-500/10 active:scale-95">
+                    Sair da Conta
+                </button>
+            </section>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer
+            class="absolute bottom-0 w-full bg-[#141414] border-t border-gray-800 flex items-center justify-around py-2 z-50">
+            <a href="HOME.HTML" class="flex flex-col items-center gap-1 group py-1">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H15C14.4477 21 14 20.5523 14 20V15C14 14.4477 13.5523 14 13 14H11C10.4477 14 10 14.4477 10 15V20C10 20.5523 9.55228 21 9 21H4C3.44772 21 3 20.5523 3 20V10.5Z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Começar</span>
+            </a>
+            <a href="OFERTAS.HTML" class="flex flex-col items-center gap-1 group py-1">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">redeem</span>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Ofertas</span>
+            </a>
+            <a href="SUPORTE.HTML" class="flex flex-col items-center gap-1 group py-1">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">support_agent</span>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Suporte</span>
+            </a>
+            <button class="flex flex-col items-center gap-1 py-1">
+                <div class="text-[#FFB800]">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+                </div>
+                <span class="text-[9px] font-bold text-[#FFB800]">Perfil</span>
+            </button>
+        </footer>
+
+        <script>
+            const API_URL = 'http://163.245.218.28:3000/api';
+
+            async function syncUserData() {
+                const token = localStorage.getItem('30win_token');
+                if (!token) {
+                    window.location.href = '/AUTH.HTML';
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`${API_URL}/user/info`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        window.currentUser = data.user;
+                        document.getElementById('userBalance').innerText = parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        document.getElementById('userPhone').innerText = data.user.phone;
+                        document.getElementById('userId').innerText = 'ID: ' + data.user.id_user;
+                    } else {
+                        localStorage.removeItem('30win_token');
+                        window.location.href = '/AUTH.HTML';
+                    }
+                } catch (err) { console.error('Sync failed'); }
+            }
+
+            function handleLogout() {
+                localStorage.removeItem('30win_token');
+                window.location.href = '/AUTH.HTML';
+            }
+
+            // Run sync
+            syncUserData();
+            setInterval(syncUserData, 5000);
+
+            document.getElementById('refresh-balance').onclick = () => {
+                syncUserData();
+            };
+        </script>
+
+        <!-- Deposit Modal -->
+        <div id="modal-deposit" class="hidden fixed inset-0 z-[100] bg-black/90 flex justify-center p-4"
+            style="align-items: center;">
+            <div
+                class="bg-surface-container glass-card rounded-2xl p-6 md:p-8 max-w-sm w-full border border-primary/30 relative">
+                <button onclick="closeDepositModal()"
+                    class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+                <h3 class="font-headline font-black text-2xl mb-2 text-primary text-center">DEPOSITAR</h3>
+
+                <div id="deposit-step-1" class="space-y-4 mt-6">
+                    <p class="text-xs text-center text-gray-400 mb-4">Insira o valor que deseja depositar via PIX.</p>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor
+                            (R$)</label>
+                        <input type="number" id="deposit_amount" min="1" step="1"
+                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-4 text-center font-bold text-2xl text-white focus:border-primary outline-none"
+                            placeholder="0,00">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 mt-2">
+                        <button onclick="document.getElementById('deposit_amount').value=20"
+                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
+                            R$ 20</button>
+                        <button onclick="document.getElementById('deposit_amount').value=50"
+                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
+                            R$ 50</button>
+                        <button onclick="document.getElementById('deposit_amount').value=100"
+                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
+                            R$ 100</button>
+                    </div>
+                    <button id="btn-process-deposit" onclick="processDeposit()"
+                        class="w-full mt-6 bg-gradient-to-r from-primary to-primary-container text-black font-black py-4 rounded-xl shadow-[0_0_20px_rgba(223,142,255,0.4)] active:scale-95 transition-all">GERAR
+                        PIX</button>
+                </div>
+
+                <div id="deposit-step-2-demo" class="hidden space-y-4 mt-6 text-center">
+                    <span
+                        class="material-symbols-outlined text-6xl text-secondary animate-pulse block mx-auto">qr_code_scanner</span>
+                    <p class="font-bold text-secondary">Depósito Fictício Gerado</p>
+                    <p class="text-xs text-gray-400">Aguarde 8 segundos para simular a liquidação bancária do
+                        influenciador...</p>
+                    <div class="w-full bg-gray-800 rounded-full h-1.5 mb-4 overflow-hidden mt-4">
+                        <div class="bg-secondary h-1.5 rounded-full"
+                            style="width: 100%; animation: shrink 8s linear forwards;"></div>
+                    </div>
+                </div>
+
+                <div id="deposit-step-2-real" class="hidden space-y-4 mt-6 text-center">
+                    <p class="text-xs text-gray-400 mb-2">Escaneie o QR Code ou cole o código. O saldo cai
+                        automaticamente!</p>
+                    <div class="bg-white p-2 rounded-xl inline-block">
+                        <img id="deposit-qrcode" src="" alt="QR Code" class="w-48 h-48">
+                    </div>
+                    <div class="mt-4 text-left">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">PIX
+                            Copia e Cola</label>
+                        <div class="flex">
+                            <input type="text" id="pix-code-display" readonly
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded-l p-3 text-[10px] text-gray-300 outline-none">
+                            <button onclick="copyPix()" class="bg-primary text-black px-4 font-bold rounded-r"><span
+                                    class="material-symbols-outlined text-sm">content_copy</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Withdraw Modal -->
+        <div id="modal-withdraw" class="hidden fixed inset-0 z-[100] bg-black/90 flex justify-center p-4"
+            style="align-items: center;">
+            <div
+                class="bg-surface-container glass-card rounded-2xl p-6 md:p-8 max-w-sm w-full border border-primary/30 relative">
+                <button onclick="closeWithdrawModal()"
+                    class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+                <h3 class="font-headline font-black text-2xl mb-2 text-primary text-center">SAQUE</h3>
+
+                <div class="space-y-4 mt-6">
+                    <p class="text-xs text-center text-gray-400 mb-4">Mínimo de R$ 10,00</p>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor
+                            (R$)</label>
+                        <input type="number" id="withdraw_amount" min="10" step="1"
+                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-4 text-center font-bold text-2xl text-white focus:border-primary outline-none"
+                            placeholder="0,00">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tipo de
+                            Chave PIX</label>
+                        <select id="withdraw_pix_type"
+                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-3 text-white focus:border-primary outline-none text-sm">
+                            <option value="CPF">CPF</option>
+                            <option value="PHONE">Telefone</option>
+                            <option value="EMAIL">E-mail</option>
+                            <option value="EVP">Chave Aleatória</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Sua
+                            Chave PIX</label>
+                        <input type="text" id="withdraw_pix_key"
+                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-3 text-white focus:border-primary outline-none text-sm"
+                            placeholder="Digite a chave PIX">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Senha de
+                            Saque (PIN)</label>
+                        <input type="password" id="withdraw_password" maxlength="4"
+                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-3 text-center text-white focus:border-primary outline-none tracking-[0.5em] text-xl"
+                            placeholder="****">
+                    </div>
+                    <button id="btn-process-withdraw" onclick="processWithdrawal()"
+                        class="w-full mt-4 bg-gradient-to-r from-primary to-primary-container text-black font-black py-4 rounded-xl shadow-[0_0_20px_rgba(223,142,255,0.4)] active:scale-95 transition-all">SOLICITAR
+                        SAQUE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create PIN Modal -->
+        <div id="modal-create-pin" class="hidden fixed inset-0 z-[100] bg-black/90 flex justify-center p-4"
+            style="align-items: center;">
+            <div
+                class="bg-surface-container glass-card rounded-2xl p-6 md:p-8 max-w-sm w-full border border-secondary/30 relative">
+                <button onclick="document.getElementById('modal-create-pin').classList.add('hidden')"
+                    class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+                <h3 class="font-headline font-black text-xl mb-2 text-secondary text-center">CRIAR SENHA DE SAQUE</h3>
+                <p class="text-xs text-center text-gray-400 mb-6">Você precisa criar uma senha numérica de 4 dígitos
+                    (PIN) para aprovar seus futuros saques.</p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Novo PIN
+                            (4 dígitos)</label>
+                        <input type="password" id="new_withdraw_pin" maxlength="4" inputmode="numeric" pattern="[0-9]*"
+                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-4 text-center font-bold text-2xl tracking-[0.5em] text-white focus:border-secondary outline-none"
+                            placeholder="****">
+                    </div>
+                    <button id="btn-create-pin" onclick="createWithdrawPin()"
+                        class="w-full mt-4 bg-secondary text-black font-black py-4 rounded-xl shadow-[0_0_20px_rgba(0,227,253,0.4)] active:scale-95 transition-all">SALVAR
+                        PIN</button>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            @keyframes shrink {
+                from {
+                    width: 100%;
+                }
+
+                to {
+                    width: 0%;
+                }
+            }
+        </style>
+
+        <script>
+            function openDepositModal() {
+                const token = localStorage.getItem('30win_token');
+                if (!token) { window.location.href = '/AUTH.HTML'; return; }
+
+                document.getElementById('deposit_amount').value = '';
+                document.getElementById('deposit-step-1').classList.remove('hidden');
+                document.getElementById('deposit-step-2-demo').classList.add('hidden');
+                document.getElementById('deposit-step-2-real').classList.add('hidden');
+                document.getElementById('btn-process-deposit').innerText = 'GERAR PIX';
+                document.getElementById('btn-process-deposit').disabled = false;
+
+                document.getElementById('modal-deposit').classList.remove('hidden');
+            }
+            function closeDepositModal() { document.getElementById('modal-deposit').classList.add('hidden'); }
+
+            async function processDeposit() {
+                const amountStr = document.getElementById('deposit_amount').value;
+                const amount = parseFloat(amountStr);
+                if (!amount || amount < 1) { alert('Valor inválido. Mínimo R$ 1,00'); return; }
+
+                const btn = document.getElementById('btn-process-deposit');
+                btn.innerText = 'Processando...'; btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/deposit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
+                        body: JSON.stringify({ amount })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        if (data.is_demo) {
+                            document.getElementById('deposit-step-1').classList.add('hidden');
+                            document.getElementById('deposit-step-2-demo').classList.remove('hidden');
+                            setTimeout(async () => {
+                                await fetch('/api/fictitious-deposit', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
+                                    body: JSON.stringify({ amount })
+                                });
+                                alert('Depósito fictício concluído!');
+                                window.location.reload();
+                            }, 8000);
+                        } else {
+                            document.getElementById('deposit-step-1').classList.add('hidden');
+                            document.getElementById('deposit-step-2-real').classList.remove('hidden');
+                            document.getElementById('pix-code-display').value = data.pixCopyPaste;
+                            document.getElementById('deposit-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pixCode)}`;
+                        }
+                    } else {
+                        alert('Erro: ' + data.error);
+                        btn.innerText = 'GERAR PIX'; btn.disabled = false;
+                    }
+                } catch (e) { alert('Erro de conexão.'); btn.innerText = 'GERAR PIX'; btn.disabled = false; }
+            }
+
+            function copyPix() {
+                const input = document.getElementById('pix-code-display');
+                input.select(); document.execCommand('copy');
+                alert('Código PIX Copiado!');
+            }
+
+            function openWithdrawModal() {
+                const token = localStorage.getItem('30win_token');
+                if (!token) { window.location.href = '/AUTH.HTML'; return; }
+
+                if (window.currentUser) {
+                    if (!window.currentUser.has_withdraw_password) {
+                        document.getElementById('modal-create-pin').classList.remove('hidden');
+                        return;
+                    }
+                    if (window.currentUser.rollover_required > 0 && window.currentUser.rollover_progress < window.currentUser.rollover_required) {
+                        const remaining = window.currentUser.rollover_required - window.currentUser.rollover_progress;
+                        alert(`Rollover pendente! Faltam R$ ${remaining.toFixed(2)} em apostas para liberar o saque.`);
+                    }
+                }
+
+                document.getElementById('withdraw_amount').value = '';
+                document.getElementById('withdraw_pix_key').value = '';
+                const pwInput = document.getElementById('withdraw_password');
+                if (pwInput) pwInput.value = '';
+                document.getElementById('btn-process-withdraw').innerText = 'SOLICITAR SAQUE';
+                document.getElementById('btn-process-withdraw').disabled = false;
+                document.getElementById('modal-withdraw').classList.remove('hidden');
+            }
+            function closeWithdrawModal() { document.getElementById('modal-withdraw').classList.add('hidden'); }
+
+            async function createWithdrawPin() {
+                const pin = document.getElementById('new_withdraw_pin').value;
+                if (!pin || pin.length !== 4) { alert('Sua senha deve ter exatamente 4 dígitos numéricos.'); return; }
+
+                const btn = document.getElementById('btn-create-pin');
+                btn.innerText = 'Salvando...'; btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/finance/withdraw-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
+                        body: JSON.stringify({ withdraw_password: pin })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        alert('Senha de saque criada com sucesso!');
+                        document.getElementById('modal-create-pin').classList.add('hidden');
+                        window.currentUser.has_withdraw_password = true;
+                        openWithdrawModal(); // re-open the withdraw modal now that PIN is set
+                    } else {
+                        alert(data.error || 'Erro ao criar PIN.');
+                    }
+                } catch (e) { alert('Erro na conexão.'); }
+                finally {
+                    btn.innerText = 'SALVAR PIN'; btn.disabled = false;
+                }
+            }
+
+            async function processWithdrawal() {
+                const amount = parseFloat(document.getElementById('withdraw_amount').value);
+                const pix_type = document.getElementById('withdraw_pix_type').value;
+                const pix_key = document.getElementById('withdraw_pix_key').value;
+                const password = document.getElementById('withdraw_password').value;
+
+                if (!amount || amount < 10) { alert('Valor mínimo não atingido'); return; }
+                if (!pix_key) { alert('Chave PIX é obrigatória'); return; }
+                if (!password) { alert('Senha de saque (PIN) é obrigatória'); return; }
+
+                const btn = document.getElementById('btn-process-withdraw');
+                btn.innerText = 'Enviando...'; btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/withdraw', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
+                        body: JSON.stringify({ amount, pix_key, pix_type, withdraw_password: password })
+                    });
+                    const data = await res.json();
+
+                    alert(data.message || data.error);
+                    if (data.success) {
+                        closeWithdrawModal();
+                        window.location.reload();
+                    } else {
+                        btn.innerText = 'SOLICITAR SAQUE'; btn.disabled = false;
+                    }
+                } catch (e) { alert('Erro de conexão.'); btn.innerText = 'SOLICITAR SAQUE'; btn.disabled = false; }
+            }
+        </script>
+</body>
+
+</html>

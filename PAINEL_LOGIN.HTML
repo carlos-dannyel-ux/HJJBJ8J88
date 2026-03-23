@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Arcade Admin Login</title>
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-dim": "#bb00fc",
+                        "on-primary-container": "#3d0055",
+                        "on-surface-variant": "#aba7ca",
+                        "surface-dim": "#0c0a25",
+                        "error": "#ff6e84",
+                        "surface-container-lowest": "#000000",
+                        "outline": "#757292",
+                        "primary-container": "#d878ff",
+                        "primary": "#df8eff",
+                        "tertiary-fixed-dim": "#ff769e",
+                        "on-error": "#490013",
+                        "surface-container-low": "#110f2d",
+                        "secondary-fixed-dim": "#00d7f0",
+                        "inverse-primary": "#9a00d0",
+                        "on-secondary-fixed": "#003a42",
+                        "secondary-container": "#006875",
+                        "on-error-container": "#ffb2b9",
+                        "on-primary": "#4f006d",
+                        "surface-container": "#181536",
+                        "surface-bright": "#2a2751",
+                        "tertiary": "#ff6b98",
+                        "inverse-surface": "#fcf8ff",
+                        "error-dim": "#d73357",
+                        "on-tertiary-container": "#000000",
+                        "error-container": "#a70138",
+                        "tertiary-fixed": "#ff8eac",
+                        "surface-tint": "#df8eff",
+                        "on-primary-fixed": "#000000",
+                        "outline-variant": "#474563",
+                        "on-secondary-container": "#e8fbff",
+                        "on-secondary": "#004d57",
+                        "on-primary-fixed-variant": "#4b0068",
+                        "secondary-dim": "#00d4ec",
+                        "secondary": "#00e3fd",
+                        "primary-fixed": "#d878ff",
+                        "secondary-fixed": "#26e6ff",
+                        "on-tertiary-fixed-variant": "#760035",
+                        "tertiary-container": "#fc0078",
+                        "primary-fixed-dim": "#d061ff",
+                        "on-tertiary-fixed": "#380015",
+                        "on-tertiary": "#47001d",
+                        "tertiary-dim": "#e4006c",
+                        "surface": "#0c0a25",
+                        "on-surface": "#e6e2ff",
+                        "surface-container-highest": "#232148",
+                        "inverse-on-surface": "#545270",
+                        "surface-variant": "#232148",
+                        "background": "#0c0a25",
+                        "surface-container-high": "#1d1b3f",
+                        "on-background": "#e6e2ff",
+                        "on-secondary-fixed-variant": "#005964"
+                    },
+                    fontFamily: {
+                        "headline": ["Lexend"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Lexend"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .bg-grid-pattern {
+            background-image: radial-gradient(circle, #474563 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        body {
+            zoom: 0.75;
+        }
+    html { font-size: 75%; }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+
+        body {
+            zoom: 0.75;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-surface font-body text-on-surface min-h-screen flex items-center justify-center overflow-hidden relative">
+    <!-- Ambient Floating Background Elements -->
+    <div class="absolute inset-0 z-0 bg-grid-pattern opacity-10"></div>
+    <!-- Floating Neon Assets (Asymmetric) -->
+    <div class="absolute top-[10%] left-[5%] rotate-12 opacity-40 blur-[1px]">
+        <span class="material-symbols-outlined text-secondary text-8xl"
+            style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+    </div>
+    <div class="absolute bottom-[15%] right-[8%] -rotate-12 opacity-40 blur-[2px]">
+        <span class="material-symbols-outlined text-tertiary text-9xl"
+            style="font-variation-settings: 'FILL' 1;">mist</span>
+    </div>
+    <div class="absolute top-[60%] left-[12%] rotate-45 opacity-30 blur-[1px]">
+        <span class="material-symbols-outlined text-primary text-7xl"
+            style="font-variation-settings: 'FILL' 1;">videogame_asset</span>
+    </div>
+    <div class="absolute top-[20%] right-[15%] -rotate-6 opacity-20 blur-[3px]">
+        <span class="material-symbols-outlined text-secondary text-6xl"
+            style="font-variation-settings: 'FILL' 1;">joystick</span>
+    </div>
+    <!-- Login Container -->
+    <main class="relative z-10 w-full max-w-md px-6">
+        <!-- Brand Header -->
+        <div class="text-center mb-10">
+            <div
+                class="inline-flex items-center justify-center p-4 bg-surface-container-highest rounded-xl shadow-[0_0_30px_rgba(223,142,255,0.2)] mb-6 transform -rotate-2">
+                <span class="material-symbols-outlined text-primary text-5xl"
+                    style="font-variation-settings: 'FILL' 1;">sports_esports</span>
+            </div>
+            <h1
+                class="font-headline font-black text-4xl md:text-5xl tracking-tighter text-on-background drop-shadow-[0_0_12px_rgba(223,142,255,0.5)]">
+                ARCADE ADMIN LOGIN
+            </h1>
+            <p class="font-headline text-secondary font-bold tracking-[0.2em] mt-2 uppercase text-sm">
+                GET READY TO PLAY
+            </p>
+        </div>
+        <!-- Glassmorphism Login Card -->
+        <div
+            class="bg-surface-container-high/60 backdrop-blur-2xl p-8 rounded-xl border-t border-l border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            <form action="#" class="space-y-6">
+                <!-- Operator ID -->
+                <div class="space-y-2">
+                    <label
+                        class="font-label text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-2">Operator
+                        ID</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span
+                                class="material-symbols-outlined text-outline group-focus-within:text-tertiary transition-colors">badge</span>
+                        </div>
+                        <input id="operatorId"
+                            class="w-full bg-surface-container-lowest border-none rounded-lg py-4 pl-12 pr-4 text-on-surface placeholder-on-surface-variant/30 focus:ring-2 focus:ring-tertiary/50 transition-all outline-none font-medium"
+                            placeholder="PLAYER_ONE_2024" type="text" />
+                    </div>
+                </div>
+                <!-- Secret Password -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center ml-2">
+                        <label
+                            class="font-label text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Secret
+                            Password</label>
+                        <a class="font-label text-[10px] font-bold uppercase text-secondary hover:text-primary transition-colors"
+                            href="#">Forgot?</a>
+                    </div>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span
+                                class="material-symbols-outlined text-outline group-focus-within:text-tertiary transition-colors">lock</span>
+                        </div>
+                        <input id="password"
+                            class="w-full bg-surface-container-lowest border-none rounded-lg py-4 pl-12 pr-4 text-on-surface placeholder-on-surface-variant/30 focus:ring-2 focus:ring-tertiary/50 transition-all outline-none"
+                            placeholder="••••••••••••" type="password" />
+                    </div>
+                </div>
+                <!-- Submit Button -->
+                <button id="loginBtn"
+                    class="w-full group relative flex items-center justify-center gap-3 bg-gradient-to-br from-primary to-primary-container py-5 rounded-xl text-on-primary-container font-headline font-black text-lg tracking-wide shadow-[0_10px_25px_rgba(223,142,255,0.4)] active:scale-95 transition-all duration-200"
+                    type="button">
+                    ENTER THE GAME
+                    <span
+                        class="material-symbols-outlined font-bold group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    <!-- Tactile Inner Glow -->
+                    <div class="absolute inset-x-0 top-0 h-[2px] bg-white/30 rounded-full mx-4 mt-1"></div>
+                </button>
+            </form>
+            <!-- Server Status Indicator -->
+            <div class="mt-8 flex items-center justify-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#00e3fd] animate-pulse"></div>
+                <span class="font-label text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
+                    Server Status: <span class="text-secondary">Optimal</span>
+                </span>
+            </div>
+        </div>
+        <!-- Footer Links -->
+        <footer class="mt-12 flex flex-col items-center gap-4">
+            <div class="flex gap-8">
+                <a class="group flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-lg" data-icon="help_center">help_center</span>
+                    <span class="font-label text-[10px] font-bold uppercase tracking-wider">Help &amp; Support</span>
+                </a>
+                <a class="group flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-lg" data-icon="policy">policy</span>
+                    <span class="font-label text-[10px] font-bold uppercase tracking-wider">Terms</span>
+                </a>
+            </div>
+            <!-- Version Tag -->
+            <div class="px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/10">
+                <span class="font-label text-[9px] font-bold text-outline uppercase tracking-[0.2em]">Build
+                    9.4.2-ALPHA</span>
+            </div>
+        </footer>
+    </main>
+    <!-- Overlay "Power Up" Gradient -->
+    <div
+        class="fixed inset-0 pointer-events-none z-50 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60">
+    </div>
+
+    <script>
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const operatorId = document.getElementById('operatorId').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ operatorId, password })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/POS_LOGIN.HTML';
+                } else {
+                    alert(data.message || 'Erro ao fazer login');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro de conexão');
+            }
+        });
+    </script>
+</body>
+
+</html>

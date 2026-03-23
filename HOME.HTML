@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - Casino Online</title>
+    <!-- Tailwind CSS v3 -->
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style data-purpose="custom-base-styles">
+        html,
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F0F0F !important;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide scrollbars globally */
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        .text-brand-yellow {
+            color: #ffcc00;
+        }
+
+        .bg-brand-yellow {
+            background-color: #ffcc00;
+        }
+
+        .border-brand-yellow {
+            border-color: #ffcc00;
+        }
+
+        /* Custom scrollbar hiding for horizontal menus */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Grid layout for game cards to match the 3-column mobile look */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        html {
+            font-size: 100%;
+        }
+    </style>
+    <style>
+        .category-item-active {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .category-item-active:active {
+            transform: scale(0.95);
+            filter: brightness(1.1);
+        }
+    </style>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap v5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body class="bg-[#050505] text-white">
+    <!-- Mobile-First Wrapper -->
+    <div
+        class="max-w-[450px] w-full mx-auto h-[100dvh] bg-[#0f0f0f] relative shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden border-x-2 border-[#0F0F0F]">
+
+        <!-- Overlay for Sidebar -->
+        <div id="sidebar-overlay"
+            class="absolute inset-0 z-[90] bg-[#000000]/60 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none"
+            onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar-menu"
+            class="bg-[#0e0e0e] h-full w-[320px] absolute left-0 top-0 z-[100] overflow-y-auto hide-scrollbar shadow-2xl shadow-black flex flex-col py-0 transform -translate-x-full transition-transform duration-300">
+            <!-- Header Section -->
+            <header
+                class="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 py-4 space-y-4 border-b border-[#0F0F0F]">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-2xl" data-icon="close"
+                            style="cursor:pointer;" onclick="toggleSidebar()">close</span>
+                        <img alt="30.WIN Logo" class="h-6 w-auto object-contain"
+                            src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/1880941958243016705.avif">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="bg-surface-container-highest px-3 py-1.5 rounded-full flex items-center gap-2">
+                            <span id="userBalance" class="text-xs font-bold text-white/90">R$ 0,00</span>
+                            <div id="refreshBtn"
+                                class="w-5 h-5 bg-primary-container rounded-full flex items-center justify-center cursor-pointer transition-transform duration-500">
+                                <svg class="w-3 h-3" fill="none" height="12" viewBox="0 0 100 100" width="12"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M25 45C25 31.1929 36.1929 20 50 20C58.2843 20 65.6324 24.0323 70.1655 30.2285"
+                                        stroke="#413200" stroke-linecap="round" stroke-width="12"></path>
+                                    <path d="M72 18V32H58" stroke="#413200" stroke-linecap="round"
+                                        stroke-linejoin="round" stroke-width="12"></path>
+                                    <path
+                                        d="M75 55C75 68.8071 63.8071 80 50 80C41.7157 80 34.3676 75.9677 29.8345 69.7715"
+                                        stroke="#413200" stroke-linecap="round" stroke-width="12"></path>
+                                    <path d="M28 82V68H42" stroke="#413200" stroke-linecap="round"
+                                        stroke-linejoin="round" stroke-width="12"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="openDepositModal()"
+                    class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-fixed font-bold py-3 rounded-full active:scale-[0.98] transition-all shadow-lg shadow-primary/10">
+                    Depósito
+                </button>
+            </header>
+            <!-- Sidebar Body -->
+            <div class="px-4 pb-24 space-y-6">
+                <!-- Promo Banner -->
+                <div
+                    class="relative mt-4 overflow-hidden rounded-2xl aspect-[16/6] bg-gradient-to-br from-[#1a1919] to-[#262626] border border-[#0F0F0F] group">
+                    <div class="absolute inset-0 opacity-40 mix-blend-overlay">
+                        <!-- Decorative pattern placeholder -->
+                    </div>
+                    <div class="relative p-4 flex flex-col justify-center h-full">
+                        <h3 class="text-white font-bold text-sm leading-tight">Coleção gratuita<br><span
+                                class="text-primary text-lg">R$ 15</span></h3>
+                        <button
+                            class="mt-2 w-max bg-white/10 backdrop-blur-md hover:bg-white/20 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider transition-colors"
+                            onclick="window.open('/public/30win.apk', '_blank')">
+                            Baixar Agora
+                        </button>
+                    </div>
+                    <!-- Visual asset mockup element -->
+                    <div
+                        class="absolute right-0 top-1/2 -translate-y-1/2 w-24 h-24 bg-primary/20 blur-2xl rounded-full">
+                    </div>
+                    <span
+                        class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-4xl text-primary/40"
+                        data-icon="download_for_offline">download_for_offline</span>
+                </div>
+                <!-- Search Bar -->
+                <div class="relative group">
+                    <span
+                        class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-xl"
+                        data-icon="search">search</span>
+                    <input
+                        class="w-full bg-surface-container-highest border-none rounded-xl pl-12 pr-4 py-3.5 text-sm text-white placeholder:text-white/30 focus:ring-1 focus:ring-primary/30 transition-all"
+                        placeholder="Pesquisar" type="text">
+                </div>
+                <!-- Category Grid -->
+                <section>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Popular -->
+                        <div
+                            class="bg-surface-container-highest/60 hover:bg-surface-container-highest p-3 rounded-xl flex flex-col gap-2 transition-colors cursor-pointer group">
+                            <img alt="Popular icon" class="w-6 h-6 object-contain"
+                                src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/2-1-common/common/_sprite/icon_dtfl_rm_1.avif?manualVersion=1&version=d8102e6ae1">
+                            <span class="text-xs font-semibold text-on-surface/80 group-hover:text-white">Popular</span>
+                        </div>
+                        <!-- Slots -->
+                        <div
+                            class="bg-surface-container-highest/60 hover:bg-surface-container-highest p-3 rounded-xl flex flex-col gap-2 transition-colors cursor-pointer group">
+                            <span class="material-symbols-outlined text-primary" data-icon="casino"
+                                style="font-variation-settings: &quot;FILL&quot; 1;">casino</span>
+                            <span class="text-xs font-semibold text-on-surface/80 group-hover:text-white">Slots</span>
+                        </div>
+                        <!-- Blockchain -->
+                        <!-- Pescaria -->
+                        <!-- Ao Vivo -->
+                        <!-- Cartas -->
+                        <!-- Esporte -->
+                        <!-- Recente -->
+                        <div
+                            class="bg-surface-container-highest/60 hover:bg-surface-container-highest p-3 rounded-xl flex flex-col gap-2 transition-colors cursor-pointer group">
+                            <span class="material-symbols-outlined text-on-surface-variant"
+                                data-icon="history">history</span>
+                            <span class="text-xs font-semibold text-on-surface/80 group-hover:text-white">Recente</span>
+                        </div>
+                    </div>
+                    <div
+                        class="mt-3 bg-surface-container-highest/60 hover:bg-surface-container-highest p-3 rounded-xl flex items-center justify-between transition-colors cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-yellow-400" data-icon="star"
+                                style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+                            <span
+                                class="text-xs font-semibold text-on-surface/80 group-hover:text-white">Favoritos</span>
+                        </div>
+                        <span class="material-symbols-outlined text-on-surface-variant text-sm"
+                            data-icon="chevron_right">chevron_right</span>
+                    </div>
+                </section>
+                <!-- Action Menu -->
+                <nav class="space-y-1">
+                    <a class="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-surface-container transition-colors group"
+                        href="#">
+                        <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary"
+                            data-icon="history">history</span>
+                        <span class="text-sm font-medium text-on-surface/70 group-hover:text-on-surface">Apostas</span>
+                    </a>
+                    <a class="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-surface-container transition-colors group"
+                        href="#">
+                        <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary"
+                            data-icon="share">share</span>
+                        <span
+                            class="text-sm font-medium text-on-surface/70 group-hover:text-on-surface">Partilhar</span>
+                    </a>
+
+                </nav>
+                <!-- Feature Cards (Asymmetric Bento) -->
+                <section class="grid grid-cols-2 gap-3 pb-8">
+                    <!-- Eventos -->
+                    <div
+                        class="relative col-span-2 bg-gradient-to-br from-blue-600 to-indigo-900 p-6 rounded-2xl border border-blue-400/20 min-h-[140px] flex flex-col justify-between group overflow-hidden shadow-xl">
+                        <div class="absolute inset-0 opacity-30 mix-blend-overlay bg-cover bg-center"
+                            style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuCCE1FUeCMnPY_p5XV9wbSOvxUc71DktOAW6k-cZEyYoZobSPxQ4fEDxUvkumPCU44DCNYZHLnJfcghTLmqZhM7Hwb8vp-iY0HC3v-IGjceYlTHlJNN0z3RYP8G2l40IBrIX9A7IQQ810XqhrXLh-6MEvFDted984IeVhqXUz8ElTuLvSrKNDruB_u2VQX0GkeTgh-zn9DSBrWuhuZ5K_MnKeV72ojXwVsjxmthaBQtepmLnsKaPq17ka5kcimHuZKRjHUm4HVqpw&quot;);">
+                        </div>
+                        <div class="absolute -right-4 -top-4 w-32 h-32 bg-blue-400/20 blur-3xl"></div>
+                        <div class="relative flex justify-between items-start">
+                            <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+                                <span class="material-symbols-outlined text-blue-200 text-3xl"
+                                    data-icon="event_note">event_note</span>
+                            </div>
+                            <span class="bg-blue-500 text-white text-xs font-black px-2 py-1 rounded-md shadow-lg">5
+                                NOVOS</span>
+                        </div>
+                        <div class="relative">
+                            <h4 class="text-lg font-black text-white uppercase tracking-tight">Eventos
+                                Especiais
+                            </h4>
+                            <p class="text-[10px] text-blue-200/80 font-medium uppercase tracking-widest mt-1">
+                                Confira os bônus ativos</p>
+                        </div>
+                    </div>
+                    <!-- Missão -->
+                    <!-- Taxa de Rebate -->
+                    <!-- VIP -->
+                </section>
+            </div>
+        </aside>
+        <!-- BEGIN: Top Banner (Collection Offer) -->
+        <header class="bg-[#1a1a1a] px-3 py-1 flex items-center justify-between text-[10px] sticky top-0 z-50">
+            <div class="flex items-center gap-2">
+                <button class="text-gray-400">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        </path>
+                    </svg>
+                </button>
+                <div class="flex items-center gap-1">
+                    <span class="text-brand-yellow font-bold italic">30win</span>
+                    <span class="text-white">Coleção gratuita</span>
+                    <span class="text-brand-yellow font-bold">R$15</span>
+                </div>
+            </div>
+            <button class="bg-brand-yellow text-black font-bold px-3 py-1 rounded-full text-[9px] uppercase"
+                onclick="window.open('/public/30win.apk', '_blank')">Baixar
+                Agora</button>
+        </header>
+        <!-- END: Top Banner -->
+        <!-- BEGIN: Main Header / Navigation -->
+        <nav class="bg-[#141414] px-4 py-2 flex items-center justify-between border-b border-[#0F0F0F]">
+            <div class="flex items-center gap-3">
+                <button class="text-white" onclick="toggleSidebar()">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6h16M4 12h8m-8 6h16" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2">
+                        </path>
+                    </svg>
+                </button>
+                <div class="flex items-center">
+                    <span class="text-white text-2xl font-black italic tracking-tighter"><img alt="30win logo"
+                            class="h-7 w-auto object-contain"
+                            src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/1880941958243016705.avif"></span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="bg-[#262626] rounded-full flex items-center px-2 py-1 gap-1 border border-[#0F0F0F]">
+                    <img alt="Brazil Flag" class="rounded-sm"
+                        src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/BRL.avif" width="16">
+                    <span class="text-brand-yellow font-bold text-xs">0,00</span>
+                    <button class="text-brand-yellow" onclick="syncUserData()">
+                        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd"
+                                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                                fill-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+                <button onclick="openDepositModal()"
+                    class="bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1">
+                    Depósito
+                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path clip-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            fill-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        <!-- END: Main Header -->
+        <main class="flex-grow overflow-y-auto pb-20">
+            <!-- BEGIN: Promotional Slider -->
+            <section class="px-4 py-4">
+                <div
+                    class="relative w-full aspect-[1000/300] rounded-xl overflow-hidden shadow-lg border border-[#0F0F0F]">
+                    <img alt="Promo Banner" class="w-full h-full object-cover"
+                        src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/1880932816460828673.avif">
+                    <!-- Dot Indicators -->
+                    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-40"></div>
+                        <div class="w-4 h-1.5 rounded-full bg-white"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-40"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-white opacity-40"></div>
+                    </div>
+                </div>
+            </section>
+            <!-- END: Promotional Slider -->
+            <!-- BEGIN: Announcement Bar -->
+            <section class="px-4 py-1 flex items-center gap-2 text-[11px] text-gray-400 bg-[#1a1a1a] mx-4 rounded-full">
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+                <div class="overflow-hidden whitespace-nowrap">
+                    <p class="animate-marquee">Site oficial da 30win [ 30win.ai ] Coleção ~ necessária!</p>
+                </div>
+                <button class="ml-auto text-brand-yellow">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                </button>
+            </section>
+            <style data-purpose="animations">
+                @keyframes marquee {
+                    0% {
+                        transform: translateX(100%);
+                    }
+
+                    100% {
+                        transform: translateX(-100%);
+                    }
+                }
+
+                .animate-marquee {
+                    animation: marquee 15s linear infinite;
+                }
+            </style>
+            <!-- END: Announcement Bar -->
+            <!-- BEGIN: Category Navigation -->
+            <section class="mt-4 px-4">
+                <div class="flex gap-4 pb-2 justify-center">
+                    <div
+                        class="flex flex-col items-center gap-1 min-w-[60px] transition-all duration-200 active:scale-95 cursor-pointer category-item-active">
+                        <div
+                            class="w-12 h-12 bg-[#222] rounded-xl flex items-center justify-center border border-brand-yellow shadow-[0_0_10px_rgba(255,204,0,0.2)]">
+                            <span class="text-2xl"><img alt="Popular icon" class="w-8 h-8 object-contain"
+                                    src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/2-1-common/common/_sprite/icon_dtfl_rm_1.avif?manualVersion=1&amp;version=d8102e6ae1"></span>
+                        </div>
+                        <span class="text-[10px] text-brand-yellow font-medium">Popular</span>
+                    </div>
+                    <div
+                        class="flex flex-col items-center gap-1 min-w-[60px] transition-all duration-200 active:scale-95 cursor-pointer category-item-active">
+                        <div class="w-12 h-12 bg-[#222] rounded-xl flex items-center justify-center">
+                            <span class="text-2xl"><img alt="Slots icon" class="w-8 h-8 object-contain"
+                                    src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/2-1-common/common/_sprite/icon_dtfl_dz_1.avif?manualVersion=1&amp;version=12588989f7"></span>
+                        </div>
+                        <span class="text-[10px] text-gray-400">Slots</span>
+                    </div>
+                    <div
+                        class="flex flex-col items-center gap-1 min-w-[60px] transition-all duration-200 active:scale-95 cursor-pointer category-item-active">
+                        <div class="w-12 h-12 bg-[#222] rounded-xl flex items-center justify-center">
+                            <span class="text-2xl"><img alt="Blockchain icon" class="w-8 h-8 object-contain"
+                                    src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/2-1-common/common/_sprite/icon_dtfl_by_1.avif?manualVersion=1&version=b8445639f9"></span>
+                        </div>
+                        <span class="text-[10px] text-gray-400">Blockchain</span>
+                    </div>
+                </div>
+            </section>
+            <!-- END: Category Navigation -->
+            <!-- BEGIN: Popular Games Section -->
+            <section class="mt-6 px-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <img alt="Popular icon" class="w-5 h-5 object-contain"
+                            src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/2-1-common/common/_sprite/icon_dtfl_rm_1.avif?manualVersion=1&version=d8102e6ae1">
+                        <h2 class="text-sm font-bold">Popular</h2>
+                    </div>
+                    <div class="flex bg-[#1a1a1a] rounded-lg p-0.5 items-center">
+                        <button class="p-1 px-2"><svg class="h-3 w-3 text-gray-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2">
+                                </path>
+                            </svg></button>
+                        <span class="text-[10px] px-2 text-gray-300">Tudo</span>
+                        <button class="p-1 px-2"><svg class="h-3 w-3 text-gray-300" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                </path>
+                            </svg></button>
+                    </div>
+                </div>
+                <div class="game-grid">
+                    <!-- Game Card 1 -->
+                    <div class="flex flex-col gap-1">
+                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
+                            <img alt="Fortune Rabbit" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OhOxFeaY-LcJdWKILJKiAQ0rHw-TWu_uPt8JVrr9Gb3ezvi9FRhIEDxyWXiFhlzMH6rrvMkDAVGoad1hDDbFJOXoePBAXrzbNgjW8Ex7pXdAYN6CkuboaWB5uF4_VCdJzPXXhOLgp0TMHUEaCop0uJ7gcrKs91lM0ISwXzd37aa5KyxX2dNm1T-GqNc_KD2_WDdkzd6e7fZltSIYXAS4pIFfbyMGeFXjUxXrkGKY3deYl-ogHa_f1--hBXeRy0BLmg5L0b-DBQ">
+                            <div
+                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
+                                PG</div>
+                            <div class="absolute top-1 right-1">
+                                <svg class="h-3 w-3 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
+                            Rabbit</span>
+                    </div>
+                    <!-- Game Card 2 -->
+                    <div class="flex flex-col gap-1">
+                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
+                            <img alt="Fortune Tiger" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA_G2oW86NlHcN86wVQR2hvL7pxKgTfUFWogLAs8WarYiLsXA6vifbTioYsVjiH6gBhGL4cs-Pxj7L-5QI84NKfEkRQMjpqjkX0nn8DeZtIL-CDiGJwf0UjVPojNd5AHpJH9Nj153VG3P9zPQzQlVZH47XSHf3P8kdbosQcoky4Wyq5fNDUCSBqnRh1jIeYAOqE-DJROI-joPezTYJZE90txKw3lekg8D5oItogXy5ZYqVHk40Sol3vTNSciDi-RcPxh3yZeT7Mg">
+                            <div
+                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
+                                PG</div>
+                            <div class="absolute top-1 right-1">
+                                <svg class="h-3 w-3 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
+                            Tiger</span>
+                    </div>
+                    <!-- Game Card 3 -->
+                    <div class="flex flex-col gap-1">
+                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
+                            <img alt="Fortune Dragon" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_NkYuh3IcxNM156jglm5ch-AaRlAM4uLfS2-ciMiethsM0Gsri_wAHnlrFH7l496JrBDSBt2cy_OXe-wzzJVG-vbrlP1j9TIjthQyFIarc1mKQVJZ2BM3zTKm6-g7Oq54zQiA8ADHAi6947KZ_u9KMT_LyfK08uRRYjqRO6-zjDv9YKZMUtHvrPHtH4kksPabdFBTj0sz0Tpi7fZenHVHUTlfYU5ftHPYXE8y85q0UQltMAUbR0G5zsaQCrZXWSv4glGQ9RLeGQ">
+                            <div
+                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
+                                PG</div>
+                            <div class="absolute top-1 right-1">
+                                <svg class="h-3 w-3 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
+                            Dragon</span>
+                    </div>
+                    <!-- Game Card 4 -->
+                    <div class="flex flex-col gap-1">
+                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
+                            <img alt="Dragon Hatch" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKBWILc7GLCSoZ_usPOLkCTXHosKQ2Og0b_oemloRguSkLaa53l46YoASlh5jyY-FepYJyMep8Ltwr8Ci7fMHG-mEYH-nhOUBm3sZ5P6cAkR2Dc8gaeTUwjXZ7f1G-rWXrTbj3duUcq5XQ9RgEun9p6KYX6ODEjLwzXCd6822b1cUvHUpl-kuP9FupUozUDCVfw0yG0IMazTHphT_AyMNvBfDzRj4hhBRZURyW_TeRjH-_DCNnxXZFJit1zIVGzYPegKXaQXVIHQ">
+                            <div
+                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
+                                PG</div>
+                        </div>
+                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Dragon
+                            Hatch</span>
+                    </div>
+                    <!-- Game Card 5 -->
+                    <div class="flex flex-col gap-1">
+                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
+                            <img alt="Fortune Ox" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHoN-vIXwSIGB-3Rp28ZZBvi1-xHdumg-jxjMybArbAko1m7Dp7B0NPOL1he3ayt2H0hEJiuV_Es53HvTlteRIkVCkbdYIzrDkyNdXhaEqULPXiYSu9O2LKn4f8TfXRX_aSNR1D-4wzIseHShzae76T5LY99M4tYswbb1CZ2HOmVJX2mglVgpxH3Ct4HoSVWeuKbTkin0kO8V0bw6P2QDu1aP1ZD0YBjkfP27cnJpq2D6gyJX6LpITAZYdd25r3bo5PVvSlWvRfw">
+                            <div
+                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
+                                PG</div>
+                        </div>
+                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
+                            Ox</span>
+                    </div>
+                    <!-- Game Card 6 -->
+                    <div class="flex flex-col gap-1">
+                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
+                            <img alt="Fortune Mouse" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSdbNEXL9NiaML_iUKgf5rB_xAZUUIqnTVvEobM0Dc7imL55es68y8uB1ieRQSgvr6-HnpMVnib569GYcbCq1UmEebSrAV3aY61vgwVh5dbmQsNb85cLfZodTLzLJ1vwYDreQSm5_MIPMn1xpSsCAPYDOZtCRgA7kKO2fYPRU_geMbBXv0BPnIZ2xNY_njfJ99kHSMHyABodaRSCOQ4fvN5-VdA4jI_vKi4wcVzZhnFp10lzQkGCrqPbSsTlK2K_6YD97nmfIx9w">
+                            <div
+                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
+                                PG</div>
+                        </div>
+                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
+                            Mouse</span>
+                    </div>
+                </div>
+            </section>
+            <!-- END: Popular Games Section -->
+
+            <div id="dynamic-providers-container"></div>
+        </main>
+        <!-- BEGIN: Bottom Navigation -->
+        <footer
+            class="absolute bottom-0 w-full bg-[#1a1a1a] border-t border-[#0F0F0F] flex items-center justify-around py-2 z-50">
+            <button class="flex flex-col items-center gap-1">
+                <div class="text-brand-yellow">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H15C14.4477 21 14 20.5523 14 20V15C14 14.4477 13.5523 14 13 14H11C10.4477 14 10 14.4477 10 15V20C10 20.5523 9.55228 21 9 21H4C3.44772 21 3 20.5523 3 20V10.5Z"
+                            fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 3L2 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M12 3L22 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <rect x="10" y="14" width="4" height="7" rx="0.5" fill="#0f0f0f" />
+                    </svg>
+                </div>
+                <span class="text-[10px] font-bold text-brand-yellow">Começar</span>
+            </button>
+            <a href="OFERTAS.HTML" class="flex flex-col items-center gap-1 relative" style="text-decoration:none;">
+                <div class="text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] text-gray-500">Ofertas</span>
+                <span
+                    class="absolute -top-1 right-0 bg-red-600 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] text-center">9</span>
+            </a>
+            <a href="SUPORTE.HTML" class="flex flex-col items-center gap-1" style="text-decoration:none;">
+                <div class="text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] text-gray-500">Suporte</span>
+            </a>
+            <a href="PERFIL.HTML" id="nav-perfil" class="flex flex-col items-center gap-1"
+                style="text-decoration:none;">
+                <div class="text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] text-gray-500">Perfil</span>
+            </a>
+            <a href="AUTH.HTML" id="nav-login" class="flex flex-col items-center gap-1"
+                style="text-decoration:none; display:none;">
+                <div class="text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] text-gray-500">Login</span>
+            </a>
+        </footer>
+        <script>
+            (function () {
+                var token = localStorage.getItem('30win_token');
+                var loginBtn = document.getElementById('nav-login');
+                var perfilBtn = document.getElementById('nav-perfil');
+                if (!token) {
+                    loginBtn.style.display = 'flex';
+                    perfilBtn.style.display = 'none';
+                }
+            })();
+        </script>
+        <!-- END: Bottom Navigation -->
+
+        <!-- Sidebar Toggle Script -->
+        <script>
+            function toggleSidebar() {
+                var sidebar = document.getElementById('sidebar-menu');
+                var overlay = document.getElementById('sidebar-overlay');
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('opacity-0', 'pointer-events-none');
+                    overlay.classList.add('opacity-100', 'pointer-events-auto');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                    overlay.classList.add('opacity-0', 'pointer-events-none');
+                }
+            }
+        </script>
+
+        <script>
+            const API_URL = 'http://163.245.218.28:3000/api';
+
+            async function syncUserData() {
+                const token = localStorage.getItem('30win_token');
+                if (!token) return;
+
+                try {
+                    const res = await fetch(`${API_URL}/user/info`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        const balanceElements = document.querySelectorAll('#userBalance');
+                        balanceElements.forEach(el => {
+                            el.innerText = 'R$ ' + parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        });
+                    } else if (res.status === 401 || res.status === 402 || res.status === 403) {
+                        localStorage.removeItem('30win_token');
+                    }
+                } catch (err) { console.error('Sync error:', err); }
+            }
+
+            setInterval(syncUserData, 5000);
+            syncUserData();
+
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.onclick = () => {
+                    refreshBtn.style.transform = 'rotate(360deg)';
+                    syncUserData().finally(() => {
+                        setTimeout(() => { refreshBtn.style.transform = 'rotate(0deg)'; }, 500);
+                    });
+                };
+            }
+
+            document.addEventListener('click', (e) => {
+                const token = localStorage.getItem('30win_token');
+                if (!token) {
+                    const target = e.target.closest('button, a, .game-card');
+                    if (target && (target.innerText.includes('Depósito') || target.innerText.includes('Jogar') || target.closest('.game-card') || target.classList.contains('game-card'))) {
+                        e.preventDefault();
+                        window.location.href = '/AUTH.HTML';
+                    }
+                }
+            }, true);
+
+            async function loadApiGames() {
+                try {
+                    const res = await fetch('/api/games');
+                    const data = await res.json();
+                    if (!data.success || !data.providers) return;
+
+                    const container = document.getElementById('dynamic-providers-container');
+                    if (!container) return;
+
+                    let html = '';
+                    for (const [provider, games] of Object.entries(data.providers)) {
+                        if (games.length === 0) continue;
+
+                        const displayGames = games.slice(0, 12);
+                        let gamesHtml = '';
+                        displayGames.forEach(game => {
+                            const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
+                            gamesHtml += `
+                            <div class="flex flex-col gap-1 game-card" style="cursor: pointer;">
+                                <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
+                                    <img alt="${game.game_name}" class="w-full h-full object-cover" src="${bannerSrc}" loading="lazy">
+                                    <div class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">${provider}</div>
+                                </div>
+                                <span class="text-[10px] font-medium truncate text-gray-300 text-center px-1">${game.game_name}</span>
+                            </div>
+                            `;
+                        });
+
+                        html += `
+                        <section class="mt-4 px-4 pb-2">
+                            <div class="flex items-center justify-between mb-3 px-1">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-1 h-4 bg-brand-yellow rounded-full"></div>
+                                    <h2 class="text-sm font-bold tracking-wide">${provider}</h2>
+                                </div>
+                                <div class="flex items-center gap-1 active:scale-95 cursor-pointer">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tudo</span>
+                                    <span class="material-symbols-outlined text-[14px] text-gray-400" style="font-variation-settings: 'FILL' 1;">chevron_right</span>
+                                </div>
+                            </div>
+                            <div class="game-grid">
+                                ${gamesHtml}
+                            </div>
+                        </section>
+                        `;
+                    }
+                    container.innerHTML = html;
+                } catch (err) {
+                    console.error('Erro ao carregar jogos da API:', err);
+                }
+            }
+            document.addEventListener('DOMContentLoaded', loadApiGames);
+        </script>
+
+        <!-- Deposit Modal -->
+        <div id="modal-deposit" class="hidden fixed inset-0 z-[100] bg-black/90 flex justify-center p-4"
+            style="align-items: center;">
+            <div
+                class="bg-surface-container glass-card rounded-2xl p-6 md:p-8 max-w-sm w-full border border-primary/30 relative">
+                <button onclick="closeDepositModal()"
+                    class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+                <h3 class="font-headline font-black text-2xl mb-2 text-primary text-center">DEPOSITAR</h3>
+
+                <div id="deposit-step-1" class="space-y-4 mt-6">
+                    <p class="text-xs text-center text-gray-400 mb-4">Insira o valor que deseja depositar via PIX.</p>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor
+                            (R$)</label>
+                        <input type="number" id="deposit_amount" min="1" step="1"
+                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-4 text-center font-bold text-2xl text-white focus:border-primary outline-none"
+                            placeholder="0,00">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 mt-2">
+                        <button onclick="document.getElementById('deposit_amount').value=20"
+                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
+                            R$ 20</button>
+                        <button onclick="document.getElementById('deposit_amount').value=50"
+                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
+                            R$ 50</button>
+                        <button onclick="document.getElementById('deposit_amount').value=100"
+                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
+                            R$ 100</button>
+                    </div>
+                    <button id="btn-process-deposit" onclick="processDeposit()"
+                        class="w-full mt-6 bg-gradient-to-r from-primary to-primary-container text-black font-black py-4 rounded-xl shadow-[0_0_20px_rgba(223,142,255,0.4)] active:scale-95 transition-all">GERAR
+                        PIX</button>
+                </div>
+
+                <div id="deposit-step-2-demo" class="hidden space-y-4 mt-6 text-center">
+                    <span
+                        class="material-symbols-outlined text-6xl text-secondary animate-pulse block mx-auto">qr_code_scanner</span>
+                    <p class="font-bold text-secondary">Depósito Fictício Gerado</p>
+                    <p class="text-xs text-gray-400">Aguarde 8 segundos para simular a liquidação bancária do
+                        influenciador...</p>
+                    <div class="w-full bg-gray-800 rounded-full h-1.5 mb-4 overflow-hidden mt-4">
+                        <div class="bg-secondary h-1.5 rounded-full"
+                            style="width: 100%; animation: shrink 8s linear forwards;"></div>
+                    </div>
+                </div>
+
+                <div id="deposit-step-2-real" class="hidden space-y-4 mt-6 text-center">
+                    <p class="text-xs text-gray-400 mb-2">Escaneie o QR Code ou cole o código. O saldo cai
+                        automaticamente!</p>
+                    <div class="bg-white p-2 rounded-xl inline-block">
+                        <img id="deposit-qrcode" src="" alt="QR Code" class="w-48 h-48">
+                    </div>
+                    <div class="mt-4 text-left">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">PIX
+                            Copia e Cola</label>
+                        <div class="flex">
+                            <input type="text" id="pix-code-display" readonly
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded-l p-3 text-[10px] text-gray-300 outline-none">
+                            <button onclick="copyPix()" class="bg-primary text-black px-4 font-bold rounded-r"><span
+                                    class="material-symbols-outlined text-sm">content_copy</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            @keyframes shrink {
+                from {
+                    width: 100%;
+                }
+
+                to {
+                    width: 0%;
+                }
+            }
+        </style>
+
+        <script>
+            function openDepositModal() {
+                const token = localStorage.getItem('30win_token');
+                if (!token) { window.location.href = '/AUTH.HTML'; return; }
+
+                document.getElementById('deposit_amount').value = '';
+                document.getElementById('deposit-step-1').classList.remove('hidden');
+                document.getElementById('deposit-step-2-demo').classList.add('hidden');
+                document.getElementById('deposit-step-2-real').classList.add('hidden');
+                document.getElementById('btn-process-deposit').innerText = 'GERAR PIX';
+                document.getElementById('btn-process-deposit').disabled = false;
+
+                document.getElementById('modal-deposit').classList.remove('hidden');
+            }
+
+            function closeDepositModal() { document.getElementById('modal-deposit').classList.add('hidden'); }
+
+            async function processDeposit() {
+                const amountStr = document.getElementById('deposit_amount').value;
+                const amount = parseFloat(amountStr);
+                if (!amount || amount < 1) { alert('Valor inválido. Mínimo R$ 1,00'); return; }
+
+                const btn = document.getElementById('btn-process-deposit');
+                btn.innerText = 'Processando...'; btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/deposit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
+                        body: JSON.stringify({ amount })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        if (data.is_demo) {
+                            document.getElementById('deposit-step-1').classList.add('hidden');
+                            document.getElementById('deposit-step-2-demo').classList.remove('hidden');
+                            setTimeout(async () => {
+                                await fetch('/api/fictitious-deposit', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
+                                    body: JSON.stringify({ amount })
+                                });
+                                alert('Depósito fictício concluído!');
+                                window.location.reload();
+                            }, 8000);
+                        } else {
+                            document.getElementById('deposit-step-1').classList.add('hidden');
+                            document.getElementById('deposit-step-2-real').classList.remove('hidden');
+                            document.getElementById('pix-code-display').value = data.pixCopyPaste;
+                            document.getElementById('deposit-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pixCode)}`;
+                        }
+                    } else {
+                        alert('Erro: ' + data.error);
+                        btn.innerText = 'GERAR PIX'; btn.disabled = false;
+                    }
+                } catch (e) { alert('Erro de conexão.'); btn.innerText = 'GERAR PIX'; btn.disabled = false; }
+            }
+
+            function copyPix() {
+                const input = document.getElementById('pix-code-display');
+                input.select(); document.execCommand('copy');
+                alert('Código PIX Copiado!');
+            }
+        </script>
+</body>
+
+</html>

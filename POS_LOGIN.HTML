@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .glass-card {
+            background: rgba(35, 33, 72, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(71, 69, 99, 0.2);
+        }
+
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(223, 142, 255, 0.15);
+        }
+
+        .glow-secondary {
+            box-shadow: 0 0 20px rgba(0, 227, 253, 0.15);
+        }
+
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+
+        body {
+            zoom: 0.75;
+        }
+
+        html {
+            font-size: 75%;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+
+        body {
+            zoom: 0.75;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-surface text-on-background font-body selection:bg-primary selection:text-on-primary overflow-x-hidden min-h-screen">
+    <!-- TopAppBar -->
+    <header class="docked w-full top-0 z-50 bg-[#0c0a25] dark:bg-[#0c0a25] shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+        <div class="flex justify-between items-center px-6 py-4 w-full">
+            <div class="flex items-center gap-3 active:scale-95 cursor-pointer">
+                <span class="material-symbols-outlined text-[#df8eff] text-3xl"
+                    style="font-variation-settings: 'FILL' 1;">sports_esports</span>
+                <h1
+                    class="font-['Lexend'] font-bold tracking-wider uppercase text-xl text-[#df8eff] drop-shadow-[0_0_8px_rgba(223,142,255,0.6)]">
+                    ARCADE ADMIN</h1>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex gap-8">
+                    <span
+                        class="font-['Lexend'] font-bold tracking-wider uppercase text-[#00e3fd] drop-shadow-[0_0_5px_rgba(0,227,253,0.8)] cursor-pointer">Dashboard</span>
+                    <span
+                        class="font-['Lexend'] font-bold tracking-wider uppercase text-[#e6e2ff]/60 hover:text-[#ff6b98] transition-all duration-300 cursor-pointer">Games</span>
+                    <span
+                        class="font-['Lexend'] font-bold tracking-wider uppercase text-[#e6e2ff]/60 hover:text-[#ff6b98] transition-all duration-300 cursor-pointer">Players</span>
+                    <span
+                        class="font-['Lexend'] font-bold tracking-wider uppercase text-[#e6e2ff]/60 hover:text-[#ff6b98] transition-all duration-300 cursor-pointer">Shop</span>
+                </div>
+                <div class="flex items-center gap-4 text-[#df8eff]">
+                    <span
+                        class="material-symbols-outlined cursor-pointer active:scale-95 hover:text-[#ff6b98] transition-all"
+                        data-icon="notifications_active">notifications_active</span>
+                    <div
+                        class="h-8 w-8 rounded-full bg-surface-container-highest border border-primary/30 flex items-center justify-center overflow-hidden">
+                        <img alt="Admin" data-alt="Neon gaming avatar for admin profile"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzdPPYTo-i-cOt06KbNpPjdW-du-6MWXxF2J1J46MT3UcZtTxMAVQyTW7E7LgZtxORciDVaX-RKPGVtAa-B0qtkXoc1v8CSyQ-ukAj6bpKrhvJOj3g8oHgb3B06HTuId4cWsHFUq2YkNAvvqOM6BhVdO89aQvNgLZj-H7Vm_zLOuAgLmTqQ6Bz9MKDBN2Ihr_NVoVlq9vcG8T3pkZjYThaUZirUfDFPoqfJ1SJnN8m4Wc-1Gq-CWpdVKWvtmAHsTWqmI9i-Htw-9U" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="flex flex-col md:flex-row min-h-screen pt-20">
+        <!-- NavigationDrawer (Sidebar for Desktop) -->
+        <aside
+            class="hidden md:flex flex-col h-[calc(100vh-5rem)] w-80 bg-[#110f2d] shadow-[10px_0_40px_rgba(0,0,0,0.9)] sticky top-20 rounded-r-[2.5rem] overflow-y-auto">
+            <div class="flex flex-col h-full py-8">
+                <!-- Profile Header -->
+                <div class="px-8 mb-10 flex flex-col items-start gap-4">
+                    <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-secondary p-1">
+                        <div
+                            class="h-full w-full bg-surface-container-highest rounded-xl flex items-center justify-center overflow-hidden">
+                            <img alt="NEON_BOSS" data-alt="Cyberpunk style character profile picture"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDygsyFYvtdnyPuJYpa6L8D25iGzqUrf-lonqMstk2Gj4l7RQ5nSLwSi2-s6-XM8TnIIpQGWvuMjlIayuZktaFb3eS8p_l80A42dosLJagyTMdLG5Qu3HTkZctEB6o-IHYi0FDobr11GjE1ajGQ2ahAEqcZgbPKCT2z33IO-ik1jg0_FkJo0A0emY8KidgZkcwUJZRCnKAZ_8Q27uw3Q4lhorE5KmxzySVD23B1VBH-aBTo4BnHX7Lht8NGa2JCVvUK8KMnJTtFt8s" />
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-headline font-bold text-lg text-[#ff6b98]">NEON_BOSS</h3>
+                        <p class="text-xs text-on-surface-variant uppercase tracking-widest font-medium">Level 99
+                            Architect</p>
+                        <p class="text-[10px] text-secondary mt-1 font-bold">XP: 45,000</p>
+                    </div>
+                </div>
+                <!-- Nav Items -->
+                <nav class="space-y-1">
+                    <div id="tab-dashboard" onclick="switchTab('dashboard')"
+                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#df8eff] bg-[#232148] font-bold border-r-4 border-[#df8eff]">
+                        <span class="material-symbols-outlined"
+                            style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">Dashboard</span>
+                    </div>
+                    <div id="tab-api" onclick="switchTab('api')"
+                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all">
+                        <span class="material-symbols-outlined">api</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">API DE JOGOS</span>
+                    </div>
+                    <div id="tab-users" onclick="switchTab('users')"
+                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all">
+                        <span class="material-symbols-outlined">groups</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">USUÁRIOS</span>
+                    </div>
+                    <div id="tab-finance" onclick="switchTab('finance')"
+                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all">
+                        <span class="material-symbols-outlined">account_balance</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">SAQUES & DEPÓSITOS</span>
+                    </div>
+                    <div id="tab-settings" onclick="switchTab('settings')"
+                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all">
+                        <span class="material-symbols-outlined">settings</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">Configs Globais</span>
+                    </div>
+                    <div class="mt-40 flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:text-error transition-all"
+                        onclick="localStorage.removeItem('30win_token'); window.location.href='/PAINEL_LOGIN.HTML'">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">Logout</span>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+        <!-- Main Content Canvas -->
+        <main class="flex-1 px-4 md:px-10 py-8 relative">
+            <!-- Floating Decorative Assets -->
+            <div
+                class="absolute top-20 right-10 w-32 h-32 opacity-20 floating-element pointer-events-none hidden lg:block">
+                <span class="material-symbols-outlined text-primary text-9xl">videogame_asset</span>
+            </div>
+            <div class="absolute bottom-40 left-10 w-24 h-24 opacity-10 floating-element pointer-events-none hidden lg:block"
+                style="animation-delay: 2s">
+                <span class="material-symbols-outlined text-secondary text-7xl">token</span>
+            </div>
+            <div class="absolute top-1/2 left-1/4 w-16 h-16 opacity-15 floating-element pointer-events-none hidden lg:block"
+                style="animation-delay: 4s">
+                <span class="material-symbols-outlined text-tertiary text-6xl">casino</span>
+            </div>
+            <!-- Page Header -->
+            <div class="flex items-center justify-between mb-10">
+                <div class="space-y-1">
+                    <h2
+                        class="font-headline text-3xl font-black text-on-background tracking-tighter uppercase flex items-center gap-3">
+                        <span class="w-2 h-8 bg-tertiary rounded-full"></span>
+                        GERAL
+                    </h2>
+                    <p class="text-on-surface-variant font-medium text-sm ml-5 uppercase tracking-[0.2em]">Visão Geral
+                        da Plataforma</p>
+                </div>
+                <button
+                    class="bg-primary hover:bg-primary-dim text-on-primary font-headline font-bold px-6 py-3 rounded-xl active:scale-95 transition-all shadow-[0_0_20px_rgba(223,142,255,0.4)] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">refresh</span>
+                    ATUALIZAR DADOS
+                </button>
+            </div>
+            <!-- Dashboard Grid: Bento Style -->
+            <div id="view-dashboard" class="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-fr">
+                <!-- Faturamento Card (Primary Focus) -->
+                <div
+                    class="md:col-span-6 lg:col-span-5 glass-card rounded-xl p-8 flex flex-col justify-between relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] group-hover:bg-primary/30 transition-all">
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-primary/10 rounded-xl text-primary">
+                                <span class="material-symbols-outlined"
+                                    style="font-variation-settings: 'FILL' 1;">payments</span>
+                            </div>
+                            <span
+                                class="font-headline text-sm font-bold tracking-widest text-on-surface-variant uppercase">FATURAMENTO
+                                ATUAL</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-on-surface-variant text-lg font-bold">R$</span>
+                            <span id="total_billing"
+                                class="text-5xl md:text-6xl font-black text-on-background tracking-tighter -mt-2 drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)]">0,00</span>
+                        </div>
+                    </div>
+                    <div class="mt-8 flex items-center gap-2 text-secondary font-bold">
+                        <span class="material-symbols-outlined text-sm">trending_up</span>
+                        <span class="text-sm">+12.5% em relação a ontem</span>
+                    </div>
+                </div>
+                <!-- Usuários Ativos Card -->
+                <div
+                    class="md:col-span-6 lg:col-span-4 glass-card rounded-xl p-8 flex flex-col justify-between border-l-4 border-secondary">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 bg-secondary/10 rounded-xl text-secondary">
+                                <span class="material-symbols-outlined"
+                                    style="font-variation-settings: 'FILL' 1;">person_play</span>
+                            </div>
+                            <span
+                                class="font-headline text-sm font-bold tracking-widest text-on-surface-variant uppercase">ATIVOS
+                                AGORA</span>
+                        </div>
+                        <div class="flex h-2 w-2 rounded-full bg-secondary animate-pulse shadow-[0_0_8px_#00e3fd]">
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="active_players" class="text-6xl font-black text-secondary tracking-tighter">0</span>
+                        <span class="text-on-surface-variant text-sm font-medium uppercase">Jogadores</span>
+                    </div>
+                    <div class="mt-6 space-y-2">
+                        <div
+                            class="flex justify-between text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">
+                            <span>Capacidade do Servidor</span>
+                            <span>74%</span>
+                        </div>
+                        <div
+                            class="h-3 w-full bg-surface-container rounded-full overflow-hidden p-0.5 border border-outline-variant/10">
+                            <div class="h-full bg-gradient-to-r from-secondary-container to-secondary rounded-full"
+                                style="width: 74%"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Usuários Cadastrados Card -->
+                <div
+                    class="md:col-span-12 lg:col-span-3 glass-card rounded-xl p-8 flex flex-col items-center justify-center text-center">
+                    <div class="relative mb-6">
+                        <!-- Circle Progress -->
+                        <svg class="w-32 h-32 transform -rotate-90">
+                            <circle class="text-surface-container" cx="64" cy="64" fill="transparent" r="58"
+                                stroke="currentColor" stroke-width="8"></circle>
+                            <circle class="text-tertiary drop-shadow-[0_0_8px_rgba(255,107,152,0.5)]" cx="64" cy="64"
+                                fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4"
+                                stroke-dashoffset="65.6" stroke-linecap="round" stroke-width="8"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center rotate-90">
+                            <span class="text-2xl font-black text-on-background">82%</span>
+                            <span class="text-[8px] font-black text-tertiary tracking-tighter uppercase">Metas</span>
+                        </div>
+                    </div>
+                    <span
+                        class="font-headline text-xs font-bold tracking-widest text-on-surface-variant uppercase mb-1">USUÁRIOS
+                        CADASTRADOS</span>
+                    <span id="registered_users" class="text-4xl font-black text-on-background tracking-tighter">0</span>
+                </div>
+                <!-- Histórico de Depósitos Table Section -->
+                <div class="md:col-span-12 glass-card rounded-xl overflow-hidden mt-6">
+                    <div class="px-8 py-6 border-b border-outline-variant/10 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-primary">history</span>
+                            <h3 class="font-headline font-bold text-lg uppercase tracking-wider">HISTÓRICO DE DEPÓSITOS
+                            </h3>
+                        </div>
+                        <button class="text-xs font-bold text-secondary uppercase tracking-widest hover:underline">Ver
+                            Todos</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr
+                                    class="bg-surface-container-low text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant">
+                                    <th class="px-8 py-4">Jogador</th>
+                                    <th class="px-8 py-4">Data/Hora</th>
+                                    <th class="px-8 py-4">Valor</th>
+                                    <th class="px-8 py-4">Método</th>
+                                    <th class="px-8 py-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant/5">
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-8 py-5">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold text-primary">
+                                                UL</div>
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-sm text-on-background">UltraLord_99</span>
+                                                <span class="text-[10px] text-on-surface-variant">ID: #85921</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5 text-sm font-medium">Hoje, 14:23</td>
+                                    <td class="px-8 py-5 font-headline font-bold text-on-background">R$ 1.500,00</td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="material-symbols-outlined text-xs text-on-surface-variant">account_balance_wallet</span>
+                                            <span class="text-xs font-medium uppercase">PIX Fast</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex justify-center">
+                                            <span
+                                                class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-secondary/10 text-secondary border border-secondary/20 shadow-[0_0_10px_rgba(0,227,253,0.1)]">COMPLETED</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-8 py-5">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold text-primary">
+                                                NK</div>
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-sm text-on-background">NeonKnight</span>
+                                                <span class="text-[10px] text-on-surface-variant">ID: #44012</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5 text-sm font-medium">Hoje, 14:15</td>
+                                    <td class="px-8 py-5 font-headline font-bold text-on-background">R$ 50,00</td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="material-symbols-outlined text-xs text-on-surface-variant">credit_card</span>
+                                            <span class="text-xs font-medium uppercase">Card</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex justify-center">
+                                            <span
+                                                class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-tertiary/10 text-tertiary border border-tertiary/20 shadow-[0_0_10px_rgba(255,107,152,0.1)]">PENDING</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-8 py-5">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold text-primary">
+                                                CZ</div>
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-sm text-on-background">CryptoZez</span>
+                                                <span class="text-[10px] text-on-surface-variant">ID: #10293</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5 text-sm font-medium">Hoje, 14:02</td>
+                                    <td class="px-8 py-5 font-headline font-bold text-on-background">R$ 2.450,00</td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="material-symbols-outlined text-xs text-on-surface-variant">currency_bitcoin</span>
+                                            <span class="text-xs font-medium uppercase">USDT</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex justify-center">
+                                            <span
+                                                class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-secondary/10 text-secondary border border-secondary/20">COMPLETED</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API de Jogos View -->
+            <div id="view-api" class="hidden flex flex-col gap-6">
+                <div class="glass-card rounded-xl p-8 border-l-4 border-primary">
+                    <h3 class="font-headline font-bold text-xl mb-4 text-[#df8eff]">Credenciais da API Max Games</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase mb-2">Agent
+                                Code</label>
+                            <input type="text" id="api_agent_code"
+                                class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg p-3 text-white focus:outline-none focus:border-primary transition-colors"
+                                placeholder="Ex: ag_main_001">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase mb-2">Agent
+                                Token</label>
+                            <input type="text" id="api_agent_token"
+                                class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg p-3 text-white focus:outline-none focus:border-primary transition-colors"
+                                placeholder="Ex: tok_8f3a2b...">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase mb-2">Agent
+                                Secret</label>
+                            <input type="text" id="api_agent_secret"
+                                class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg p-3 text-white focus:outline-none focus:border-primary transition-colors"
+                                placeholder="Para Webhooks">
+                        </div>
+                    </div>
+                    <button onclick="saveApiCredentials()"
+                        class="bg-primary hover:bg-primary-dim text-on-primary font-bold py-3 px-6 rounded-lg shadow-[0_0_15px_rgba(223,142,255,0.4)] transition-all">SALVAR
+                        CREDENCIAIS</button>
+                </div>
+
+                <div class="glass-card rounded-xl p-8 border-l-4 border-secondary flex flex-col md:flex-row gap-6">
+                    <div class="flex-1">
+                        <h3 class="font-headline font-bold text-xl mb-2 text-[#00e3fd]">Gerenciar Jogos</h3>
+                        <p class="text-sm text-on-surface-variant mb-6">Extraia todos os jogos da provedora ou remova os
+                            jogos atuais do banco de dados local. As imagens serão baixadas para o servidor. Este
+                            processo pode demorar alguns minutos.</p>
+                        <div class="flex gap-4">
+                            <button id="btn-extract" onclick="extractGames()"
+                                class="bg-secondary hover:bg-secondary-dim text-on-secondary font-bold py-3 px-6 rounded-lg shadow-[0_0_15px_rgba(0,227,253,0.4)] transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm" id="icon-extract">download</span>
+                                <span id="text-extract">EXTRAIR JOGOS DA API</span>
+                            </button>
+                            <button onclick="removeGames()"
+                                class="bg-error/20 hover:bg-error/30 text-error border border-error/50 font-bold py-3 px-6 rounded-lg transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">delete</span>
+                                REMOVER JOGOS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USUÁRIOS View -->
+            <div id="view-users" class="hidden flex flex-col gap-6">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-headline font-bold text-2xl text-[#df8eff]">Gestão de Usuários</h3>
+                    <button onclick="openModal('modal-new-demo')"
+                        class="bg-secondary hover:bg-secondary-dim text-on-secondary font-bold py-2 px-4 rounded-lg shadow-[0_0_15px_rgba(0,227,253,0.4)] transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">person_add</span>
+                        CRIAR CONTA DEMO
+                    </button>
+                </div>
+
+                <!-- Users Table -->
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr
+                                    class="bg-surface-container-low text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant sticky top-0">
+                                    <th class="px-6 py-4">ID / Nome</th>
+                                    <th class="px-6 py-4">Telefone</th>
+                                    <th class="px-6 py-4">Saldo</th>
+                                    <th class="px-6 py-4 text-center">Tipo</th>
+                                    <th class="px-6 py-4 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody" class="divide-y divide-outline-variant/5">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINANCEIRO View -->
+            <div id="view-finance" class="hidden flex flex-col gap-6">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-headline font-bold text-2xl text-[#00e3fd]">Saques e Depósitos (GGPIX)</h3>
+                </div>
+
+                <!-- Config Gateway GGPIX -->
+                <div class="glass-card rounded-xl p-8 border-l-4 border-primary">
+                    <h3 class="font-headline font-bold text-xl mb-4 text-[#df8eff]">Chave da API GGPIX</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase mb-2">API Key (Agent
+                                Token)</label>
+                            <input type="text" id="ggpix_api_key"
+                                class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg p-3 text-white focus:outline-none focus:border-primary transition-colors"
+                                placeholder="Cole sua API Key do Painel GGPIX">
+                        </div>
+                    </div>
+                    <button onclick="saveGgpixCredentials()"
+                        class="bg-primary hover:bg-primary-dim text-on-primary font-bold py-3 px-6 rounded-lg shadow-[0_0_15px_rgba(223,142,255,0.4)] transition-all">SALVAR
+                        CHAVE GGPIX</button>
+                </div>
+
+                <!-- Grid de Tabelas (Depósitos e Saques) -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <!-- Depósitos -->
+                    <div class="glass-card rounded-xl overflow-hidden flex flex-col">
+                        <div class="px-6 py-4 border-b border-outline-variant/10 bg-surface-container/50">
+                            <h3 class="font-headline font-bold text-lg text-secondary">Depósitos Recentes</h3>
+                        </div>
+                        <div class="overflow-x-auto flex-1 max-h-[400px] overflow-y-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr
+                                        class="bg-surface-container-low text-[10px] font-black uppercase text-on-surface-variant sticky top-0">
+                                        <th class="px-4 py-3">Data</th>
+                                        <th class="px-4 py-3">Usuário</th>
+                                        <th class="px-4 py-3">Valor</th>
+                                        <th class="px-4 py-3 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deposits-tbody" class="divide-y divide-outline-variant/5"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Saques Pendentes / Histórico -->
+                    <div class="glass-card rounded-xl overflow-hidden flex flex-col">
+                        <div class="px-6 py-4 border-b border-outline-variant/10 bg-surface-container/50">
+                            <h3 class="font-headline font-bold text-lg text-primary">Solicitações de Saque</h3>
+                        </div>
+                        <div class="overflow-x-auto flex-1 max-h-[400px] overflow-y-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr
+                                        class="bg-surface-container-low text-[10px] font-black uppercase text-on-surface-variant sticky top-0">
+                                        <th class="px-4 py-3">Data</th>
+                                        <th class="px-4 py-3">Ref/Chave</th>
+                                        <th class="px-4 py-3">Valor</th>
+                                        <th class="px-4 py-3 text-center">Status / Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="withdrawals-tbody" class="divide-y divide-outline-variant/5"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS View -->
+            <div id="view-settings" class="hidden flex flex-col gap-6">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-headline font-bold text-2xl text-primary">Configurações Globais (Bônus e Limites)
+                    </h3>
+                </div>
+
+                <div class="glass-card rounded-xl p-8 border-l-4 border-secondary">
+                    <h3 class="font-headline font-bold text-xl mb-4 text-[#00e3fd]">Depósitos e Saques</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Depósito Mínimo (R$)</label>
+                            <input type="number" id="cfg_min_deposit"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Saque Mínimo (R$)</label>
+                            <input type="number" id="cfg_min_withdraw"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary">
+                        </div>
+                    </div>
+
+                    <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-[#00e3fd]">Bônus de Cadastro</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Valor do Bônus Fixo (R$)</label>
+                            <input type="number" id="cfg_signup_bonus_val"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Multiplicador de Rollover (Ex:
+                                3)</label>
+                            <input type="number" id="cfg_signup_rollover_mult"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary">
+                        </div>
+                    </div>
+
+                    <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-[#00e3fd]">Regras de Bônus Escalonado</h3>
+                    <p class="text-[10px] text-gray-500 mb-4 uppercase tracking-widest font-bold">Configure bônus
+                        diferentes por faixa de depósito. A maior faixa atingida é a que vale.</p>
+
+                    <div id="bonus-rules-container" class="space-y-3 mb-6">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <button onclick="addBonusRule()"
+                        class="text-xs font-bold text-secondary uppercase tracking-widest flex items-center gap-1 hover:underline mb-8">
+                        <span class="material-symbols-outlined text-sm">add_circle</span> Adicionar Nova Faixa
+                    </button>
+
+                    <div class="border-t border-outline-variant/10 pt-8">
+                        <button onclick="saveSystemSettings()"
+                            class="bg-secondary hover:bg-secondary-dim text-black font-bold py-3 px-10 rounded-xl shadow-[0_10px_30px_rgba(0,227,253,0.3)] transition-all uppercase tracking-widest text-xs">
+                            SALVAR CONFIGURAÇÕES
+                        </button>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Modal Criar Conta Demo -->
+    <div id="modal-new-demo" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div
+            class="bg-surface-container glass-card rounded-xl p-8 max-w-md w-full border border-outline-variant/20 relative">
+            <button onclick="closeModal('modal-new-demo')"
+                class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+            <h3 class="font-headline font-bold text-xl mb-6 text-secondary">Criar Conta Demo</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Nome</label>
+                    <input type="text" id="demo_name"
+                        class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary"
+                        placeholder="Nome do Influencer">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Telefone (Login)</label>
+                    <input type="text" id="demo_phone"
+                        class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary"
+                        placeholder="Apenas números">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Senha</label>
+                    <input type="text" id="demo_pass"
+                        class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary"
+                        placeholder="Senha de acesso">
+                </div>
+                <button onclick="createDemoUser()"
+                    class="w-full bg-secondary hover:bg-secondary-dim text-black font-bold py-3 rounded mt-4 transition-colors">CRIAR
+                    CONTA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Usuário -->
+    <div id="modal-edit-user" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div
+            class="bg-surface-container glass-card rounded-xl p-8 max-w-md w-full border border-outline-variant/20 relative">
+            <button onclick="closeModal('modal-edit-user')"
+                class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+            <h3 class="font-headline font-bold text-xl mb-6 text-primary">Editar Usuário</h3>
+            <div class="space-y-4">
+                <input type="hidden" id="edit_user_id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Nome</label>
+                    <input type="text" id="edit_name"
+                        class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Nova Senha (deixe em branco para
+                        não alterar)</label>
+                    <input type="text" id="edit_pass"
+                        class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                        placeholder="Nova senha">
+                    <p class="text-[10px] text-gray-500 mt-1">Senha atual salva no banco (plain_password): <span
+                            id="current_pass_display" class="font-mono text-gray-300">...</span></p>
+                </div>
+                <button onclick="saveEditUser()"
+                    class="w-full bg-primary hover:bg-primary-dim text-white font-bold py-3 rounded mt-4 transition-colors">SALVAR
+                    ALTERAÇÕES</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal User Details -->
+    <div id="modal-user-details" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div
+            class="bg-surface-container glass-card rounded-xl p-8 max-w-4xl w-full border border-outline-variant/20 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('modal-user-details')"
+                class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+            <h3 class="font-headline font-bold text-2xl mb-6 text-primary flex items-center gap-3"><span
+                    class="material-symbols-outlined">history</span> Detalhes do Usuário</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-4 rounded-xl bg-surface-container/50">
+                    <h4 class="font-headline font-bold text-lg text-secondary mb-4">Histórico de Depósitos</h4>
+                    <div class="overflow-y-auto max-h-[300px]">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-gray-400 border-b border-gray-700">
+                                    <th class="py-2">Data</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-details-deposits" class="divide-y divide-gray-800"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="glass-card p-4 rounded-xl bg-surface-container/50">
+                    <h4 class="font-headline font-bold text-lg text-[#df8eff] mb-4">Histórico de Saques</h4>
+                    <div class="overflow-y-auto max-h-[300px]">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-gray-400 border-b border-gray-700">
+                                    <th class="py-2">Data</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-details-withdrawals" class="divide-y divide-gray-800"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spacing for BottomNav on Mobile -->
+    <div class="h-24 md:hidden"></div>
+    </main>
+    </div>
+    <!-- BottomNavBar (Visible only on Mobile) -->
+    <footer
+        class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-[#110f2d]/80 backdrop-blur-xl border-t border-[#474563]/20 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] rounded-t-[2rem]">
+        <div class="flex justify-around items-center px-4 pb-4 pt-2">
+            <div
+                class="flex flex-col items-center justify-center text-[#e6e2ff]/40 p-3 hover:text-[#df8eff] transition-colors active:scale-90 duration-150">
+                <span class="material-symbols-outlined text-2xl">videogame_asset</span>
+                <span class="font-['Lexend'] text-[10px] font-medium uppercase tracking-tighter mt-1">Games</span>
+            </div>
+            <div
+                class="flex flex-col items-center justify-center text-[#00e3fd] bg-[#232148] rounded-full p-4 shadow-[0_0_15px_rgba(0,227,253,0.3)] active:scale-90 duration-150 -translate-y-4">
+                <span class="material-symbols-outlined text-2xl"
+                    style="font-variation-settings: 'FILL' 1;">dashboard_customize</span>
+                <span class="font-['Lexend'] text-[10px] font-medium uppercase tracking-tighter mt-1">Dashboard</span>
+            </div>
+            <div
+                class="flex flex-col items-center justify-center text-[#e6e2ff]/40 p-3 hover:text-[#df8eff] transition-colors active:scale-90 duration-150">
+                <span class="material-symbols-outlined text-2xl">group</span>
+                <span class="font-['Lexend'] text-[10px] font-medium uppercase tracking-tighter mt-1">Players</span>
+            </div>
+            <div
+                class="flex flex-col items-center justify-center text-[#e6e2ff]/40 p-3 hover:text-[#df8eff] transition-colors active:scale-90 duration-150">
+                <span class="material-symbols-outlined text-2xl">shopping_cart</span>
+                <span class="font-['Lexend'] text-[10px] font-medium uppercase tracking-tighter mt-1">Shop</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(tab) {
+            const dashboardView = document.getElementById('view-dashboard');
+            const apiView = document.getElementById('view-api');
+            const usersView = document.getElementById('view-users');
+            const financeView = document.getElementById('view-finance');
+            const settingsView = document.getElementById('view-settings');
+
+            const tabDashboard = document.getElementById('tab-dashboard');
+            const tabApi = document.getElementById('tab-api');
+            const tabUsers = document.getElementById('tab-users');
+            const tabFinance = document.getElementById('tab-finance');
+            const tabSettings = document.getElementById('tab-settings');
+
+            const inactiveClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all";
+            const activeClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#df8eff] bg-[#232148] font-bold border-r-4 border-[#df8eff]";
+
+            [dashboardView, apiView, usersView, financeView, settingsView].forEach(v => { if (v) v.classList.add('hidden'); });
+            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings].forEach(t => { if (t) t.className = inactiveClass; });
+
+            if (tab === 'dashboard') { dashboardView.classList.remove('hidden'); tabDashboard.className = activeClass; }
+            else if (tab === 'api') { apiView.classList.remove('hidden'); tabApi.className = activeClass; }
+            else if (tab === 'users') { usersView.classList.remove('hidden'); tabUsers.className = activeClass; loadUsers(); }
+            else if (tab === 'finance') { financeView.classList.remove('hidden'); tabFinance.className = activeClass; loadFinance(); }
+            else if (tab === 'settings') { settingsView.classList.remove('hidden'); tabSettings.className = activeClass; loadSystemSettings(); }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/admin/users');
+                const data = await res.json();
+                if (data.success) {
+                    const tbody = document.getElementById('users-tbody');
+                    tbody.innerHTML = '';
+                    data.users.forEach(u => {
+                        const typeHtml = u.is_demo
+                            ? `<span class="px-2 py-1 rounded text-[9px] bg-secondary/20 text-secondary border border-secondary/30 font-bold uppercase">Demo</span>`
+                            : `<span class="px-2 py-1 rounded text-[9px] bg-gray-700 text-gray-300 font-bold uppercase">Real</span>`;
+
+                        tbody.innerHTML += `
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="block font-bold">${u.name || 'Sem Nome'}</span>
+                                <span class="text-[10px] text-gray-500">ID: ${u.id_user}</span>
+                            </td>
+                            <td class="px-6 py-4 text-sm">${u.phone}</td>
+                            <td class="px-6 py-4 font-bold text-primary">R$ ${parseFloat(u.balance).toFixed(2)}</td>
+                            <td class="px-6 py-4 text-center">${typeHtml}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="openEditUser(${u.id}, '${(u.name || '').replace(/'/g, "\\'").trim()}', '${(u.plain_password || '').replace(/'/g, "\\'").trim()}')" class="text-xs bg-surface-container-high px-3 py-1.5 rounded hover:bg-primary/20 hover:text-primary transition-colors">Editar</button>
+                                <button onclick="openUserDetails(${u.id})" class="text-xs bg-surface-container-high px-3 py-1.5 rounded hover:bg-secondary/20 hover:text-secondary transition-colors ml-1">Detalhes</button>
+                                <button onclick="deleteUser(${u.id})" class="text-xs bg-error/10 text-error px-3 py-1.5 rounded hover:bg-error hover:text-white transition-colors ml-1">X</button>
+                            </td>
+                        </tr>
+                        `;
+                    });
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function createDemoUser() {
+            const name = document.getElementById('demo_name').value;
+            const phone = document.getElementById('demo_phone').value;
+            const password = document.getElementById('demo_pass').value;
+            try {
+                const res = await fetch('/api/admin/users/demo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone, password })
+                });
+                const data = await res.json();
+                alert(data.message || data.error);
+                if (data.success) { closeModal('modal-new-demo'); loadUsers(); }
+            } catch (e) { alert('Erro'); }
+        }
+
+        function openEditUser(id, name, plain_password) {
+            document.getElementById('edit_user_id').value = id;
+            document.getElementById('edit_name').value = name;
+            document.getElementById('edit_pass').value = '';
+            document.getElementById('current_pass_display').innerText = plain_password || 'Desconhecida (Foi criptografada antes)';
+            openModal('modal-edit-user');
+        }
+
+        async function deleteUser(id) {
+            if (!confirm("Atenção: Excluir este usuário apagará seu acesso. Relacionamentos devem estar resolvidos.")) return;
+            try {
+                const res = await fetch('/api/admin/users/' + id, { method: 'DELETE' });
+                const data = await res.json();
+                alert(data.message || data.error);
+                if (data.success) loadUsers();
+            } catch (e) { alert('Erro ao deletar'); }
+        }
+
+        async function openUserDetails(id) {
+            try {
+                const res = await fetch('/api/admin/users/' + id + '/details');
+                const data = await res.json();
+                if (data.success) {
+                    const depTbd = document.getElementById('user-details-deposits');
+                    depTbd.innerHTML = '';
+                    data.deposits.forEach(d => {
+                        depTbd.innerHTML += `<tr class="hover:bg-white/5"><td class="py-2">${new Date(d.created_at).toLocaleString()}</td><td class="font-bold text-secondary">R$ ${parseFloat(d.amount).toFixed(2)}</td><td>${d.status}</td></tr>`;
+                    });
+
+                    const wdtbd = document.getElementById('user-details-withdrawals');
+                    wdtbd.innerHTML = '';
+                    data.withdrawals.forEach(w => {
+                        wdtbd.innerHTML += `<tr class="hover:bg-white/5"><td class="py-2">${new Date(w.created_at).toLocaleString()}</td><td class="font-bold text-[#df8eff]">R$ ${parseFloat(w.amount).toFixed(2)}</td><td>${w.status}</td></tr>`;
+                    });
+
+                    openModal('modal-user-details');
+                } else {
+                    alert('Nenhum detalhe encontrado');
+                }
+            } catch (e) { alert('Erro ao buscar detalhes'); }
+        }
+
+        let currentBonusRules = [];
+
+        async function loadSystemSettings() {
+            try {
+                const res = await fetch('/api/admin/system/settings');
+                const data = await res.json();
+                if (data.success && data.settings) {
+                    document.getElementById('cfg_min_deposit').value = data.settings.min_deposit || '';
+                    document.getElementById('cfg_min_withdraw').value = data.settings.min_withdraw || '';
+                    document.getElementById('cfg_signup_bonus_val').value = data.settings.signup_bonus_val || '';
+                    document.getElementById('cfg_signup_rollover_mult').value = data.settings.signup_rollover_mult || '';
+
+                    try {
+                        currentBonusRules = JSON.parse(data.settings.deposit_bonus_rules || '[]');
+                    } catch (e) { currentBonusRules = []; }
+                    renderBonusRules();
+                }
+            } catch (e) { console.error('Erro config', e); }
+        }
+
+        function addBonusRule() {
+            currentBonusRules.push({ min: 0, bonus: 0, rollover: 1 });
+            renderBonusRules();
+        }
+
+        function removeBonusRule(index) {
+            currentBonusRules.splice(index, 1);
+            renderBonusRules();
+        }
+
+        function renderBonusRules() {
+            const container = document.getElementById('bonus-rules-container');
+            container.innerHTML = '';
+
+            if (currentBonusRules.length === 0) {
+                container.innerHTML = '<p class="text-xs text-on-surface-variant italic">Nenhuma faixa configurada. O sistema usará os valores padrão se existirem.</p>';
+                return;
+            }
+
+            currentBonusRules.forEach((rule, idx) => {
+                container.innerHTML += `
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white/5 p-4 rounded-lg border border-white/10 items-end">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Min. Depósito (R$)</label>
+                            <input type="number" value="${rule.min}" onchange="updateRule(${idx}, 'min', this.value)"
+                                class="w-full bg-[#0c0a25] border border-gray-700 rounded p-2 text-white text-sm focus:border-secondary">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Bônus (R$)</label>
+                            <input type="number" value="${rule.bonus}" onchange="updateRule(${idx}, 'bonus', this.value)"
+                                class="w-full bg-[#0c0a25] border border-gray-700 rounded p-2 text-white text-sm focus:border-secondary">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Rollover Multi</label>
+                            <input type="number" value="${rule.rollover}" onchange="updateRule(${idx}, 'rollover', this.value)"
+                                class="w-full bg-[#0c0a25] border border-gray-700 rounded p-2 text-white text-sm focus:border-secondary">
+                        </div>
+                        <button onclick="removeBonusRule(${idx})" class="h-10 bg-error/10 text-error hover:bg-error hover:text-white rounded transition-colors flex items-center justify-center">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function updateRule(idx, field, val) {
+            currentBonusRules[idx][field] = parseFloat(val) || 0;
+        }
+
+        async function saveSystemSettings() {
+            const settings = {
+                min_deposit: document.getElementById('cfg_min_deposit').value,
+                min_withdraw: document.getElementById('cfg_min_withdraw').value,
+                signup_bonus_val: document.getElementById('cfg_signup_bonus_val').value,
+                signup_rollover_mult: document.getElementById('cfg_signup_rollover_mult').value,
+                deposit_bonus_rules: currentBonusRules
+            };
+            try {
+                const res = await fetch('/api/admin/system/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ settings })
+                });
+                const data = await res.json();
+                alert(data.message || data.error);
+            } catch (e) { alert('Erro ao salvar'); }
+        }
+
+        async function saveEditUser() {
+            const id = document.getElementById('edit_user_id').value;
+            const name = document.getElementById('edit_name').value;
+            const password = document.getElementById('edit_pass').value;
+            try {
+                const res = await fetch('/api/admin/users/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, password })
+                });
+                const data = await res.json();
+                alert(data.message || data.error);
+                if (data.success) { closeModal('modal-edit-user'); loadUsers(); }
+            } catch (e) { alert('Erro'); }
+        }
+
+        async function loadFinance() {
+            try {
+                const [resKey, resDep, resWd] = await Promise.all([
+                    fetch('/api/admin/ggpix-credentials'),
+                    fetch('/api/admin/deposits'),
+                    fetch('/api/admin/withdrawals')
+                ]);
+
+                const dKey = await resKey.json();
+                if (dKey.success && dKey.credentials) {
+                    document.getElementById('ggpix_api_key').value = dKey.credentials.agent_token || '';
+                }
+
+                const dDep = await resDep.json();
+                if (dDep.success) {
+                    const tbody = document.getElementById('deposits-tbody');
+                    tbody.innerHTML = '';
+                    dDep.deposits.forEach(d => {
+                        let stHtml = '';
+                        if (d.status === 'completed') stHtml = `< span class="text-secondary text-[10px] uppercase font-bold" > Concluído</span > `;
+                        else if (d.status === 'pending') stHtml = `< span class="text-tertiary text-[10px] uppercase font-bold" > Pendente</span > `;
+                        else stHtml = `< span class="text-error text-[10px] uppercase font-bold" > Falhou</span > `;
+
+                        tbody.innerHTML += `
+                            < tr class="hover:bg-white/5" >
+                            <td class="px-4 py-3 text-xs text-gray-400">${new Date(d.created_at).toLocaleString()}</td>
+                            <td class="px-4 py-3 text-xs">${d.name || d.phone} ${d.is_demo ? '<span class="text-secondary text-[8px]">(Demo)</span>' : ''}</td>
+                            <td class="px-4 py-3 font-bold text-on-surface">R$ ${parseFloat(d.amount).toFixed(2)}</td>
+                            <td class="px-4 py-3 text-center text-xs font-bold">${stHtml}</td>
+                        </tr > `;
+                    });
+                }
+
+                const dWd = await resWd.json();
+                if (dWd.success) {
+                    const tbody = document.getElementById('withdrawals-tbody');
+                    tbody.innerHTML = '';
+                    dWd.withdrawals.forEach(w => {
+                        let actionHtml = '';
+                        if (w.status === 'pending') {
+                            actionHtml = `
+                            < div class="flex items-center justify-center gap-2" >
+                                    <button onclick="approveWithdrawal(${w.id})" class="text-[9px] font-bold tracking-widest bg-secondary/20 text-secondary px-2 py-1 rounded hover:bg-secondary border border-secondary/50 hover:text-on-secondary transition-all">APROVAR</button>
+                                    <button onclick="rejectWithdrawal(${w.id})" class="text-[9px] font-bold tracking-widest bg-error/20 text-error px-2 py-1 rounded hover:bg-error border border-error/50 hover:text-on-error transition-all">REJEITAR</button>
+                                </div >
+                            `;
+                        } else if (w.status === 'approved') {
+                            actionHtml = `< span class="text-xs text-secondary font-bold" > Pago via Pix</span > `;
+                        } else {
+                            actionHtml = `< span class="text-xs text-error font-bold" > Rejeitado</span > `;
+                        }
+
+                        tbody.innerHTML += `
+                            < tr class="hover:bg-white/5" >
+                            <td class="px-4 py-3 text-xs text-gray-400">${new Date(w.created_at).toLocaleString()}</td>
+                            <td class="px-4 py-3 text-xs">
+                                <span class="block">${w.name || w.phone}</span>
+                                <span class="text-gray-500 text-[10px]">Chave: <span class="text-gray-300">${w.pix_key}</span> (${w.pix_type})</span>
+                            </td>
+                            <td class="px-4 py-3 font-bold text-[#df8eff]">R$ ${parseFloat(w.amount).toFixed(2)}</td>
+                            <td class="px-4 py-3 text-center flex justify-center">${actionHtml}</td>
+                        </tr >`;
+                    });
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function saveGgpixCredentials() {
+            const agent_token = document.getElementById('ggpix_api_key').value;
+            try {
+                const res = await fetch('/api/admin/ggpix-credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent_token })
+                });
+                const data = await res.json();
+                alert(data.message || data.error);
+            } catch (e) { alert('Erro ao salvar'); }
+        }
+
+        async function approveWithdrawal(id) {
+            if (!confirm("Aprovar saque? O GGPIX fará a transferência imediatamente.")) return;
+            try {
+                const res = await fetch('/api/admin/withdrawals/' + id + '/approve', { method: 'POST' });
+                const data = await res.json();
+                alert(data.message || data.error);
+                loadFinance();
+            } catch (e) { alert('Erro ao processar.'); }
+        }
+
+        async function rejectWithdrawal(id) {
+            if (!confirm("Rejeitar? O valor voltará para o saldo do jogador.")) return;
+            try {
+                const res = await fetch('/api/admin/withdrawals/' + id + '/reject', { method: 'POST' });
+                const data = await res.json();
+                alert(data.message || data.error);
+                loadFinance();
+            } catch (e) { alert('Erro ao processar.'); }
+        }
+
+        async function loadApiCredentials() {
+            try {
+                const res = await fetch('/api/admin/api-credentials');
+                const data = await res.json();
+                if (data.success && data.credentials) {
+                    document.getElementById('api_agent_code').value = data.credentials.agent_code || '';
+                    document.getElementById('api_agent_token').value = data.credentials.agent_token || '';
+                    document.getElementById('api_agent_secret').value = data.credentials.agent_secret || '';
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function saveApiCredentials() {
+            const agent_code = document.getElementById('api_agent_code').value;
+            const agent_token = document.getElementById('api_agent_token').value;
+            const agent_secret = document.getElementById('api_agent_secret').value;
+            try {
+                const res = await fetch('/api/admin/api-credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent_code, agent_token, agent_secret })
+                });
+                const data = await res.json();
+                alert(data.message || data.error);
+            } catch (err) { alert('Erro na conexão!'); }
+        }
+
+        async function extractGames() {
+            const btn = document.getElementById('btn-extract');
+            const text = document.getElementById('text-extract');
+            const icon = document.getElementById('icon-extract');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-70');
+            icon.innerText = 'sync';
+            icon.classList.add('animate-spin');
+            text.innerText = 'EXTRAINDO E BAIXANDO...';
+
+            try {
+                const res = await fetch('/api/admin/games/extract', { method: 'POST' });
+                const data = await res.json();
+                alert(data.message || data.error);
+            } catch (err) {
+                alert('Timeout ou Erro na conexão! As imagens podem demorar.');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-70');
+                icon.innerText = 'download';
+                icon.classList.remove('animate-spin');
+                text.innerText = 'EXTRAIR JOGOS DA API';
+            }
+        }
+
+        async function removeGames() {
+            if (!confirm("Tem certeza? Isso apagará todos os jogos e banners atuais.")) return;
+            try {
+                const res = await fetch('/api/admin/games/remove', { method: 'POST' });
+                const data = await res.json();
+                alert(data.message || data.error);
+            } catch (err) {
+                alert('Erro ao remover jogos.');
+            }
+        }
+
+        loadApiCredentials();
+
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('total_billing').innerText = data.stats.totalBilling.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    document.getElementById('active_players').innerText = data.stats.activePlayers;
+                    document.getElementById('registered_users').innerText = data.stats.registeredUsers;
+                }
+            } catch (err) {
+                console.error('Erro ao buscar estatísticas:', err);
+            }
+        }
+
+        // Fetch on load
+        fetchStats();
+        // Refresh every 30 seconds
+        setInterval(fetchStats, 30000);
+    </script>
+</body>
+
+</html>
