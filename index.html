@@ -904,10 +904,10 @@
                         document.getElementById('game-iframe').src = data.launch_url;
                         document.getElementById('game-overlay').classList.remove('hidden');
                         document.getElementById('game-overlay').classList.add('flex');
-                        // Hide Navbars
-                        document.getElementById('top-banner').classList.add('hidden');
-                        document.getElementById('main-nav').classList.add('hidden');
-                        document.getElementById('bottom-nav').classList.add('hidden');
+                        // Hide Navbars with style for extra safety
+                        document.getElementById('top-banner').style.display = 'none';
+                        document.getElementById('main-nav').style.display = 'none';
+                        document.getElementById('bottom-nav').style.display = 'none';
                     } else {
                         showToast('Erro ao iniciar: ' + (data.error || 'Tente novamente'), 'error');
                     }
@@ -922,9 +922,9 @@
                 document.getElementById('game-overlay').classList.remove('flex');
                 document.getElementById('game-iframe').src = '';
                 // Show Navbars
-                document.getElementById('top-banner').classList.remove('hidden');
-                document.getElementById('main-nav').classList.remove('hidden');
-                document.getElementById('bottom-nav').classList.remove('hidden');
+                document.getElementById('top-banner').style.display = 'flex';
+                document.getElementById('main-nav').style.display = 'flex';
+                document.getElementById('bottom-nav').style.display = 'flex';
                 syncUserData(); // Atualiza saldo apos fechar o jogo
             }
 
@@ -934,21 +934,24 @@
         <!-- Depósito redireciona para página dedicada -->
 
 
-        <!-- Jogo Overlay -->
-        <div id="game-overlay" class="fixed inset-0 bg-black z-[10000] hidden flex-col">
-            <div class="h-14 bg-[#0e0e0e] flex items-center justify-between px-4 border-b border-white/10">
-                <div class="flex items-center gap-2">
-                    <img src="/public/FAV.png" class="h-6 w-auto" alt="Logo">
-                    <span class="font-black text-sm uppercase tracking-tighter">30WIN GAMES</span>
+        <!-- Jogo Overlay Fullscreen -->
+        <div id="game-overlay" class="fixed inset-0 bg-black z-[10000] hidden items-center justify-center">
+            <!-- Floating Home/Return Button (Watermark style) -->
+            <button onclick="closeGameOverlay()"
+                class="fixed left-0 top-1/2 -translate-y-1/2 z-[10001] w-10 h-20 bg-white/10 backdrop-blur-lg border border-white/20 rounded-r-2xl flex items-center justify-center active:scale-95 transition-all shadow-[10px_0_30px_rgba(0,0,0,0.5)] group">
+                <div class="flex flex-col items-center gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                        </path>
+                    </svg>
+                    <span class="text-[8px] font-bold text-white uppercase tracking-tighter">Sair</span>
                 </div>
-                <button onclick="closeGameOverlay()"
-                    class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 active:scale-95 transition-transform">
-                    <span class="material-symbols-outlined text-white">close</span>
-                </button>
-            </div>
-            <div class="flex-1 w-full bg-[#000] relative">
-                <iframe id="game-iframe" src="" class="w-full h-full border-none shadow-2xl"></iframe>
-            </div>
+            </button>
+
+            <!-- Fullscreen Iframe -->
+            <iframe id="game-iframe" src="" class="w-screen h-screen border-none shadow-2xl"></iframe>
         </div>
 
         <script>
