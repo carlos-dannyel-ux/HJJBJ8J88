@@ -76,9 +76,19 @@
             width: 100%;
             aspect-ratio: 3/4 !important;
             object-fit: cover;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
             background-color: #222;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .game-card-img-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.5);
+            border-color: rgba(251, 191, 36, 0.3);
         }
 
         .game-card-img-container img {
@@ -86,6 +96,11 @@
             height: 100% !important;
             object-fit: cover !important;
             display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .game-card-img-container:hover img {
+            transform: scale(1.05);
         }
 
         .game-grid {
@@ -472,28 +487,24 @@
                 </div>
                 <div id="popular-games-grid" class="grid grid-cols-3 gap-x-2 gap-y-4 px-1 pb-2">
                     <!-- Game Card 1 -->
-                    <div class="w-full flex flex-col gap-1 cursor-pointer">
-                        <div class="relative game-card-img-container border border-[#0F0F0F]">
+                    <div class="w-full flex flex-col cursor-pointer" onclick="launchGame('fortune-rabbit')">
+                        <div class="relative game-card-img-container">
                             <img alt="Fortune Rabbit"
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OhOxFeaY-LcJdWKILJKiAQ0rHw-TWu_uPt8JVrr9Gb3ezvi9FRhIEDxyWXiFhlzMH6rrvMkDAVGoad1hDDbFJOXoePBAXrzbNgjW8Ex7pXdAYN6CkuboaWB5uF4_VCdJzPXXhOLgp0TMHUEaCop0uJ7gcrKs91lM0ISwXzd37aa5KyxX2dNm1T-GqNc_KD2_WDdkzd6e7fZltSIYXAS4pIFfbyMGeFXjUxXrkGKY3deYl-ogHa_f1--hBXeRy0BLmg5L0b-DBQ">
                             <div
                                 class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
                                 PG</div>
                         </div>
-                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
-                            Rabbit</span>
                     </div>
                     <!-- Game Card 2 -->
-                    <div class="w-full flex flex-col gap-1 cursor-pointer">
-                        <div class="relative game-card-img-container border border-[#0F0F0F]">
+                    <div class="w-full flex flex-col cursor-pointer" onclick="launchGame('fortune-tiger')">
+                        <div class="relative game-card-img-container">
                             <img alt="Fortune Tiger"
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA_G2oW86NlHcN86wVQR2hvL7pxKgTfUFWogLAs8WarYiLsXA6vifbTioYsVjiH6gBhGL4cs-Pxj7L-5QI84NKfEkRQMjpqjkX0nn8DeZtIL-CDiGJwf0UjVPojNd5AHpJH9Nj153VG3P9zPQzQlVZH47XSHf3P8kdbosQcoky4Wyq5fNDUCSBqnRh1jIeYAOqE-DJROI-joPezTYJZE90txKw3lekg8D5oItogXy5ZYqVHk40Sol3vTNSciDi-RcPxh3yZeT7Mg">
                             <div
                                 class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
                                 PG</div>
                         </div>
-                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
-                            Tiger</span>
                     </div>
                 </div>
             </section>
@@ -655,11 +666,10 @@
                         data.popular.forEach(game => {
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             popHtml += `
-                            <div class="w-full space-y-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
-                            <div class="game-card-img-container border border-[#1a1a1a]">
-                                <img src="${bannerSrc}">
-                            </div>
-                                <span class="text-[9px] font-medium truncate block text-center text-white/70 px-1">${game.game_name}</span>
+                            <div class="w-full cursor-pointer" onclick="launchGame('${game.game_code}')">
+                                <div class="game-card-img-container">
+                                    <img src="${bannerSrc}">
+                                </div>
                             </div>`;
                         });
                         popularContainer.innerHTML = popHtml;
@@ -672,17 +682,16 @@
                     for (const [provider, games] of Object.entries(data.providers)) {
                         if (games.length === 0) continue;
 
-                        const displayGames = games.slice(0, 12);
+                        const displayGames = games.slice(0, 9);
                         let gamesHtml = '';
                         displayGames.forEach(game => {
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             gamesHtml += `
-                            <div class="w-full flex flex-col gap-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
-                                <div class="relative game-card-img-container border border-[#0F0F0F]">
+                            <div class="w-full cursor-pointer" onclick="launchGame('${game.game_code}')">
+                                <div class="relative game-card-img-container">
                                     <img alt="${game.game_name}" src="${bannerSrc}" loading="lazy">
                                     <div class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">${provider.split(' ')[0]}</div>
                                 </div>
-                                <span class="text-[10px] font-medium truncate text-gray-300 text-center px-1">${game.game_name}</span>
                             </div>
                             `;
                         });
