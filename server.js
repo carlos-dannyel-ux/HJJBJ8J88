@@ -781,6 +781,163 @@ app.post('/api/finance/withdraw-password', authenticateToken, async (req, res) =
     }
 });
 
+// --- MAX API WEBHOOK & LAUNCH ---
+app.post('/api/games/launch', authenticateToken, async (req, res) => {
+    const { gameCode } = req.body;
+    if (!gameCode) return res.status(400).json({ error: 'Código do jogo é obrigatório.' });
+
+    try {
+        const creds = await pool.query('SELECT * FROM api_credentials WHERE module = $1', ['max_api']);
+        if (creds.rows.length === 0) return res.status(400).json({ error: 'Credenciais da API não configuradas.' });
+
+        const { agent_code, agent_token } = creds.rows[0];
+        const userCode = `30win_user_${req.user.id}`;
+
+        // Create player in Max API in case it does not exist
+        await axios.post('https://maxapigames.com/api/v2', {
+            method: 'user_create',
+            agent_code,
+            agent_token,
+            user_code: userCode
+        }).catch(e => console.error('Erro silent criar user:', e.message));
+
+        const launchPayload = {
+            method: 'game_launch',
+            agent_code,
+            agent_token,
+            user_code: userCode,
+            game_code: gameCode,
+            callback_url: `https://${req.get('host')}/api/webhook/maxapi`
+        };
+
+        const response = await axios.post('https://maxapigames.com/api/v2', launchPayload);
+        const data = response.data;
+
+        if (data.status === 1) {
+            res.json({ launch_url: data.launch_url });
+        } else {
+            res.status(400).json({ error: data.msg || 'Erro na API MAX' });
+        }
+    } catch (err) {
+        console.error('Game Launch Error:', err);
+        res.status(500).json({ error: 'Erro ao gerar link de jogo.' });
+    }
+});
+
+app.post('/api/webhook/maxapi', async (req, res) => {
+    const { method, agent_code, agent_secret, user_code, slot } = req.body;
+
+    try {
+        const creds = await pool.query('SELECT * FROM api_credentials WHERE module = $1', ['max_api']);
+        if (creds.rows.length === 0) return res.status(401).json({ status: 0, msg: 'INVALID_AGENT' });
+
+        // Verifica Agent Secret
+        const agentSettings = creds.rows[0];
+        if (agentSettings.agent_code !== agent_code || agentSettings.agent_secret !== agent_secret) {
+            return res.status(401).json({ status: 0, msg: 'INVALID_AGENT' });
+        }
+
+        const userId = parseInt(user_code.replace('30win_user_', ''));
+        if (isNaN(userId)) return res.status(400).json({ status: 0, msg: 'INVALID_USER' });
+
+        const userRows = await pool.query('SELECT balance FROM users WHERE id = $1', [userId]);
+        if (userRows.rows.length === 0) return res.status(400).json({ status: 0, msg: 'INVALID_USER' });
+
+        let userBalance = parseFloat(userRows.rows[0].balance);
+
+        if (method === 'user_balance') {
+            return res.json({ status: 1, user_balance: userBalance });
+        }
+
+        if (method === 'transaction' && slot) {
+            let bet = parseFloat(slot.bet_money) || 0;
+            let win = parseFloat(slot.win_money) || 0;
+
+            // Fetch current Reward System settings
+            const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name LIKE 'reward_%'");
+            const settings = {};
+            sRows.rows.forEach(r => settings[r.key_name] = r.key_value);
+
+            let phase = settings['reward_system_phase'] || 'arrecadacao';
+            const metaArrecadacao = parseFloat(settings['reward_meta_arrecadacao']) || 1000.00;
+            const metaRetribuicao = parseFloat(settings['reward_meta_retribuicao']) || 500.00;
+            let currentArrecadacao = parseFloat(settings['reward_current_arrecadacao']) || 0.00;
+            let currentRetribuicao = parseFloat(settings['reward_current_retribuicao']) || 0.00;
+            const maxPrize = parseFloat(settings['reward_max_prize']) || 99999.00;
+            const rtpArrecadacao = settings['reward_rtp_arrecadacao'] || '5';
+            const rtpRetribuicao = settings['reward_rtp_retribuicao'] || '95';
+
+            // 1. Max Prize Constraint
+            if (win > maxPrize && maxPrize > 0) {
+                win = maxPrize; // Capping win
+            }
+
+            // Update local balance
+            userBalance = userBalance - bet + win;
+            if (userBalance < 0) userBalance = 0;
+            await pool.query('UPDATE users SET balance = $1 WHERE id = $2', [userBalance, userId]);
+
+            // 2. Cycle Logic
+            let transitionOccurred = false;
+            let nextRtp = null;
+            let profit = bet - win; // Negative if player wins more than bet
+
+            if (phase === 'arrecadacao') {
+                currentArrecadacao += profit;
+                if (currentArrecadacao >= metaArrecadacao) {
+                    phase = 'retribuicao';
+                    currentArrecadacao = 0;
+                    currentRetribuicao = 0;
+                    transitionOccurred = true;
+                    nextRtp = rtpRetribuicao;
+                }
+            } else if (phase === 'retribuicao') {
+                currentRetribuicao += (win - bet > 0 ? win - bet : 0); // Accumulate net player wins
+
+                if (currentRetribuicao >= metaRetribuicao) {
+                    phase = 'arrecadacao';
+                    currentRetribuicao = 0;
+                    currentArrecadacao = 0;
+                    transitionOccurred = true;
+                    nextRtp = rtpArrecadacao;
+                }
+            }
+
+            // Save metrics tracking to database
+            const updates = {
+                reward_system_phase: phase,
+                reward_current_arrecadacao: String(currentArrecadacao.toFixed(2)),
+                reward_current_retribuicao: String(currentRetribuicao.toFixed(2))
+            };
+
+            for (const [k, v] of Object.entries(updates)) {
+                await pool.query('UPDATE system_settings SET key_value = $1 WHERE key_name = $2', [v, k]);
+            }
+
+            // 3. Trigger API RTP control on Phase Change
+            if (transitionOccurred && nextRtp !== null) {
+                try {
+                    await axios.post('https://maxapigames.com/api/v2', {
+                        method: 'control_rtp',
+                        agent_code: agentSettings.agent_code,
+                        agent_token: agentSettings.agent_token,
+                        rtp: parseInt(nextRtp)
+                    });
+                } catch (apiErr) {
+                    console.error('Failed to command RTP to MAX API:', apiErr.message);
+                }
+            }
+
+            return res.json({ status: 1, user_balance: userBalance });
+        }
+
+        return res.status(400).json({ status: 0, msg: 'INVALID_METHOD' });
+    } catch (err) {
+        console.error('Webhook Max API Error:', err);
+        return res.status(500).json({ status: 0, msg: 'INTERNAL_ERROR' });
+    }
+});
+
 // --- ROUTES FOR HTML ---
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));

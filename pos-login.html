@@ -155,6 +155,11 @@
                         <span class="material-symbols-outlined">settings</span>
                         <span class="font-headline uppercase tracking-wide text-sm">Configs Globais</span>
                     </div>
+                    <div id="tab-reward" onclick="switchTab('reward')"
+                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all">
+                        <span class="material-symbols-outlined">account_balance_wallet</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">Retribuição e RTP</span>
+                    </div>
                     <div class="mt-40 flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:text-error transition-all"
                         onclick="localStorage.removeItem('30win_token'); window.location.href='/admin.html'">
                         <span class="material-symbols-outlined">logout</span>
@@ -648,6 +653,98 @@
                     </div>
                 </div>
             </div>
+
+            <!-- REWARD View -->
+            <div id="view-reward" class="hidden flex flex-col gap-6">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-headline font-bold text-2xl text-[#00e3fd]">Sistema de Retribuição e Gestão de RTP
+                    </h3>
+                </div>
+
+                <!-- Status Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="glass-card rounded-xl p-6 border-t-4 border-[#ff6b98]">
+                        <h4 class="font-bold text-[#e6e2ff]/70 uppercase tracking-widest text-[10px] mb-2">Fase Atual
+                        </h4>
+                        <span id="ui_current_phase"
+                            class="text-2xl font-black text-[#ff6b98] uppercase">CARREGANDO...</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 border-t-4 border-[#df8eff]">
+                        <h4 class="font-bold text-[#e6e2ff]/70 uppercase tracking-widest text-[10px] mb-2">Arrecadado
+                            (Lucro)</h4>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-xl font-bold text-white">R$</span>
+                            <span id="ui_current_arrecadacao" class="text-3xl font-black text-white">0.00</span>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 border-t-4 border-[#00e3fd]">
+                        <h4 class="font-bold text-[#e6e2ff]/70 uppercase tracking-widest text-[10px] mb-2">Distribuído
+                            (Prêmios)</h4>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-xl font-bold text-white">R$</span>
+                            <span id="ui_current_retribuicao" class="text-3xl font-black text-white">0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-8 border-l-4 border-primary">
+                    <h3 class="font-headline font-bold text-xl mb-4 text-[#df8eff]">1. Fase de Arrecadação (Casa Lucra)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Meta de Arrecadação (R$)</label>
+                            <input type="number" id="reward_meta_arrecadacao"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                                placeholder="Ex: 1000">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">RTP na Arrecadação (%)</label>
+                            <input type="number" id="reward_rtp_arrecadacao"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                                placeholder="Ex: 5">
+                        </div>
+                    </div>
+
+                    <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-[#df8eff]">2. Fase de Retribuição
+                        (Jogadores Ganham)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Meta de Distribuição (R$)</label>
+                            <input type="number" id="reward_meta_retribuicao"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                                placeholder="Ex: 500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">RTP na Distribuição (%)</label>
+                            <input type="number" id="reward_rtp_retribuicao"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                                placeholder="Ex: 95">
+                        </div>
+                    </div>
+
+                    <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-error">3. Limite de Prejuízo (Trava)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Prêmio Máximo por Giro
+                                (R$)</label>
+                            <input type="number" id="reward_max_prize"
+                                class="w-full bg-[#110f2d] border border-error/50 rounded p-3 text-white focus:border-error"
+                                placeholder="Ex: 50">
+                            <p class="text-[10px] text-gray-500 mt-2">Ganhos acima desse valor em um único giro serão
+                                bloqueados pelo Webhook. Ex: limite 50$ (O usuário saca 50$ no maximo num grande
+                                premio).</p>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-outline-variant/10 pt-8">
+                        <button onclick="saveRewardSettings()"
+                            class="bg-primary hover:bg-primary-dim text-white font-bold py-3 px-10 rounded-xl shadow-[0_10px_30px_rgba(223,142,255,0.3)] transition-all uppercase tracking-widest text-xs">
+                            SALVAR CICLOS E RTP
+                        </button>
+                    </div>
+                </div>
+            </div>
+
     </div>
 
     <!-- Modal Criar Conta Demo -->
@@ -798,24 +895,27 @@
             const usersView = document.getElementById('view-users');
             const financeView = document.getElementById('view-finance');
             const settingsView = document.getElementById('view-settings');
+            const rewardView = document.getElementById('view-reward');
 
             const tabDashboard = document.getElementById('tab-dashboard');
             const tabApi = document.getElementById('tab-api');
             const tabUsers = document.getElementById('tab-users');
             const tabFinance = document.getElementById('tab-finance');
             const tabSettings = document.getElementById('tab-settings');
+            const tabReward = document.getElementById('tab-reward');
 
             const inactiveClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all";
             const activeClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#df8eff] bg-[#232148] font-bold border-r-4 border-[#df8eff]";
 
-            [dashboardView, apiView, usersView, financeView, settingsView].forEach(v => { if (v) v.classList.add('hidden'); });
-            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings].forEach(t => { if (t) t.className = inactiveClass; });
+            [dashboardView, apiView, usersView, financeView, settingsView, rewardView].forEach(v => { if (v) v.classList.add('hidden'); });
+            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings, tabReward].forEach(t => { if (t) t.className = inactiveClass; });
 
             if (tab === 'dashboard') { dashboardView.classList.remove('hidden'); tabDashboard.className = activeClass; }
             else if (tab === 'api') { apiView.classList.remove('hidden'); tabApi.className = activeClass; loadAdminGames(); }
             else if (tab === 'users') { usersView.classList.remove('hidden'); tabUsers.className = activeClass; loadUsers(); }
             else if (tab === 'finance') { financeView.classList.remove('hidden'); tabFinance.className = activeClass; loadFinance(); }
             else if (tab === 'settings') { settingsView.classList.remove('hidden'); tabSettings.className = activeClass; loadSystemSettings(); }
+            else if (tab === 'reward') { rewardView.classList.remove('hidden'); tabReward.className = activeClass; loadRewardSettings(); }
         }
 
         async function loadAdminGames() {
@@ -1325,6 +1425,68 @@
         fetchStats();
         // Refresh every 30 seconds
         setInterval(fetchStats, 30000);
+
+        // --- SISTEMA DE RETRIBUIÇÃO ---
+        async function loadRewardSettings() {
+            try {
+                const res = await fetch('/api/admin/system/settings');
+                const data = await res.json();
+                if (data.success && data.settings) {
+                    const s = data.settings;
+
+                    // UI STATUS
+                    const phaseUI = document.getElementById('ui_current_phase');
+                    if (s.reward_system_phase === 'arrecadacao') {
+                        phaseUI.innerText = 'CASA LUCRA (ARRECADAÇÃO)';
+                        phaseUI.classList.remove('text-[#00e3fd]');
+                        phaseUI.classList.add('text-[#ff6b98]');
+                    } else if (s.reward_system_phase === 'retribuicao') {
+                        phaseUI.innerText = 'PLAYERS GANHAM (DISTRIBUIÇÃO)';
+                        phaseUI.classList.remove('text-[#ff6b98]');
+                        phaseUI.classList.add('text-[#00e3fd]');
+                    }
+
+                    document.getElementById('ui_current_arrecadacao').innerText = parseFloat(s.reward_current_arrecadacao || 0).toFixed(2);
+                    document.getElementById('ui_current_retribuicao').innerText = parseFloat(s.reward_current_retribuicao || 0).toFixed(2);
+
+                    // INPUTS
+                    document.getElementById('reward_meta_arrecadacao').value = s.reward_meta_arrecadacao || '';
+                    document.getElementById('reward_meta_retribuicao').value = s.reward_meta_retribuicao || '';
+                    document.getElementById('reward_rtp_arrecadacao').value = s.reward_rtp_arrecadacao || '';
+                    document.getElementById('reward_rtp_retribuicao').value = s.reward_rtp_retribuicao || '';
+                    document.getElementById('reward_max_prize').value = s.reward_max_prize || '';
+                }
+            } catch (err) {
+                console.error('Erro ao carregar Retribuição:', err);
+            }
+        }
+
+        async function saveRewardSettings() {
+            const settings = {
+                reward_meta_arrecadacao: document.getElementById('reward_meta_arrecadacao').value,
+                reward_meta_retribuicao: document.getElementById('reward_meta_retribuicao').value,
+                reward_rtp_arrecadacao: document.getElementById('reward_rtp_arrecadacao').value,
+                reward_rtp_retribuicao: document.getElementById('reward_rtp_retribuicao').value,
+                reward_max_prize: document.getElementById('reward_max_prize').value
+            };
+
+            try {
+                const res = await fetch('/api/admin/system/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ settings })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Configurações de Retribuição e RTP atualizadas!');
+                    loadRewardSettings();
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            } catch (err) {
+                alert('Erro na conexão!');
+            }
+        }
     </script>
 </body>
 
