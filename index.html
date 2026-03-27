@@ -470,9 +470,9 @@
                             </svg></button>
                     </div>
                 </div>
-                <div class="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth px-1 pb-2">
+                <div id="popular-games-grid" class="grid grid-cols-3 gap-x-2 gap-y-4 px-1 pb-2">
                     <!-- Game Card 1 -->
-                    <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer">
+                    <div class="w-full flex flex-col gap-1 cursor-pointer">
                         <div class="relative game-card-img-container border border-[#0F0F0F]">
                             <img alt="Fortune Rabbit"
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OhOxFeaY-LcJdWKILJKiAQ0rHw-TWu_uPt8JVrr9Gb3ezvi9FRhIEDxyWXiFhlzMH6rrvMkDAVGoad1hDDbFJOXoePBAXrzbNgjW8Ex7pXdAYN6CkuboaWB5uF4_VCdJzPXXhOLgp0TMHUEaCop0uJ7gcrKs91lM0ISwXzd37aa5KyxX2dNm1T-GqNc_KD2_WDdkzd6e7fZltSIYXAS4pIFfbyMGeFXjUxXrkGKY3deYl-ogHa_f1--hBXeRy0BLmg5L0b-DBQ">
@@ -484,7 +484,7 @@
                             Rabbit</span>
                     </div>
                     <!-- Game Card 2 -->
-                    <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer">
+                    <div class="w-full flex flex-col gap-1 cursor-pointer">
                         <div class="relative game-card-img-container border border-[#0F0F0F]">
                             <img alt="Fortune Tiger"
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA_G2oW86NlHcN86wVQR2hvL7pxKgTfUFWogLAs8WarYiLsXA6vifbTioYsVjiH6gBhGL4cs-Pxj7L-5QI84NKfEkRQMjpqjkX0nn8DeZtIL-CDiGJwf0UjVPojNd5AHpJH9Nj153VG3P9zPQzQlVZH47XSHf3P8kdbosQcoky4Wyq5fNDUCSBqnRh1jIeYAOqE-DJROI-joPezTYJZE90txKw3lekg8D5oItogXy5ZYqVHk40Sol3vTNSciDi-RcPxh3yZeT7Mg">
@@ -495,7 +495,6 @@
                         <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
                             Tiger</span>
                     </div>
-                    <!-- Outros cards omitidos por brevidade ou podem ser mantidos no mesmo estilo -->
                 </div>
             </section>
             <!-- END: Popular Games Section -->
@@ -656,7 +655,7 @@
                         data.popular.forEach(game => {
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             popHtml += `
-                            <div class="flex-none w-[110px] space-y-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
+                            <div class="w-full space-y-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
                             <div class="game-card-img-container border border-[#1a1a1a]">
                                 <img src="${bannerSrc}">
                             </div>
@@ -678,7 +677,7 @@
                         displayGames.forEach(game => {
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             gamesHtml += `
-                            <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
+                            <div class="w-full flex flex-col gap-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
                                 <div class="relative game-card-img-container border border-[#0F0F0F]">
                                     <img alt="${game.game_name}" src="${bannerSrc}" loading="lazy">
                                     <div class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">${provider.split(' ')[0]}</div>
@@ -700,7 +699,7 @@
                                     <span class="material-symbols-outlined text-[14px] text-gray-400" style="font-variation-settings: 'FILL' 1;">chevron_right</span>
                                 </div>
                             </div>
-                            <div class="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+                            <div class="grid grid-cols-3 gap-x-2 gap-y-4">
                                 ${gamesHtml}
                             </div>
                         </section>
