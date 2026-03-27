@@ -1426,6 +1426,29 @@
         // Refresh every 30 seconds
         setInterval(fetchStats, 30000);
 
+        // Atualização em tempo real do Painel de Retribuição (Sem focar no input)
+        async function pollRewardStatus() {
+            if (document.getElementById('view-reward').classList.contains('hidden')) return;
+            try {
+                const res = await fetch('/api/admin/system/settings');
+                const data = await res.json();
+                if (data.success && data.settings) {
+                    const s = data.settings;
+                    const phaseUI = document.getElementById('ui_current_phase');
+                    if (s.reward_system_phase === 'arrecadacao') {
+                        phaseUI.innerText = 'CASA LUCRA (ARRECADAÇÃO)';
+                        phaseUI.className = 'text-2xl font-black text-[#ff6b98] uppercase';
+                    } else if (s.reward_system_phase === 'retribuicao') {
+                        phaseUI.innerText = 'PLAYERS GANHAM (DISTRIBUIÇÃO)';
+                        phaseUI.className = 'text-2xl font-black text-[#00e3fd] uppercase';
+                    }
+                    document.getElementById('ui_current_arrecadacao').innerText = parseFloat(s.reward_current_arrecadacao || 0).toFixed(2);
+                    document.getElementById('ui_current_retribuicao').innerText = parseFloat(s.reward_current_retribuicao || 0).toFixed(2);
+                }
+            } catch (err) { }
+        }
+        setInterval(pollRewardStatus, 5000);
+
         // --- SISTEMA DE RETRIBUIÇÃO ---
         async function loadRewardSettings() {
             try {
