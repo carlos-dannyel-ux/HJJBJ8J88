@@ -835,8 +835,17 @@
 
             function handleSaqueClick() {
                 const token = localStorage.getItem('30win_token');
-                if (!token) window.location.href = '/auth.html';
-                else window.location.href = '/perfil.html';
+                if (!token) { window.location.href = '/auth.html'; return; }
+
+                if (window.currentUser) {
+                    if (window.currentUser.has_withdraw_password) {
+                        window.location.href = '/saques.html';
+                    } else {
+                        window.location.href = '/criar-pin.html';
+                    }
+                } else {
+                    window.location.href = '/perfil.html';
+                }
             }
 
             async function launchGame(code) {

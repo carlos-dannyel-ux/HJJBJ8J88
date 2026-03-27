@@ -689,7 +689,13 @@
             function openWithdrawModal() {
                 const token = localStorage.getItem('30win_token');
                 if (!token) { window.location.href = '/auth.html'; return; }
-                window.location.href = '/saques.html';
+
+                // Redireciona para criação de PIN se o usuário ainda não tiver um
+                if (window.currentUser && window.currentUser.has_withdraw_password) {
+                    window.location.href = '/saques.html';
+                } else {
+                    window.location.href = '/criar-pin.html';
+                }
             }
         </script>
 </body>
