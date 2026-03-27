@@ -559,13 +559,23 @@
                 const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
                 const toast = document.createElement('div');
                 toast.id = 'toast-container';
-                toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-[400px] w-[90%] p-4 rounded-xl bg-gradient-to-r ${colors[type] || colors.info} border text-white shadow-2xl flex items-center gap-3 transition-all duration-500`;
-                toast.style.transform = 'translate(-50%, -100px)';
+                toast.className = `fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] max-w-[400px] w-[90%] p-6 rounded-2xl bg-gradient-to-br ${colors[type] || colors.info} border-2 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-4 transition-all duration-500`;
+                toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
                 toast.style.opacity = '0';
-                toast.innerHTML = `<span class="text-xl">${icons[type] || icons.info}</span><span class="text-sm font-bold flex-1">${msg}</span>`;
+                toast.innerHTML = `
+                    <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl shadow-inner animate-pulse">${icons[type] || icons.info}</div>
+                    <span class="text-lg font-black tracking-tight uppercase">${msg}</span>
+                `;
                 document.body.appendChild(toast);
-                requestAnimationFrame(() => { toast.style.transform = 'translate(-50%, 0)'; toast.style.opacity = '1'; });
-                setTimeout(() => { toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+                requestAnimationFrame(() => {
+                    toast.style.transform = 'translate(-50%, -50%) scale(1)';
+                    toast.style.opacity = '1';
+                });
+                setTimeout(() => {
+                    toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 500);
+                }, 3000);
             }
 
             function handleLogout() {
