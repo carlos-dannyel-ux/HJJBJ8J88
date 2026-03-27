@@ -467,7 +467,7 @@
                         d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                 </svg>
-                <div class="overflow-hidden whitespace-nowrap">
+                <div class="flex-1 min-w-0 overflow-hidden whitespace-nowrap">
                     <p class="animate-marquee">Site oficial da 30win [ 30win.ai ] Coleção ~ necessária!</p>
                 </div>
                 <button class="ml-auto text-brand-yellow">
@@ -668,6 +668,28 @@
         <script>
             const API_URL = '/api';
 
+            // --- TOAST SYSTEM ---
+            function showToast(msg, type = 'info') {
+                const existing = document.getElementById('toast-container');
+                if (existing) existing.remove();
+                const colors = {
+                    success: 'from-green-600 to-green-800 border-green-400',
+                    error: 'from-red-600 to-red-800 border-red-400',
+                    info: 'from-yellow-500 to-orange-600 border-yellow-300',
+                    warning: 'from-orange-500 to-red-600 border-orange-300'
+                };
+                const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
+                const toast = document.createElement('div');
+                toast.id = 'toast-container';
+                toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-[400px] w-[90%] p-4 rounded-xl bg-gradient-to-r ${colors[type] || colors.info} border text-white shadow-2xl flex items-center gap-3 transition-all duration-500`;
+                toast.style.transform = 'translate(-50%, -100px)';
+                toast.style.opacity = '0';
+                toast.innerHTML = `<span class="text-xl">${icons[type] || icons.info}</span><span class="text-sm font-bold flex-1">${msg}</span>`;
+                document.body.appendChild(toast);
+                requestAnimationFrame(() => { toast.style.transform = 'translate(-50%, 0)'; toast.style.opacity = '1'; });
+                setTimeout(() => { toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+            }
+
             // Animacao de Tally para o saldo
             let currentDisplayBalance = 0;
             let targetBalance = 0;
@@ -803,7 +825,7 @@
 
             function viewAllByProvider(provider) {
                 // Simplesmente filtra os jogos na tela atual ou abre uma nova "página" (tab)
-                alert('Mostrando todos os jogos de: ' + provider);
+                showToast('Mostrando todos os jogos de: ' + provider, 'info');
                 // No futuro aqui podemos carregar uma view específica
             }
 
@@ -833,9 +855,9 @@
                         document.getElementById('game-overlay').classList.remove('hidden');
                         document.getElementById('game-overlay').classList.add('flex');
                     } else {
-                        alert('Erro ao iniciar jogo: ' + (data.error || 'Tente novamente'));
+                        showToast('Erro ao iniciar jogo: ' + (data.error || 'Tente novamente'), 'error');
                     }
-                } catch (e) { alert('Erro de conexão'); }
+                } catch (e) { showToast('Erro de conexão', 'error'); }
             }
 
             function closeGameOverlay() {
@@ -946,7 +968,7 @@
             async function processDeposit() {
                 const amountStr = document.getElementById('deposit_amount').value;
                 const amount = parseFloat(amountStr);
-                if (!amount || amount < 1) { alert('Valor inválido. Mínimo R$ 1,00'); return; }
+                if (!amount || amount < 1) { showToast('Valor inválido. Mínimo R$ 1,00', 'error'); return; }
 
                 const btn = document.getElementById('btn-process-deposit');
                 btn.innerText = 'Processando...'; btn.disabled = true;
@@ -969,7 +991,7 @@
                                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
                                     body: JSON.stringify({ amount })
                                 });
-                                alert('Depósito fictício concluído!');
+                                showToast('Depósito fictício concluído!', 'success');
                                 window.location.reload();
                             }, 8000);
                         } else {
@@ -979,16 +1001,16 @@
                             document.getElementById('deposit-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pixCode)}`;
                         }
                     } else {
-                        alert('Erro: ' + data.error);
+                        showToast('Erro: ' + data.error, 'error');
                         btn.innerText = 'GERAR PIX'; btn.disabled = false;
                     }
-                } catch (e) { alert('Erro de conexão.'); btn.innerText = 'GERAR PIX'; btn.disabled = false; }
+                } catch (e) { showToast('Erro de conexão.', 'error'); btn.innerText = 'GERAR PIX'; btn.disabled = false; }
             }
 
             function copyPix() {
                 const input = document.getElementById('pix-code-display');
                 input.select(); document.execCommand('copy');
-                alert('Código PIX Copiado!');
+                showToast('Código PIX Copiado!', 'success');
             }
         </script>
 </body>

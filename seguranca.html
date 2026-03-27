@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - Segurança</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            background-color: #0e0e0e;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .headline-font {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html {
+            font-size: 75%;
+        }
+
+        body {
+            min-height: 100dvh;
+        }
+
+        .security-card {
+            background: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .security-card:hover {
+            border-color: rgba(255, 184, 0, 0.2);
+        }
+
+        .input-field {
+            width: 100%;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #FFB800;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-action:active {
+            transform: scale(0.97);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary-gold {
+            background: linear-gradient(135deg, #FFB800, #FF8A00);
+            color: #000;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: white;
+        }
+
+        .toggle-container {
+            width: 48px;
+            height: 26px;
+            background: #333;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-container.active {
+            background: #FFB800;
+        }
+
+        .toggle-container .toggle-dot {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: left 0.3s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-container.active .toggle-dot {
+            left: 25px;
+        }
+
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #262626;
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface antialiased">
+    <div
+        class="max-w-[450px] w-full mx-auto h-[100dvh] bg-[#0e0e0e] relative shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden">
+        <!-- TopAppBar -->
+        <header
+            class="sticky top-0 w-full flex justify-between items-center px-6 h-16 bg-[#0e0e0e]/70 backdrop-blur-xl z-50 shadow-[0_4px_30px_rgba(0,0,0,0.1)] shrink-0">
+            <div class="flex items-center gap-4">
+                <a href="perfil.html" class="hover:opacity-80 transition-opacity active:scale-90"
+                    style="text-decoration: none; color: inherit;">
+                    <span class="material-symbols-outlined text-on-surface">arrow_back_ios</span>
+                </a>
+                <span class="font-bold text-lg headline-font">Segurança</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-green-400"
+                    style="font-variation-settings: 'FILL' 1;">verified_user</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto pt-4 px-4 space-y-5 pb-28">
+
+            <!-- Info Banner -->
+            <div
+                class="flex items-center gap-3 p-4 bg-gradient-to-r from-[#FFB800]/10 to-transparent rounded-2xl border border-[#FFB800]/20">
+                <span class="material-symbols-outlined text-[#FFB800] text-3xl"
+                    style="font-variation-settings: 'FILL' 1;">shield</span>
+                <div>
+                    <p class="font-bold text-sm headline-font">Central de Segurança</p>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Gerencie as configurações de proteção da sua conta.</p>
+                </div>
+            </div>
+
+            <!-- Section: Change Password -->
+            <div class="security-card">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-blue-400">lock_reset</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Alterar Senha</p>
+                        <p class="text-[10px] text-gray-500">Atualize sua senha de acesso à plataforma</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <input type="password" id="current_password" class="input-field" placeholder="Senha atual">
+                    <input type="password" id="new_password" class="input-field"
+                        placeholder="Nova senha (mín. 6 caracteres)">
+                    <input type="password" id="confirm_new_password" class="input-field"
+                        placeholder="Confirmar nova senha">
+                    <button id="btn-change-pass" onclick="changePassword()" class="btn-action btn-primary-gold mt-2">
+                        <span class="flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">save</span>
+                            Salvar Nova Senha
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section: Change Withdraw PIN -->
+            <div class="security-card">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-purple-400">pin</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Alterar PIN de Saque</p>
+                        <p class="text-[10px] text-gray-500">Atualize sua senha numérica de 4 dígitos para saques</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <input type="password" id="current_pin" class="input-field" maxlength="4" inputmode="numeric"
+                        placeholder="PIN atual (4 dígitos)">
+                    <input type="password" id="new_pin" class="input-field" maxlength="4" inputmode="numeric"
+                        placeholder="Novo PIN (4 dígitos)">
+                    <button id="btn-change-pin" onclick="changeWithdrawPin()" class="btn-action btn-primary-gold mt-2">
+                        <span class="flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">save</span>
+                            Salvar Novo PIN
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section: Active Sessions -->
+            <div class="security-card">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-cyan-400">devices</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Sessões Ativas</p>
+                        <p class="text-[10px] text-gray-500">Dispositivos conectados à sua conta</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="session-item">
+                        <div class="w-9 h-9 rounded-full bg-green-900/30 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-green-400 text-lg">smartphone</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-bold">Este dispositivo</p>
+                            <p class="text-[10px] text-gray-500" id="session-info">Navegador Web · Agora</p>
+                        </div>
+                        <span
+                            class="text-[10px] font-bold text-green-400 bg-green-900/30 px-2 py-0.5 rounded-full">Ativo</span>
+                    </div>
+                </div>
+                <button onclick="handleLogoutAll()" class="btn-action btn-danger mt-4">
+                    <span class="flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">logout</span>
+                        Encerrar Todas as Sessões
+                    </span>
+                </button>
+            </div>
+
+            <!-- Section: Security Settings -->
+            <div class="security-card">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-orange-400">tune</span>
+                    </div>
+                    <p class="font-bold text-sm">Preferências</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold">Confirmar saques por PIN</p>
+                            <p class="text-[10px] text-gray-500">Exigir PIN antes de cada saque</p>
+                        </div>
+                        <div class="toggle-container active" onclick="this.classList.toggle('active')">
+                            <div class="toggle-dot"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold">Notificações de Login</p>
+                            <p class="text-[10px] text-gray-500">Aviso ao detectar novo acesso</p>
+                        </div>
+                        <div class="toggle-container" onclick="this.classList.toggle('active')">
+                            <div class="toggle-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Account (danger) -->
+            <div class="security-card border-red-900/30">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-900/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-red-400">warning</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm text-red-400">Zona de Perigo</p>
+                        <p class="text-[10px] text-gray-500">Ações irreversíveis</p>
+                    </div>
+                </div>
+                <p class="text-[11px] text-gray-500 mb-3">Ao excluir sua conta, todos os seus dados serão
+                    permanentemente removidos. Essa ação não pode ser desfeita.</p>
+                <button onclick="confirmDeleteAccount()" class="btn-action btn-danger">
+                    <span class="flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">delete_forever</span>
+                        Excluir Minha Conta
+                    </span>
+                </button>
+            </div>
+
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer
+            class="fixed bottom-0 w-full max-w-[450px] left-1/2 -translate-x-1/2 bg-[#141414] border-t border-gray-800 flex items-center justify-around py-2 z-50">
+            <a href="index.html" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H15C14.4477 21 14 20.5523 14 20V15C14 14.4477 13.5523 14 13 14H11C10.4477 14 10 14.4477 10 15V20C10 20.5523 9.55228 21 9 21H4C3.44772 21 3 20.5523 3 20V10.5Z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Começar</span>
+            </a>
+            <a href="ofertas.html" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">redeem</span>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Ofertas</span>
+            </a>
+            <a href="suporte.html" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+                <div class="text-gray-600 group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">support_agent</span>
+                </div>
+                <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Suporte</span>
+            </a>
+            <a href="perfil.html" class="flex flex-col items-center gap-1 py-1" style="text-decoration:none;">
+                <div class="text-[#FFB800]">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+                </div>
+                <span class="text-[9px] font-bold text-[#FFB800]">Perfil</span>
+            </a>
+        </footer>
+
+    </div>
+
+    <script>
+        const API_URL = '/api';
+        const token = localStorage.getItem('30win_token');
+        if (!token) window.location.href = '/auth.html';
+
+        // --- TOAST SYSTEM ---
+        function showToast(msg, type = 'info') {
+            const existing = document.getElementById('toast-container');
+            if (existing) existing.remove();
+            const colors = {
+                success: 'from-green-600 to-green-800 border-green-400',
+                error: 'from-red-600 to-red-800 border-red-400',
+                info: 'from-yellow-500 to-orange-600 border-yellow-300',
+                warning: 'from-orange-500 to-red-600 border-orange-300'
+            };
+            const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
+            const toast = document.createElement('div');
+            toast.id = 'toast-container';
+            toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-[400px] w-[90%] p-4 rounded-xl bg-gradient-to-r ${colors[type] || colors.info} border text-white shadow-2xl flex items-center gap-3 transition-all duration-500`;
+            toast.style.transform = 'translate(-50%, -100px)';
+            toast.style.opacity = '0';
+            toast.innerHTML = `<span class="text-xl">${icons[type] || icons.info}</span><span class="text-sm font-bold flex-1">${msg}</span>`;
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => { toast.style.transform = 'translate(-50%, 0)'; toast.style.opacity = '1'; });
+            setTimeout(() => { toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+        }
+
+        // Detect session info
+        (function () {
+            const ua = navigator.userAgent;
+            let browser = 'Navegador';
+            if (ua.includes('Chrome')) browser = 'Chrome';
+            else if (ua.includes('Firefox')) browser = 'Firefox';
+            else if (ua.includes('Safari')) browser = 'Safari';
+            const el = document.getElementById('session-info');
+            if (el) el.textContent = `${browser} · Em uso agora`;
+        })();
+
+        // CHANGE PASSWORD
+        async function changePassword() {
+            const current = document.getElementById('current_password').value;
+            const newPass = document.getElementById('new_password').value;
+            const confirm = document.getElementById('confirm_new_password').value;
+
+            if (!current) return showToast('Informe sua senha atual.', 'error');
+            if (!newPass || newPass.length < 6) return showToast('A nova senha deve ter pelo menos 6 caracteres.', 'error');
+            if (newPass !== confirm) return showToast('As senhas não coincidem.', 'error');
+
+            const btn = document.getElementById('btn-change-pass');
+            btn.disabled = true; btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="animate-spin">⏳</span> Salvando...</span>';
+
+            try {
+                const res = await fetch(`${API_URL}/user/change-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ current_password: current, new_password: newPass })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Senha alterada com sucesso!', 'success');
+                    document.getElementById('current_password').value = '';
+                    document.getElementById('new_password').value = '';
+                    document.getElementById('confirm_new_password').value = '';
+                } else {
+                    showToast(data.error || 'Erro ao alterar senha.', 'error');
+                }
+            } catch (e) { showToast('Erro de conexão.', 'error'); }
+            finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">save</span> Salvar Nova Senha</span>';
+            }
+        }
+
+        // CHANGE WITHDRAW PIN
+        async function changeWithdrawPin() {
+            const currentPin = document.getElementById('current_pin').value;
+            const newPin = document.getElementById('new_pin').value;
+
+            if (!currentPin || currentPin.length !== 4) return showToast('PIN atual deve ter exatamente 4 dígitos.', 'error');
+            if (!newPin || newPin.length !== 4) return showToast('Novo PIN deve ter exatamente 4 dígitos.', 'error');
+
+            const btn = document.getElementById('btn-change-pin');
+            btn.disabled = true; btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="animate-spin">⏳</span> Salvando...</span>';
+
+            try {
+                const res = await fetch(`${API_URL}/user/change-pin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ current_pin: currentPin, new_pin: newPin })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('PIN de saque alterado com sucesso!', 'success');
+                    document.getElementById('current_pin').value = '';
+                    document.getElementById('new_pin').value = '';
+                } else {
+                    showToast(data.error || 'Erro ao alterar PIN.', 'error');
+                }
+            } catch (e) { showToast('Erro de conexão.', 'error'); }
+            finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">save</span> Salvar Novo PIN</span>';
+            }
+        }
+
+        // LOGOUT ALL SESSIONS
+        function handleLogoutAll() {
+            localStorage.removeItem('30win_token');
+            localStorage.removeItem('30win_user');
+            showToast('Todas as sessões encerradas!', 'success');
+            setTimeout(() => { window.location.href = '/auth.html'; }, 1500);
+        }
+
+        // DELETE ACCOUNT
+        function confirmDeleteAccount() {
+            // Show confirmation modal
+            const overlay = document.createElement('div');
+            overlay.id = 'delete-confirm-overlay';
+            overlay.className = 'fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4';
+            overlay.innerHTML = `
+                <div class="bg-[#1a1a1a] rounded-2xl p-6 max-w-sm w-full border border-red-500/30 text-center space-y-4">
+                    <span class="material-symbols-outlined text-red-400 text-5xl">warning</span>
+                    <h3 class="font-bold text-lg text-red-400 headline-font">Excluir Conta?</h3>
+                    <p class="text-xs text-gray-400">Essa ação é <b>irreversível</b>. Todos os seus dados, saldo e histórico serão permanentemente apagados.</p>
+                    <input type="password" id="delete_confirm_pass" class="input-field" placeholder="Digite sua senha para confirmar">
+                    <div class="flex gap-3 mt-4">
+                        <button onclick="document.getElementById('delete-confirm-overlay').remove()" class="btn-action flex-1" style="background:#262626;color:white;">Cancelar</button>
+                        <button onclick="executeDeleteAccount()" class="btn-action btn-danger flex-1">Excluir</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        async function executeDeleteAccount() {
+            const password = document.getElementById('delete_confirm_pass').value;
+            if (!password) return showToast('Confirme com sua senha.', 'error');
+
+            try {
+                const res = await fetch(`${API_URL}/user/delete-account`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Conta excluída. Redirecionando...', 'success');
+                    localStorage.clear();
+                    setTimeout(() => { window.location.href = '/auth.html'; }, 2000);
+                } else {
+                    showToast(data.error || 'Erro ao excluir conta.', 'error');
+                }
+            } catch (e) { showToast('Erro de conexão.', 'error'); }
+        }
+    </script>
+</body>
+
+</html>

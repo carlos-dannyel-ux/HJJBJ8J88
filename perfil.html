@@ -423,7 +423,7 @@
                         </div>
                         <span class="material-symbols-outlined text-gray-700">chevron_right</span>
                     </a>
-                    <a href="SEGURANCA.HTML"
+                    <a href="seguranca.html"
                         class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
                         <div
                             class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
@@ -526,6 +526,28 @@
 
         <script>
             const API_URL = '/api';
+
+            // --- TOAST SYSTEM ---
+            function showToast(msg, type = 'info') {
+                const existing = document.getElementById('toast-container');
+                if (existing) existing.remove();
+                const colors = {
+                    success: 'from-green-600 to-green-800 border-green-400',
+                    error: 'from-red-600 to-red-800 border-red-400',
+                    info: 'from-yellow-500 to-orange-600 border-yellow-300',
+                    warning: 'from-orange-500 to-red-600 border-orange-300'
+                };
+                const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
+                const toast = document.createElement('div');
+                toast.id = 'toast-container';
+                toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-[400px] w-[90%] p-4 rounded-xl bg-gradient-to-r ${colors[type] || colors.info} border text-white shadow-2xl flex items-center gap-3 transition-all duration-500`;
+                toast.style.transform = 'translate(-50%, -100px)';
+                toast.style.opacity = '0';
+                toast.innerHTML = `<span class="text-xl">${icons[type] || icons.info}</span><span class="text-sm font-bold flex-1">${msg}</span>`;
+                document.body.appendChild(toast);
+                requestAnimationFrame(() => { toast.style.transform = 'translate(-50%, 0)'; toast.style.opacity = '1'; });
+                setTimeout(() => { toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+            }
 
             async function syncUserData() {
                 const token = localStorage.getItem('30win_token');
@@ -741,7 +763,7 @@
             async function processDeposit() {
                 const amountStr = document.getElementById('deposit_amount').value;
                 const amount = parseFloat(amountStr);
-                if (!amount || amount < 1) { alert('Valor inválido. Mínimo R$ 1,00'); return; }
+                if (!amount || amount < 1) { showToast('Valor inválido. Mínimo R$ 1,00', 'error'); return; }
 
                 const btn = document.getElementById('btn-process-deposit');
                 btn.innerText = 'Processando...'; btn.disabled = true;
@@ -764,7 +786,7 @@
                                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
                                     body: JSON.stringify({ amount })
                                 });
-                                alert('Depósito fictício concluído!');
+                                showToast('Depósito fictício concluído!', 'success');
                                 window.location.reload();
                             }, 8000);
                         } else {
@@ -774,16 +796,16 @@
                             document.getElementById('deposit-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pixCode)}`;
                         }
                     } else {
-                        alert('Erro: ' + data.error);
+                        showToast('Erro: ' + data.error, 'error');
                         btn.innerText = 'GERAR PIX'; btn.disabled = false;
                     }
-                } catch (e) { alert('Erro de conexão.'); btn.innerText = 'GERAR PIX'; btn.disabled = false; }
+                } catch (e) { showToast('Erro de conexão.', 'error'); btn.innerText = 'GERAR PIX'; btn.disabled = false; }
             }
 
             function copyPix() {
                 const input = document.getElementById('pix-code-display');
                 input.select(); document.execCommand('copy');
-                alert('Código PIX Copiado!');
+                showToast('Código PIX Copiado!', 'success');
             }
 
             function openWithdrawModal() {
@@ -797,7 +819,7 @@
                     }
                     if (window.currentUser.rollover_required > 0 && window.currentUser.rollover_progress < window.currentUser.rollover_required) {
                         const remaining = window.currentUser.rollover_required - window.currentUser.rollover_progress;
-                        alert(`Rollover pendente! Faltam R$ ${remaining.toFixed(2)} em apostas para liberar o saque.`);
+                        showToast(`Rollover pendente! Faltam R$ ${remaining.toFixed(2)} em apostas para liberar o saque.`, 'warning');
                     }
                 }
 
@@ -813,7 +835,7 @@
 
             async function createWithdrawPin() {
                 const pin = document.getElementById('new_withdraw_pin').value;
-                if (!pin || pin.length !== 4) { alert('Sua senha deve ter exatamente 4 dígitos numéricos.'); return; }
+                if (!pin || pin.length !== 4) { showToast('Sua senha deve ter exatamente 4 dígitos numéricos.', 'error'); return; }
 
                 const btn = document.getElementById('btn-create-pin');
                 btn.innerText = 'Salvando...'; btn.disabled = true;
@@ -826,14 +848,14 @@
                     });
                     const data = await res.json();
                     if (data.success) {
-                        alert('Senha de saque criada com sucesso!');
+                        showToast('Senha de saque criada com sucesso!', 'success');
                         document.getElementById('modal-create-pin').classList.add('hidden');
                         window.currentUser.has_withdraw_password = true;
                         openWithdrawModal(); // re-open the withdraw modal now that PIN is set
                     } else {
-                        alert(data.error || 'Erro ao criar PIN.');
+                        showToast(data.error || 'Erro ao criar PIN.', 'error');
                     }
-                } catch (e) { alert('Erro na conexão.'); }
+                } catch (e) { showToast('Erro na conexão.', 'error'); }
                 finally {
                     btn.innerText = 'SALVAR PIN'; btn.disabled = false;
                 }
@@ -845,9 +867,9 @@
                 const pix_key = document.getElementById('withdraw_pix_key').value;
                 const password = document.getElementById('withdraw_password').value;
 
-                if (!amount || amount < 10) { alert('Valor mínimo não atingido'); return; }
-                if (!pix_key) { alert('Chave PIX é obrigatória'); return; }
-                if (!password) { alert('Senha de saque (PIN) é obrigatória'); return; }
+                if (!amount || amount < 10) { showToast('Valor mínimo não atingido', 'error'); return; }
+                if (!pix_key) { showToast('Chave PIX é obrigatória', 'error'); return; }
+                if (!password) { showToast('Senha de saque (PIN) é obrigatória', 'error'); return; }
 
                 const btn = document.getElementById('btn-process-withdraw');
                 btn.innerText = 'Enviando...'; btn.disabled = true;
@@ -860,14 +882,14 @@
                     });
                     const data = await res.json();
 
-                    alert(data.message || data.error);
+                    showToast(data.message || data.error, data.success ? 'success' : 'error');
                     if (data.success) {
                         closeWithdrawModal();
                         window.location.reload();
                     } else {
                         btn.innerText = 'SOLICITAR SAQUE'; btn.disabled = false;
                     }
-                } catch (e) { alert('Erro de conexão.'); btn.innerText = 'SOLICITAR SAQUE'; btn.disabled = false; }
+                } catch (e) { showToast('Erro de conexão.', 'error'); btn.innerText = 'SOLICITAR SAQUE'; btn.disabled = false; }
             }
         </script>
 </body>

@@ -144,6 +144,72 @@ app.get('/api/user/info', authenticateToken, async (req, res) => {
     }
 });
 
+// --- SECURITY ENDPOINTS ---
+app.post('/api/user/change-password', authenticateToken, async (req, res) => {
+    const { current_password, new_password } = req.body;
+    if (!current_password || !new_password) return res.status(400).json({ success: false, error: 'Preencha todos os campos.' });
+    if (new_password.length < 6) return res.status(400).json({ success: false, error: 'A nova senha deve ter pelo menos 6 caracteres.' });
+
+    try {
+        const rows = await pool.query('SELECT password FROM users WHERE id = $1', [req.user.id]);
+        if (rows.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
+
+        const valid = await bcrypt.compare(current_password, rows.rows[0].password);
+        if (!valid) return res.status(401).json({ success: false, error: 'Senha atual incorreta.' });
+
+        const hashed = await bcrypt.hash(new_password, 10);
+        await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, req.user.id]);
+        res.json({ success: true, message: 'Senha alterada com sucesso!' });
+    } catch (err) {
+        console.error('Change Password Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao alterar senha.' });
+    }
+});
+
+app.post('/api/user/change-pin', authenticateToken, async (req, res) => {
+    const { current_pin, new_pin } = req.body;
+    if (!current_pin || !new_pin) return res.status(400).json({ success: false, error: 'Preencha todos os campos.' });
+    if (new_pin.length !== 4) return res.status(400).json({ success: false, error: 'O novo PIN deve ter exatamente 4 dígitos.' });
+
+    try {
+        const rows = await pool.query('SELECT withdraw_password FROM users WHERE id = $1', [req.user.id]);
+        if (rows.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
+        if (!rows.rows[0].withdraw_password) return res.status(400).json({ success: false, error: 'Você ainda não tem um PIN. Crie um primeiro na tela de Saques.' });
+
+        if (rows.rows[0].withdraw_password !== current_pin) {
+            return res.status(401).json({ success: false, error: 'PIN atual incorreto.' });
+        }
+
+        await pool.query('UPDATE users SET withdraw_password = $1 WHERE id = $2', [new_pin, req.user.id]);
+        res.json({ success: true, message: 'PIN de saque alterado com sucesso!' });
+    } catch (err) {
+        console.error('Change PIN Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao alterar PIN.' });
+    }
+});
+
+app.post('/api/user/delete-account', authenticateToken, async (req, res) => {
+    const { password } = req.body;
+    if (!password) return res.status(400).json({ success: false, error: 'Confirme com sua senha.' });
+
+    try {
+        const rows = await pool.query('SELECT password FROM users WHERE id = $1', [req.user.id]);
+        if (rows.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
+
+        const valid = await bcrypt.compare(password, rows.rows[0].password);
+        if (!valid) return res.status(401).json({ success: false, error: 'Senha incorreta.' });
+
+        await pool.query('DELETE FROM deposits WHERE user_id = $1', [req.user.id]);
+        await pool.query('DELETE FROM withdrawals WHERE user_id = $1', [req.user.id]);
+        await pool.query('DELETE FROM users WHERE id = $1', [req.user.id]);
+
+        res.json({ success: true, message: 'Conta excluída com sucesso.' });
+    } catch (err) {
+        console.error('Delete Account Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao excluir conta.' });
+    }
+});
+
 app.get('/api/referral/qr', authenticateToken, async (req, res) => {
     const inviteUrl = `/AUTH.HTML?ref=${req.user.referral_code}`;
     try {
