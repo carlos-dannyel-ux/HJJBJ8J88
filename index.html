@@ -72,11 +72,20 @@
             filter: brightness(1.1);
         }
 
-        .game-card img {
+        .game-card-img-container {
             width: 100%;
-            aspect-ratio: 3/4;
+            aspect-ratio: 3/4 !important;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #222;
+        }
+
+        .game-card-img-container img {
+            width: 100%;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block;
         }
 
         .game-grid {
@@ -464,8 +473,8 @@
                 <div class="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth px-1 pb-2">
                     <!-- Game Card 1 -->
                     <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer">
-                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
-                            <img alt="Fortune Rabbit" class="w-full h-full object-cover"
+                        <div class="relative game-card-img-container border border-[#0F0F0F]">
+                            <img alt="Fortune Rabbit"
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OhOxFeaY-LcJdWKILJKiAQ0rHw-TWu_uPt8JVrr9Gb3ezvi9FRhIEDxyWXiFhlzMH6rrvMkDAVGoad1hDDbFJOXoePBAXrzbNgjW8Ex7pXdAYN6CkuboaWB5uF4_VCdJzPXXhOLgp0TMHUEaCop0uJ7gcrKs91lM0ISwXzd37aa5KyxX2dNm1T-GqNc_KD2_WDdkzd6e7fZltSIYXAS4pIFfbyMGeFXjUxXrkGKY3deYl-ogHa_f1--hBXeRy0BLmg5L0b-DBQ">
                             <div
                                 class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
@@ -476,8 +485,8 @@
                     </div>
                     <!-- Game Card 2 -->
                     <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer">
-                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
-                            <img alt="Fortune Tiger" class="w-full h-full object-cover"
+                        <div class="relative game-card-img-container border border-[#0F0F0F]">
+                            <img alt="Fortune Tiger"
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA_G2oW86NlHcN86wVQR2hvL7pxKgTfUFWogLAs8WarYiLsXA6vifbTioYsVjiH6gBhGL4cs-Pxj7L-5QI84NKfEkRQMjpqjkX0nn8DeZtIL-CDiGJwf0UjVPojNd5AHpJH9Nj153VG3P9zPQzQlVZH47XSHf3P8kdbosQcoky4Wyq5fNDUCSBqnRh1jIeYAOqE-DJROI-joPezTYJZE90txKw3lekg8D5oItogXy5ZYqVHk40Sol3vTNSciDi-RcPxh3yZeT7Mg">
                             <div
                                 class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
@@ -648,9 +657,9 @@
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             popHtml += `
                             <div class="flex-none w-[110px] space-y-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
-                                <div class="aspect-[3/4] rounded-xl overflow-hidden border border-[#1a1a1a]">
-                                    <img src="${bannerSrc}" class="w-full h-full object-cover">
-                                </div>
+                            <div class="game-card-img-container border border-[#1a1a1a]">
+                                <img src="${bannerSrc}">
+                            </div>
                                 <span class="text-[9px] font-medium truncate block text-center text-white/70 px-1">${game.game_name}</span>
                             </div>`;
                         });
@@ -670,8 +679,8 @@
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             gamesHtml += `
                             <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
-                                <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
-                                    <img alt="${game.game_name}" src="${bannerSrc}" class="w-full h-full object-cover" loading="lazy">
+                                <div class="relative game-card-img-container border border-[#0F0F0F]">
+                                    <img alt="${game.game_name}" src="${bannerSrc}" loading="lazy">
                                     <div class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">${provider.split(' ')[0]}</div>
                                 </div>
                                 <span class="text-[10px] font-medium truncate text-gray-300 text-center px-1">${game.game_name}</span>
