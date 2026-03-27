@@ -58,78 +58,69 @@
     </style>
     <script id="tailwind-config">
         document.addEventListener('DOMContentLoaded', () => {
-            const balanceElement = document.getElementById('balance-value');
+            const balanceElement = document.getElementById('userBalance');
             const refreshBtn = document.getElementById('refresh-balance');
             const coinSound = document.getElementById('coin-sound');
 
-            let currentBalance = 1250.00;
-            let isAnimating = false;
+            let currentDisplayBalance = 0;
+            let targetBalance = 0;
+            let balanceAnimFrame = null;
 
             function playSound() {
                 if (coinSound) {
                     coinSound.currentTime = 0;
-                    coinSound.play().catch(e => console.log('Autoplay blocked or audio error:', e));
+                    coinSound.play().catch(e => { });
                 }
             }
 
-            function animateBalance(target) {
-                if (isAnimating) return;
-                isAnimating = true;
+            function animateBalance() {
+                if (Math.abs(currentDisplayBalance - targetBalance) < 0.01) {
+                    currentDisplayBalance = targetBalance;
+                    if (balanceElement) balanceElement.innerText = currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    return;
+                }
+                currentDisplayBalance += (targetBalance - currentDisplayBalance) * 0.1;
+                if (balanceElement) balanceElement.innerText = currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                balanceAnimFrame = requestAnimationFrame(animateBalance);
+            }
 
-                playSound();
-
-                const duration = 1500;
-                const startValue = currentBalance;
-                const startTime = performance.now();
-
-                function update(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-
-                    const easeOut = 1 - Math.pow(1 - progress, 3);
-                    const displayValue = startValue + ((target - startValue) * easeOut);
-
-                    balanceElement.textContent = displayValue.toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
+            async function syncUserData() {
+                const token = localStorage.getItem('30win_token');
+                if (!token) return;
+                try {
+                    const res = await fetch('/api/user/info', {
+                        headers: { 'Authorization': `Bearer ${token}` }
                     });
+                    const data = await res.json();
+                    if (data.success) {
+                        targetBalance = parseFloat(data.user.balance) || 0;
+                        if (balanceAnimFrame) cancelAnimationFrame(balanceAnimFrame);
+                        balanceAnimFrame = requestAnimationFrame(animateBalance);
 
-                    if (progress < 1) {
-                        requestAnimationFrame(update);
-                    } else {
-                        currentBalance = target;
-                        isAnimating = false;
+                        document.getElementById('userPhone').innerText = data.user.phone;
+                        document.getElementById('userId').innerText = 'ID: ' + data.user.id_user;
+                        window.currentUser = data.user;
+                        playSound();
                     }
-                }
-
-                requestAnimationFrame(update);
+                } catch (err) { console.error('Sync error:', err); }
             }
 
-            // Auto-update every 5 seconds
-            setInterval(() => {
-                const increment = Math.random() * 15.50;
-                animateBalance(currentBalance + increment);
-            }, 5000);
+            // Sync on load and every 5s
+            syncUserData();
+            setInterval(syncUserData, 5000);
 
-            // Manual refresh trigger
-            refreshBtn.addEventListener('click', () => {
-                const icon = document.getElementById('refresh-icon-spin');
-                if (icon) {
-                    icon.classList.remove('animate-spin-once');
-                    void icon.offsetWidth; // Trigger reflow
-                    icon.classList.add('animate-spin-once');
-                }
-
-                // Real data sync instead of mockup increment
-                fetch('/api/user/info', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') } })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            animateBalance(parseFloat(data.user.balance));
-                        }
-                    })
-                    .catch(e => console.error(e));
-            });
+            // Manual refresh
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    const icon = document.getElementById('refresh-icon-spin');
+                    if (icon) {
+                        icon.classList.remove('animate-spin-once');
+                        void icon.offsetWidth;
+                        icon.classList.add('animate-spin-once');
+                    }
+                    syncUserData();
+                });
+            }
         });
     </script>
     <style>
@@ -577,42 +568,10 @@
                 setTimeout(() => { toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
             }
 
-            async function syncUserData() {
-                const token = localStorage.getItem('30win_token');
-                if (!token) {
-                    window.location.href = '/auth.html';
-                    return;
-                }
-
-                try {
-                    const res = await fetch(`${API_URL}/user/info`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        window.currentUser = data.user;
-                        document.getElementById('userBalance').innerText = parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                        document.getElementById('userPhone').innerText = data.user.phone;
-                        document.getElementById('userId').innerText = 'ID: ' + data.user.id_user;
-                    } else {
-                        localStorage.removeItem('30win_token');
-                        window.location.href = '/auth.html';
-                    }
-                } catch (err) { console.error('Sync failed'); }
-            }
-
             function handleLogout() {
                 localStorage.removeItem('30win_token');
                 window.location.href = '/auth.html';
             }
-
-            // Run sync
-            syncUserData();
-            setInterval(syncUserData, 5000);
-
-            document.getElementById('refresh-balance').onclick = () => {
-                syncUserData();
-            };
         </script>
 
         <!-- Depósitos e Saques redirecionam para páginas dedicadas -->
