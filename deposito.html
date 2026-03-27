@@ -140,6 +140,20 @@
             border-radius: 12px;
             display: inline-block;
         }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin-once {
+            animation: spin 0.6s ease-in-out;
+        }
     </style>
 </head>
 
@@ -162,7 +176,7 @@
             <!-- New Premium Balance Pill (Matches Image 2) -->
             <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Método de Pagamento</span>
-                <div onclick="syncBalance()"
+                <div id="balance-pill" onclick="syncBalance()"
                     class="cursor-pointer flex items-center gap-2 bg-[#1a1a1a] border border-[#333] rounded-full pl-1.5 pr-3 py-1 animate-in fade-in zoom-in duration-300">
                     <div class="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-[#262626]">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg"
@@ -306,12 +320,36 @@
             document.getElementById('method-pix2').classList.toggle('active', method === 'pix2');
         }
 
+        let currentBalance = 0;
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const val = (progress * (end - start) + start);
+                obj.innerHTML = val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
         async function syncBalance() {
+            const icon = document.querySelector('#balance-pill .material-symbols-outlined');
+            if (icon) {
+                icon.classList.remove('animate-spin-once');
+                void icon.offsetWidth; // Trigger reflow
+                icon.classList.add('animate-spin-once');
+            }
             try {
                 const res = await fetch('/api/user/info', { headers: { 'Authorization': 'Bearer ' + token } });
                 const data = await res.json();
                 if (data.success) {
-                    document.getElementById('balanceDisplay').textContent = parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    const newBalance = parseFloat(data.user.balance);
+                    animateValue(document.getElementById('balanceDisplay'), currentBalance, newBalance, 1000);
+                    currentBalance = newBalance;
                     window.currentUser = data.user;
                 }
             } catch (e) { console.error(e); }

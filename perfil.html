@@ -41,6 +41,20 @@
         html {
             font-size: 75%;
         }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin-once {
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
     <script id="tailwind-config">
         document.addEventListener('DOMContentLoaded', () => {
@@ -99,8 +113,22 @@
 
             // Manual refresh trigger
             refreshBtn.addEventListener('click', () => {
-                const manualIncrement = 5.00 + (Math.random() * 10);
-                animateBalance(currentBalance + manualIncrement);
+                const icon = document.getElementById('refresh-icon-spin');
+                if (icon) {
+                    icon.classList.remove('animate-spin-once');
+                    void icon.offsetWidth; // Trigger reflow
+                    icon.classList.add('animate-spin-once');
+                }
+
+                // Real data sync instead of mockup increment
+                fetch('/api/user/info', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') } })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            animateBalance(parseFloat(data.user.balance));
+                        }
+                    })
+                    .catch(e => console.error(e));
             });
         });
     </script>
