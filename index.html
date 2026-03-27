@@ -925,6 +925,23 @@
         <!-- Depósito redireciona para página dedicada -->
 
 
+        <!-- Jogo Overlay -->
+        <div id="game-overlay" class="fixed inset-0 bg-black z-[10000] hidden flex-col">
+            <div class="h-14 bg-[#0e0e0e] flex items-center justify-between px-4 border-b border-white/10">
+                <div class="flex items-center gap-2">
+                    <img src="/public/FAV.png" class="h-6 w-auto" alt="Logo">
+                    <span class="font-black text-sm uppercase tracking-tighter">30WIN GAMES</span>
+                </div>
+                <button onclick="closeGameOverlay()"
+                    class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-white">close</span>
+                </button>
+            </div>
+            <div class="flex-1 w-full bg-[#000] relative">
+                <iframe id="game-iframe" src="" class="w-full h-full border-none shadow-2xl"></iframe>
+            </div>
+        </div>
+
         <script>
             function openDepositModal() {
                 const token = localStorage.getItem('30win_token');
