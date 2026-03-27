@@ -444,7 +444,7 @@
             </div>
         </nav>
         <!-- END: Main Header -->
-        <main class="flex-grow overflow-y-auto pb-20">
+        <main id="main-content" class="flex-grow overflow-y-auto pb-20">
             <!-- BEGIN: Promotional Slider -->
             <section class="px-4 py-4">
                 <div
@@ -904,10 +904,11 @@
                         document.getElementById('game-iframe').src = data.launch_url;
                         document.getElementById('game-overlay').classList.remove('hidden');
                         document.getElementById('game-overlay').classList.add('flex');
-                        // Hide Navbars with style for extra safety
+                        // Hide Navbars and Main Content with style for extra safety
                         document.getElementById('top-banner').style.display = 'none';
                         document.getElementById('main-nav').style.display = 'none';
                         document.getElementById('bottom-nav').style.display = 'none';
+                        document.getElementById('main-content').style.display = 'none';
                     } else {
                         showToast('Erro ao iniciar: ' + (data.error || 'Tente novamente'), 'error');
                     }
@@ -921,10 +922,11 @@
                 document.getElementById('game-overlay').classList.add('hidden');
                 document.getElementById('game-overlay').classList.remove('flex');
                 document.getElementById('game-iframe').src = '';
-                // Show Navbars
+                // Show Navbars and Main Content
                 document.getElementById('top-banner').style.display = 'flex';
                 document.getElementById('main-nav').style.display = 'flex';
                 document.getElementById('bottom-nav').style.display = 'flex';
+                document.getElementById('main-content').style.display = 'block';
                 syncUserData(); // Atualiza saldo apos fechar o jogo
             }
 
