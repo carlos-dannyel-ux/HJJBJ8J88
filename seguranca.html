@@ -214,14 +214,14 @@
                     </div>
                     <div>
                         <p class="font-bold text-sm">Alterar PIN de Saque</p>
-                        <p class="text-[10px] text-gray-500">Atualize sua senha numérica de 4 dígitos para saques</p>
+                        <p class="text-[10px] text-gray-500">Atualize sua senha numérica de 6 dígitos para saques</p>
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <input type="password" id="current_pin" class="input-field" maxlength="4" inputmode="numeric"
-                        placeholder="PIN atual (4 dígitos)">
-                    <input type="password" id="new_pin" class="input-field" maxlength="4" inputmode="numeric"
-                        placeholder="Novo PIN (4 dígitos)">
+                    <input type="password" id="current_pin" class="input-field" maxlength="6" inputmode="numeric"
+                        placeholder="PIN atual (6 dígitos)">
+                    <input type="password" id="new_pin" class="input-field" maxlength="6" inputmode="numeric"
+                        placeholder="Novo PIN (6 dígitos)">
                     <button id="btn-change-pin" onclick="changeWithdrawPin()" class="btn-action btn-primary-gold mt-2">
                         <span class="flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined text-sm">save</span>
@@ -429,8 +429,8 @@
             const currentPin = document.getElementById('current_pin').value;
             const newPin = document.getElementById('new_pin').value;
 
-            if (!currentPin || currentPin.length !== 4) return showToast('PIN atual deve ter exatamente 4 dígitos.', 'error');
-            if (!newPin || newPin.length !== 4) return showToast('Novo PIN deve ter exatamente 4 dígitos.', 'error');
+            if (!currentPin || currentPin.length !== 6) return showToast('PIN atual deve ter exatamente 6 dígitos.', 'error');
+            if (!newPin || newPin.length !== 6) return showToast('Novo PIN deve ter exatamente 6 dígitos.', 'error');
 
             const btn = document.getElementById('btn-change-pin');
             btn.disabled = true; btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="animate-spin">⏳</span> Salvando...</span>';

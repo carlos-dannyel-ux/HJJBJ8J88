@@ -134,9 +134,9 @@
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">PIN
-                        de Saque (4 dígitos)</label>
-                    <input type="password" id="withdraw_pin" maxlength="4"
-                        class="input-f text-center tracking-[0.5em] font-bold text-xl" placeholder="****">
+                        de Saque (6 dígitos)</label>
+                    <input type="password" id="withdraw_pin" maxlength="6"
+                        class="input-f text-center tracking-[0.5em] font-bold text-xl" placeholder="******">
                 </div>
                 <button id="btn-withdraw" class="btn-withdraw mt-2" onclick="processWithdrawal()">Solicitar
                     Retirada</button>
@@ -198,7 +198,7 @@
 
             if (!amount || amount < 10) return showToast('Mínimo R$ 10,00', 'error');
             if (!pix) return showToast('Informe a chave PIX', 'error');
-            if (!pin || pin.length !== 4) return showToast('PIN deve ter 4 dígitos', 'error');
+            if (!pin || pin.length !== 6) return showToast('PIN deve ter 6 dígitos', 'error');
 
             const btn = document.getElementById('btn-withdraw');
             btn.textContent = 'Processando...'; btn.disabled = true;

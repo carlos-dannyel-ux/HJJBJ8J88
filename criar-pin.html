@@ -244,19 +244,18 @@
         }
 
         async function submitPin() {
-            if (pin1.length < 4) return showToast('A senha deve ter pelo menos 4 dígitos.', 'error');
+            if (pin1.length !== 6) return showToast('A senha deve ter exatamente 6 dígitos.', 'error');
             if (pin1 !== pin2) {
                 showToast('As senhas não coincidem. Tente novamente.', 'error');
                 pin2 = ''; renderBoxes();
                 return;
             }
-            // Use only first 4 digits as the PIN
-            const finalPin = pin1.substring(0, 4);
+            const finalPin = pin1;
             try {
                 const res = await fetch('/api/finance/withdraw-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ withdraw_password: finalPin })
+                    body: JSON.stringify({ new_password: finalPin })
                 });
                 const data = await res.json();
                 if (data.success) {

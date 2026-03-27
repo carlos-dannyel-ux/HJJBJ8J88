@@ -218,9 +218,10 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="bg-surface-container-highest px-3 py-1.5 rounded-full flex items-center gap-2">
-                            <span id="userBalance" class="text-xs font-bold text-white/90">R$ 0,00</span>
-                            <div id="refreshBtn"
-                                class="w-5 h-5 bg-primary-container rounded-full flex items-center justify-center cursor-pointer transition-transform duration-500">
+                            <span id="userBalance" class="userBalanceDisplay text-xs font-bold text-white/90">R$
+                                0,00</span>
+                            <div
+                                class="refreshBtn w-5 h-5 bg-primary-container rounded-full flex items-center justify-center cursor-pointer transition-transform duration-500">
                                 <svg class="w-3 h-3" fill="none" height="12" viewBox="0 0 100 100" width="12"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -410,9 +411,9 @@
                     <img alt="Brazil Flag" class="rounded-sm"
                         src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/BRL.avif" width="16">
                     <span id="header_balance"
-                        class="text-brand-yellow font-bold text-xs transition-all duration-300">0,00</span>
-                    <button class="text-brand-yellow" id="refreshBtn">
-                        <svg id="refreshIcon" class="h-3 w-3 transition-transform duration-500 origin-center"
+                        class="userBalanceDisplay text-brand-yellow font-bold text-xs transition-all duration-300">0,00</span>
+                    <button class="refreshBtn text-brand-yellow">
+                        <svg class="refreshIcon h-3 w-3 transition-transform duration-500 origin-center"
                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path clip-rule="evenodd"
                                 d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
@@ -698,13 +699,25 @@
             function animateBalance() {
                 if (Math.abs(currentDisplayBalance - targetBalance) < 0.01) {
                     currentDisplayBalance = targetBalance;
-                    const el = document.getElementById('header_balance');
-                    if (el) el.innerText = currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    const els = document.querySelectorAll('.userBalanceDisplay');
+                    els.forEach(el => {
+                        if (el.id === 'header_balance') {
+                            el.innerText = currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        } else {
+                            el.innerText = 'R$ ' + currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        }
+                    });
                     return;
                 }
                 currentDisplayBalance += (targetBalance - currentDisplayBalance) * 0.1;
-                const el = document.getElementById('header_balance');
-                if (el) el.innerText = currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const els = document.querySelectorAll('.userBalanceDisplay');
+                els.forEach(el => {
+                    if (el.id === 'header_balance') {
+                        el.innerText = currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    } else {
+                        el.innerText = 'R$ ' + currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    }
+                });
                 balanceAnimFrame = requestAnimationFrame(animateBalance);
             }
 
@@ -721,12 +734,8 @@
                         targetBalance = parseFloat(data.user.balance) || 0;
                         if (balanceAnimFrame) cancelAnimationFrame(balanceAnimFrame);
                         balanceAnimFrame = requestAnimationFrame(animateBalance);
-
-                        const balanceElements = document.querySelectorAll('#userBalance');
-                        balanceElements.forEach(el => {
-                            el.innerText = 'R$ ' + targetBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                        });
-                    } else if (res.status === 401 || res.status === 402 || res.status === 403) {
+                        window.currentUser = data.user;
+                    } else if (res.status === 401) {
                         localStorage.removeItem('30win_token');
                     }
                 } catch (err) { console.error('Sync error:', err); }
@@ -735,16 +744,16 @@
             setInterval(syncUserData, 5000);
             syncUserData();
 
-            const refreshBtn = document.getElementById('refreshBtn');
-            const refreshIcon = document.getElementById('refreshIcon');
             let rotation = 0;
-            if (refreshBtn) {
-                refreshBtn.onclick = () => {
+            document.querySelectorAll('.refreshBtn').forEach(btn => {
+                btn.onclick = () => {
                     rotation += 360;
-                    refreshIcon.style.transform = `rotate(${rotation}deg)`;
+                    document.querySelectorAll('.refreshIcon, .refreshBtn svg').forEach(icon => {
+                        icon.style.transform = `rotate(${rotation}deg)`;
+                    });
                     syncUserData();
                 };
-            }
+            });
 
             document.addEventListener('click', (e) => {
                 const token = localStorage.getItem('30win_token');

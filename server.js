@@ -169,18 +169,18 @@ app.post('/api/user/change-password', authenticateToken, async (req, res) => {
 app.post('/api/user/change-pin', authenticateToken, async (req, res) => {
     const { current_pin, new_pin } = req.body;
     if (!current_pin || !new_pin) return res.status(400).json({ success: false, error: 'Preencha todos os campos.' });
-    if (new_pin.length !== 4) return res.status(400).json({ success: false, error: 'O novo PIN deve ter exatamente 4 dígitos.' });
+    if (new_pin.length !== 6) return res.status(400).json({ success: false, error: 'O novo PIN deve ter exatamente 6 dígitos.' });
 
     try {
         const rows = await pool.query('SELECT withdraw_password FROM users WHERE id = $1', [req.user.id]);
         if (rows.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
         if (!rows.rows[0].withdraw_password) return res.status(400).json({ success: false, error: 'Você ainda não tem um PIN. Crie um primeiro na tela de Saques.' });
 
-        if (rows.rows[0].withdraw_password !== current_pin) {
-            return res.status(401).json({ success: false, error: 'PIN atual incorreto.' });
-        }
+        const valid = await bcrypt.compare(String(current_pin), rows.rows[0].withdraw_password);
+        if (!valid) return res.status(401).json({ success: false, error: 'PIN atual incorreto.' });
 
-        await pool.query('UPDATE users SET withdraw_password = $1 WHERE id = $2', [new_pin, req.user.id]);
+        const hashedPin = await bcrypt.hash(String(new_pin), 10);
+        await pool.query('UPDATE users SET withdraw_password = $1 WHERE id = $2', [hashedPin, req.user.id]);
         res.json({ success: true, message: 'PIN de saque alterado com sucesso!' });
     } catch (err) {
         console.error('Change PIN Error:', err);
@@ -825,7 +825,7 @@ app.post('/api/withdraw', authenticateToken, async (req, res) => {
 
 app.post('/api/finance/withdraw-password', authenticateToken, async (req, res) => {
     const { new_password } = req.body;
-    if (!new_password || String(new_password).length < 4) return res.status(400).json({ success: false, error: 'A senha deve ter pelo menos 4 caracteres.' });
+    if (!new_password || String(new_password).length !== 6) return res.status(400).json({ success: false, error: 'A senha deve ter exatamente 6 caracteres numéricos.' });
 
     try {
         const hashedPassword = await bcrypt.hash(String(new_password), 10);
