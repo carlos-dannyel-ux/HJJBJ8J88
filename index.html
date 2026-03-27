@@ -72,36 +72,88 @@
             filter: brightness(1.1);
         }
 
-        .game-card-img-container {
+        /* --- Premium Game Card --- */
+        .game-card {
             width: 100%;
-            aspect-ratio: 3/4 !important;
-            object-fit: cover;
-            border-radius: 14px;
+            aspect-ratio: 3/4;
+            border-radius: 16px;
             overflow: hidden;
-            background-color: #222;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #1c1c2e;
             position: relative;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
         }
 
-        .game-card-img-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.5);
-            border-color: rgba(251, 191, 36, 0.3);
+        .game-card:hover,
+        .game-card:active {
+            transform: scale(1.04);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
         }
 
-        .game-card-img-container img {
+        .game-card img {
             width: 100%;
-            height: 100% !important;
-            object-fit: cover !important;
+            height: 100%;
+            object-fit: cover;
             display: block;
-            transition: transform 0.5s ease;
         }
 
-        .game-card-img-container:hover img {
-            transform: scale(1.05);
+        /* Gradient overlay at the bottom */
+        .game-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 55%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
+            pointer-events: none;
         }
+
+        .game-card .card-name {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+            padding: 0 6px;
+            z-index: 2;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: 0.02em;
+        }
+
+        .game-card .card-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: linear-gradient(135deg, #ff7a00, #ff5500);
+            color: #fff;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 2px 5px;
+            border-radius: 5px;
+            z-index: 2;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-card .card-star {
+            position: absolute;
+            top: 5px;
+            right: 6px;
+            z-index: 2;
+            font-size: 14px;
+            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+        }
+
+        /* --- END Premium Game Card --- */
 
         .game-grid {
             display: grid;
@@ -485,26 +537,22 @@
                             </svg></button>
                     </div>
                 </div>
-                <div id="popular-games-grid" class="grid grid-cols-3 gap-x-2 gap-y-4 px-1 pb-2">
+                <div id="popular-games-grid" class="grid grid-cols-3 gap-2 pb-2">
                     <!-- Game Card 1 -->
-                    <div class="w-full flex flex-col cursor-pointer" onclick="launchGame('fortune-rabbit')">
-                        <div class="relative game-card-img-container">
-                            <img alt="Fortune Rabbit"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OhOxFeaY-LcJdWKILJKiAQ0rHw-TWu_uPt8JVrr9Gb3ezvi9FRhIEDxyWXiFhlzMH6rrvMkDAVGoad1hDDbFJOXoePBAXrzbNgjW8Ex7pXdAYN6CkuboaWB5uF4_VCdJzPXXhOLgp0TMHUEaCop0uJ7gcrKs91lM0ISwXzd37aa5KyxX2dNm1T-GqNc_KD2_WDdkzd6e7fZltSIYXAS4pIFfbyMGeFXjUxXrkGKY3deYl-ogHa_f1--hBXeRy0BLmg5L0b-DBQ">
-                            <div
-                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
-                                PG</div>
-                        </div>
+                    <div class="game-card" onclick="launchGame('fortune-rabbit')">
+                        <img alt="Fortune Rabbit"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OhOxFeaY-LcJdWKILJKiAQ0rHw-TWu_uPt8JVrr9Gb3ezvi9FRhIEDxyWXiFhlzMH6rrvMkDAVGoad1hDDbFJOXoePBAXrzbNgjW8Ex7pXdAYN6CkuboaWB5uF4_VCdJzPXXhOLgp0TMHUEaCop0uJ7gcrKs91lM0ISwXzd37aa5KyxX2dNm1T-GqNc_KD2_WDdkzd6e7fZltSIYXAS4pIFfbyMGeFXjUxXrkGKY3deYl-ogHa_f1--hBXeRy0BLmg5L0b-DBQ">
+                        <span class="card-badge">PG</span>
+                        <span class="card-star">⭐</span>
+                        <span class="card-name">Fortune Rabbit</span>
                     </div>
                     <!-- Game Card 2 -->
-                    <div class="w-full flex flex-col cursor-pointer" onclick="launchGame('fortune-tiger')">
-                        <div class="relative game-card-img-container">
-                            <img alt="Fortune Tiger"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA_G2oW86NlHcN86wVQR2hvL7pxKgTfUFWogLAs8WarYiLsXA6vifbTioYsVjiH6gBhGL4cs-Pxj7L-5QI84NKfEkRQMjpqjkX0nn8DeZtIL-CDiGJwf0UjVPojNd5AHpJH9Nj153VG3P9zPQzQlVZH47XSHf3P8kdbosQcoky4Wyq5fNDUCSBqnRh1jIeYAOqE-DJROI-joPezTYJZE90txKw3lekg8D5oItogXy5ZYqVHk40Sol3vTNSciDi-RcPxh3yZeT7Mg">
-                            <div
-                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
-                                PG</div>
-                        </div>
+                    <div class="game-card" onclick="launchGame('fortune-tiger')">
+                        <img alt="Fortune Tiger"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA_G2oW86NlHcN86wVQR2hvL7pxKgTfUFWogLAs8WarYiLsXA6vifbTioYsVjiH6gBhGL4cs-Pxj7L-5QI84NKfEkRQMjpqjkX0nn8DeZtIL-CDiGJwf0UjVPojNd5AHpJH9Nj153VG3P9zPQzQlVZH47XSHf3P8kdbosQcoky4Wyq5fNDUCSBqnRh1jIeYAOqE-DJROI-joPezTYJZE90txKw3lekg8D5oItogXy5ZYqVHk40Sol3vTNSciDi-RcPxh3yZeT7Mg">
+                        <span class="card-badge">PG</span>
+                        <span class="card-star">🔥</span>
+                        <span class="card-name">Fortune Tiger</span>
                     </div>
                 </div>
             </section>
@@ -666,10 +714,11 @@
                         data.popular.forEach(game => {
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             popHtml += `
-                            <div class="w-full cursor-pointer" onclick="launchGame('${game.game_code}')">
-                                <div class="game-card-img-container">
-                                    <img src="${bannerSrc}">
-                                </div>
+                            <div class="game-card" onclick="launchGame('${game.game_code}')">
+                                <img src="${bannerSrc}" loading="lazy">
+                                <span class="card-badge">${game.provider || 'HOT'}</span>
+                                <span class="card-star">⭐</span>
+                                <span class="card-name">${game.game_name}</span>
                             </div>`;
                         });
                         popularContainer.innerHTML = popHtml;
@@ -687,11 +736,11 @@
                         displayGames.forEach(game => {
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             gamesHtml += `
-                            <div class="w-full cursor-pointer" onclick="launchGame('${game.game_code}')">
-                                <div class="relative game-card-img-container">
-                                    <img alt="${game.game_name}" src="${bannerSrc}" loading="lazy">
-                                    <div class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">${provider.split(' ')[0]}</div>
-                                </div>
+                            <div class="game-card" onclick="launchGame('${game.game_code}')">
+                                <img alt="${game.game_name}" src="${bannerSrc}" loading="lazy">
+                                <span class="card-badge">${provider.split(' ')[0]}</span>
+                                <span class="card-star">⭐</span>
+                                <span class="card-name">${game.game_name}</span>
                             </div>
                             `;
                         });
@@ -708,7 +757,7 @@
                                     <span class="material-symbols-outlined text-[14px] text-gray-400" style="font-variation-settings: 'FILL' 1;">chevron_right</span>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-3 gap-x-2 gap-y-4">
+                            <div class="grid grid-cols-3 gap-2">
                                 ${gamesHtml}
                             </div>
                         </section>
