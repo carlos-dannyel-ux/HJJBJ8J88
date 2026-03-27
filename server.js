@@ -920,8 +920,13 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
             res.status(400).json({ error: data.msg || 'Erro na API MAX' });
         }
     } catch (err) {
-        console.error('Game Launch Error:', err);
-        res.status(500).json({ error: 'Erro ao gerar link de jogo.' });
+        console.error('Launch Error Details:', {
+            message: err.message,
+            response: err.response ? err.response.data : 'no response',
+            status: err.response ? err.response.status : 'n/a'
+        });
+        const errMsg = (err.response && err.response.data && err.response.data.msg) || 'Erro de comunicação backend';
+        res.status(500).json({ error: errMsg });
     }
 });
 

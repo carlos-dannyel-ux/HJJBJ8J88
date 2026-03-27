@@ -882,20 +882,34 @@
                 }
 
                 try {
+                    console.log('Iniciando jogo:', code);
                     const res = await fetch('/api/games/launch', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                         body: JSON.stringify({ gameCode: code })
                     });
+
+                    if (!res.ok) {
+                        const errorText = await res.text();
+                        let errorJson = {};
+                        try { errorJson = JSON.parse(errorText); } catch (i) { }
+                        console.error('Erro de servidor:', res.status, errorText);
+                        showToast('Erro no servidor (' + res.status + '): ' + (errorJson.error || 'Falha ao iniciar'), 'error');
+                        return;
+                    }
+
                     const data = await res.json();
                     if (data.launch_url) {
                         document.getElementById('game-iframe').src = data.launch_url;
                         document.getElementById('game-overlay').classList.remove('hidden');
                         document.getElementById('game-overlay').classList.add('flex');
                     } else {
-                        showToast('Erro ao iniciar jogo: ' + (data.error || 'Tente novamente'), 'error');
+                        showToast('Erro ao iniciar: ' + (data.error || 'Tente novamente'), 'error');
                     }
-                } catch (e) { showToast('Erro de conexão', 'error'); }
+                } catch (e) {
+                    console.error('Fetch Catch Error:', e);
+                    showToast('Erro de conexão ou timeout. Verifique sua rede.', 'error');
+                }
             }
 
             function closeGameOverlay() {
