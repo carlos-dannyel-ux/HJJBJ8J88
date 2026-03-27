@@ -901,7 +901,14 @@
 
                     const data = await res.json();
                     if (data.launch_url) {
-                        document.getElementById('game-iframe').src = data.launch_url;
+                        let iframe = document.getElementById('game-iframe');
+                        if (!iframe) {
+                            iframe = document.createElement('iframe');
+                            iframe.id = 'game-iframe';
+                            iframe.className = 'w-screen h-screen border-none shadow-2xl';
+                            document.getElementById('game-overlay').appendChild(iframe);
+                        }
+                        iframe.src = data.launch_url;
                         document.getElementById('game-overlay').classList.remove('hidden');
                         document.getElementById('game-overlay').classList.add('flex');
                         // Hide Navbars and Main Content with style for extra safety
@@ -919,9 +926,12 @@
             }
 
             function closeGameOverlay() {
+                const iframe = document.getElementById('game-iframe');
+                if (iframe) iframe.remove();
+
                 document.getElementById('game-overlay').classList.add('hidden');
                 document.getElementById('game-overlay').classList.remove('flex');
-                document.getElementById('game-iframe').src = '';
+
                 // Show Navbars and Main Content
                 document.getElementById('top-banner').style.display = 'flex';
                 document.getElementById('main-nav').style.display = 'flex';
@@ -952,8 +962,7 @@
                 </div>
             </button>
 
-            <!-- Fullscreen Iframe -->
-            <iframe id="game-iframe" src="" class="w-screen h-screen border-none shadow-2xl"></iframe>
+            <!-- Fullscreen Iframe (Sera criado dinamicamente) -->
         </div>
 
         <script>
