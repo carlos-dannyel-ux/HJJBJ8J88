@@ -793,13 +793,31 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         const { agent_code, agent_token } = creds.rows[0];
         const userCode = `30win_user_${req.user.id}`;
 
-        // Create player in Max API in case it does not exist
-        await axios.post('https://maxapigames.com/api/v2', {
+        // Verifica se o usuario e demo no nosso banco
+        const userRow = await pool.query('SELECT is_demo FROM users WHERE id = $1', [req.user.id]);
+        const isDemo = userRow.rows.length > 0 && userRow.rows[0].is_demo === true;
+
+        // Create player in Max API in case it does not exist, passando is_demo se for demo
+        const createPayload = {
             method: 'user_create',
             agent_code,
             agent_token,
             user_code: userCode
-        }).catch(e => console.error('Erro silent criar user:', e.message));
+        };
+        if (isDemo) createPayload.is_demo = true;
+
+        await axios.post('https://maxapigames.com/api/v2', createPayload)
+            .catch(e => console.error('Erro silent criar user:', e.message));
+
+        // Se for demo, garantir que o set_demo esteja ativo na MAX API
+        if (isDemo) {
+            await axios.post('https://maxapigames.com/api/v2', {
+                method: 'set_demo',
+                agent_code,
+                agent_token,
+                user_code: userCode
+            }).catch(e => console.error('Erro silent set_demo:', e.message));
+        }
 
         const launchPayload = {
             method: 'game_launch',
