@@ -409,24 +409,36 @@
                 <div class="bg-[#262626] rounded-full flex items-center px-2 py-1 gap-1 border border-[#0F0F0F]">
                     <img alt="Brazil Flag" class="rounded-sm"
                         src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/BRL.avif" width="16">
-                    <span class="text-brand-yellow font-bold text-xs">0,00</span>
-                    <button class="text-brand-yellow" onclick="syncUserData()">
-                        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <span id="header_balance"
+                        class="text-brand-yellow font-bold text-xs transition-all duration-300">0,00</span>
+                    <button class="text-brand-yellow" id="refreshBtn">
+                        <svg id="refreshIcon" class="h-3 w-3 transition-transform duration-500 origin-center"
+                            fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path clip-rule="evenodd"
                                 d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
                                 fill-rule="evenodd"></path>
                         </svg>
                     </button>
                 </div>
-                <button onclick="openDepositModal()"
-                    class="bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1">
-                    Depósito
-                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path clip-rule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            fill-rule="evenodd"></path>
-                    </svg>
-                </button>
+                <div class="relative">
+                    <button onclick="toggleDepositMenu()"
+                        class="bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1 active:scale-95 transition-all">
+                        Depósito
+                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Content -->
+                    <div id="deposit-dropdown"
+                        class="hidden absolute right-0 mt-2 w-32 bg-[#1a1a1a] border border-[#333] rounded-lg shadow-xl z-50 overflow-hidden">
+                        <button onclick="openDepositModal(); toggleDepositMenu();"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-[#222] hover:text-brand-yellow border-b border-[#333]">Depósitos</button>
+                        <button onclick="handleSaqueClick(); toggleDepositMenu();"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-[#222] hover:text-brand-yellow">Saques</button>
+                    </div>
+                </div>
             </div>
         </nav>
         <!-- END: Main Header -->
@@ -560,7 +572,7 @@
         </main>
         <!-- BEGIN: Bottom Navigation -->
         <footer
-            class="absolute bottom-0 w-full bg-[#1a1a1a] border-t border-[#0F0F0F] flex items-center justify-around py-2 z-50">
+            class="fixed bottom-0 w-full bg-[#1a1a1a] border-t border-[#0F0F0F] flex items-center justify-around py-2 z-50">
             <button class="flex flex-col items-center gap-1">
                 <div class="text-brand-yellow">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -656,6 +668,24 @@
         <script>
             const API_URL = '/api';
 
+            // Animacao de Tally para o saldo
+            let currentDisplayBalance = 0;
+            let targetBalance = 0;
+            let balanceAnimFrame = null;
+
+            function animateBalance() {
+                if (Math.abs(currentDisplayBalance - targetBalance) < 0.01) {
+                    currentDisplayBalance = targetBalance;
+                    const el = document.getElementById('header_balance');
+                    if (el) el.innerText = currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    return;
+                }
+                currentDisplayBalance += (targetBalance - currentDisplayBalance) * 0.1;
+                const el = document.getElementById('header_balance');
+                if (el) el.innerText = currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                balanceAnimFrame = requestAnimationFrame(animateBalance);
+            }
+
             async function syncUserData() {
                 const token = localStorage.getItem('30win_token');
                 if (!token) return;
@@ -666,9 +696,13 @@
                     });
                     const data = await res.json();
                     if (data.success) {
+                        targetBalance = parseFloat(data.user.balance) || 0;
+                        if (balanceAnimFrame) cancelAnimationFrame(balanceAnimFrame);
+                        balanceAnimFrame = requestAnimationFrame(animateBalance);
+
                         const balanceElements = document.querySelectorAll('#userBalance');
                         balanceElements.forEach(el => {
-                            el.innerText = 'R$ ' + parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                            el.innerText = 'R$ ' + targetBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                         });
                     } else if (res.status === 401 || res.status === 402 || res.status === 403) {
                         localStorage.removeItem('30win_token');
@@ -680,12 +714,13 @@
             syncUserData();
 
             const refreshBtn = document.getElementById('refreshBtn');
+            const refreshIcon = document.getElementById('refreshIcon');
+            let rotation = 0;
             if (refreshBtn) {
                 refreshBtn.onclick = () => {
-                    refreshBtn.style.transform = 'rotate(360deg)';
-                    syncUserData().finally(() => {
-                        setTimeout(() => { refreshBtn.style.transform = 'rotate(0deg)'; }, 500);
-                    });
+                    rotation += 360;
+                    refreshIcon.style.transform = `rotate(${rotation}deg)`;
+                    syncUserData();
                 };
             }
 
@@ -772,6 +807,16 @@
                 // No futuro aqui podemos carregar uma view específica
             }
 
+            function toggleDepositMenu() {
+                document.getElementById('deposit-dropdown').classList.toggle('hidden');
+            }
+
+            function handleSaqueClick() {
+                const token = localStorage.getItem('30win_token');
+                if (!token) window.location.href = '/auth.html';
+                else window.location.href = '/perfil.html';
+            }
+
             async function launchGame(code) {
                 const token = localStorage.getItem('30win_token');
                 if (!token) return window.location.href = '/auth.html';
@@ -784,11 +829,20 @@
                     });
                     const data = await res.json();
                     if (data.launch_url) {
-                        window.location.href = data.launch_url;
+                        document.getElementById('game-iframe').src = data.launch_url;
+                        document.getElementById('game-overlay').classList.remove('hidden');
+                        document.getElementById('game-overlay').classList.add('flex');
                     } else {
                         alert('Erro ao iniciar jogo: ' + (data.error || 'Tente novamente'));
                     }
                 } catch (e) { alert('Erro de conexão'); }
+            }
+
+            function closeGameOverlay() {
+                document.getElementById('game-overlay').classList.add('hidden');
+                document.getElementById('game-overlay').classList.remove('flex');
+                document.getElementById('game-iframe').src = '';
+                syncUserData(); // Atualiza saldo apos fechar o jogo
             }
 
             document.addEventListener('DOMContentLoaded', loadApiGames);
