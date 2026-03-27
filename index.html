@@ -870,148 +870,17 @@
             document.addEventListener('DOMContentLoaded', loadApiGames);
         </script>
 
-        <!-- Deposit Modal -->
-        <div id="modal-deposit" class="hidden fixed inset-0 z-[100] bg-black/90 flex justify-center p-4"
-            style="align-items: center;">
-            <div
-                class="bg-surface-container glass-card rounded-2xl p-6 md:p-8 max-w-sm w-full border border-primary/30 relative">
-                <button onclick="closeDepositModal()"
-                    class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
-                        class="material-symbols-outlined">close</span></button>
-                <h3 class="font-headline font-black text-2xl mb-2 text-primary text-center">DEPOSITAR</h3>
+        <!-- Depósito redireciona para página dedicada -->
 
-                <div id="deposit-step-1" class="space-y-4 mt-6">
-                    <p class="text-xs text-center text-gray-400 mb-4">Insira o valor que deseja depositar via PIX.</p>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor
-                            (R$)</label>
-                        <input type="number" id="deposit_amount" min="1" step="1"
-                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-4 text-center font-bold text-2xl text-white focus:border-primary outline-none"
-                            placeholder="0,00">
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 mt-2">
-                        <button onclick="document.getElementById('deposit_amount').value=20"
-                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
-                            R$ 20</button>
-                        <button onclick="document.getElementById('deposit_amount').value=50"
-                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
-                            R$ 50</button>
-                        <button onclick="document.getElementById('deposit_amount').value=100"
-                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
-                            R$ 100</button>
-                    </div>
-                    <button id="btn-process-deposit" onclick="processDeposit()"
-                        class="w-full mt-6 bg-gradient-to-r from-primary to-primary-container text-black font-black py-4 rounded-xl shadow-[0_0_20px_rgba(223,142,255,0.4)] active:scale-95 transition-all">GERAR
-                        PIX</button>
-                </div>
-
-                <div id="deposit-step-2-demo" class="hidden space-y-4 mt-6 text-center">
-                    <span
-                        class="material-symbols-outlined text-6xl text-secondary animate-pulse block mx-auto">qr_code_scanner</span>
-                    <p class="font-bold text-secondary">Depósito Fictício Gerado</p>
-                    <p class="text-xs text-gray-400">Aguarde 8 segundos para simular a liquidação bancária do
-                        influenciador...</p>
-                    <div class="w-full bg-gray-800 rounded-full h-1.5 mb-4 overflow-hidden mt-4">
-                        <div class="bg-secondary h-1.5 rounded-full"
-                            style="width: 100%; animation: shrink 8s linear forwards;"></div>
-                    </div>
-                </div>
-
-                <div id="deposit-step-2-real" class="hidden space-y-4 mt-6 text-center">
-                    <p class="text-xs text-gray-400 mb-2">Escaneie o QR Code ou cole o código. O saldo cai
-                        automaticamente!</p>
-                    <div class="bg-white p-2 rounded-xl inline-block">
-                        <img id="deposit-qrcode" src="" alt="QR Code" class="w-48 h-48">
-                    </div>
-                    <div class="mt-4 text-left">
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">PIX
-                            Copia e Cola</label>
-                        <div class="flex">
-                            <input type="text" id="pix-code-display" readonly
-                                class="w-full bg-[#110f2d] border border-gray-700 rounded-l p-3 text-[10px] text-gray-300 outline-none">
-                            <button onclick="copyPix()" class="bg-primary text-black px-4 font-bold rounded-r"><span
-                                    class="material-symbols-outlined text-sm">content_copy</span></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <style>
-            @keyframes shrink {
-                from {
-                    width: 100%;
-                }
-
-                to {
-                    width: 0%;
-                }
-            }
-        </style>
 
         <script>
             function openDepositModal() {
                 const token = localStorage.getItem('30win_token');
                 if (!token) { window.location.href = '/auth.html'; return; }
-
-                document.getElementById('deposit_amount').value = '';
-                document.getElementById('deposit-step-1').classList.remove('hidden');
-                document.getElementById('deposit-step-2-demo').classList.add('hidden');
-                document.getElementById('deposit-step-2-real').classList.add('hidden');
-                document.getElementById('btn-process-deposit').innerText = 'GERAR PIX';
-                document.getElementById('btn-process-deposit').disabled = false;
-
-                document.getElementById('modal-deposit').classList.remove('hidden');
+                window.location.href = '/deposito.html';
             }
 
             function closeDepositModal() { document.getElementById('modal-deposit').classList.add('hidden'); }
-
-            async function processDeposit() {
-                const amountStr = document.getElementById('deposit_amount').value;
-                const amount = parseFloat(amountStr);
-                if (!amount || amount < 1) { showToast('Valor inválido. Mínimo R$ 1,00', 'error'); return; }
-
-                const btn = document.getElementById('btn-process-deposit');
-                btn.innerText = 'Processando...'; btn.disabled = true;
-
-                try {
-                    const res = await fetch('/api/deposit', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
-                        body: JSON.stringify({ amount })
-                    });
-                    const data = await res.json();
-
-                    if (data.success) {
-                        if (data.is_demo) {
-                            document.getElementById('deposit-step-1').classList.add('hidden');
-                            document.getElementById('deposit-step-2-demo').classList.remove('hidden');
-                            setTimeout(async () => {
-                                await fetch('/api/fictitious-deposit', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
-                                    body: JSON.stringify({ amount })
-                                });
-                                showToast('Depósito fictício concluído!', 'success');
-                                window.location.reload();
-                            }, 8000);
-                        } else {
-                            document.getElementById('deposit-step-1').classList.add('hidden');
-                            document.getElementById('deposit-step-2-real').classList.remove('hidden');
-                            document.getElementById('pix-code-display').value = data.pixCopyPaste;
-                            document.getElementById('deposit-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pixCode)}`;
-                        }
-                    } else {
-                        showToast('Erro: ' + data.error, 'error');
-                        btn.innerText = 'GERAR PIX'; btn.disabled = false;
-                    }
-                } catch (e) { showToast('Erro de conexão.', 'error'); btn.innerText = 'GERAR PIX'; btn.disabled = false; }
-            }
-
-            function copyPix() {
-                const input = document.getElementById('pix-code-display');
-                input.select(); document.execCommand('copy');
-                showToast('Código PIX Copiado!', 'success');
-            }
         </script>
 </body>
 

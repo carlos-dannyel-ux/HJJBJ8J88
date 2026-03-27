@@ -434,7 +434,7 @@
                         </div>
                         <span class="material-symbols-outlined text-gray-700">chevron_right</span>
                     </a>
-                    <a href="LOCALIDADE.HTML"
+                    <a href="localidade.html"
                         class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
                         <div
                             class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
@@ -448,7 +448,7 @@
                 </div>
                 <!-- Group 3 -->
                 <div class="bg-[#1a1a1a] rounded-2xl divide-y divide-[#262626] overflow-hidden border border-white/5">
-                    <a href="FAQ.HTML"
+                    <a href="faq.html"
                         class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors group text-white no-underline">
                         <div
                             class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
@@ -459,7 +459,7 @@
                         </div>
                         <span class="material-symbols-outlined text-gray-700">chevron_right</span>
                     </a>
-                    <a href="BONUS.HTML"
+                    <a href="bonus.html"
                         class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
                         <div
                             class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
@@ -470,7 +470,7 @@
                         </div>
                         <span class="material-symbols-outlined text-gray-700">chevron_right</span>
                     </a>
-                    <a href="DISPOSITIVO.HTML"
+                    <a href="dispositivo.html"
                         class="flex items-center p-4 gap-4 hover:bg-[#262626] transition-colors cursor-pointer group no-underline text-white">
                         <div
                             class="w-10 h-10 rounded-xl bg-[#262626] flex items-center justify-center group-hover:bg-[#333]">
@@ -587,150 +587,8 @@
             };
         </script>
 
-        <!-- Deposit Modal -->
-        <div id="modal-deposit" class="hidden fixed inset-0 z-[100] bg-black/90 flex justify-center p-4"
-            style="align-items: center;">
-            <div
-                class="bg-surface-container glass-card rounded-2xl p-6 md:p-8 max-w-sm w-full border border-primary/30 relative">
-                <button onclick="closeDepositModal()"
-                    class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
-                        class="material-symbols-outlined">close</span></button>
-                <h3 class="font-headline font-black text-2xl mb-2 text-primary text-center">DEPOSITAR</h3>
+        <!-- Depósitos e Saques redirecionam para páginas dedicadas -->
 
-                <div id="deposit-step-1" class="space-y-4 mt-6">
-                    <p class="text-xs text-center text-gray-400 mb-4">Insira o valor que deseja depositar via PIX.</p>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor
-                            (R$)</label>
-                        <input type="number" id="deposit_amount" min="1" step="1"
-                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-4 text-center font-bold text-2xl text-white focus:border-primary outline-none"
-                            placeholder="0,00">
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 mt-2">
-                        <button onclick="document.getElementById('deposit_amount').value=20"
-                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
-                            R$ 20</button>
-                        <button onclick="document.getElementById('deposit_amount').value=50"
-                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
-                            R$ 50</button>
-                        <button onclick="document.getElementById('deposit_amount').value=100"
-                            class="bg-surface-container-high py-2 rounded font-bold text-xs hover:bg-primary/20 hover:text-primary transition-colors">+
-                            R$ 100</button>
-                    </div>
-                    <button id="btn-process-deposit" onclick="processDeposit()"
-                        class="w-full mt-6 bg-gradient-to-r from-primary to-primary-container text-black font-black py-4 rounded-xl shadow-[0_0_20px_rgba(223,142,255,0.4)] active:scale-95 transition-all">GERAR
-                        PIX</button>
-                </div>
-
-                <div id="deposit-step-2-demo" class="hidden space-y-4 mt-6 text-center">
-                    <span
-                        class="material-symbols-outlined text-6xl text-secondary animate-pulse block mx-auto">qr_code_scanner</span>
-                    <p class="font-bold text-secondary">Depósito Fictício Gerado</p>
-                    <p class="text-xs text-gray-400">Aguarde 8 segundos para simular a liquidação bancária do
-                        influenciador...</p>
-                    <div class="w-full bg-gray-800 rounded-full h-1.5 mb-4 overflow-hidden mt-4">
-                        <div class="bg-secondary h-1.5 rounded-full"
-                            style="width: 100%; animation: shrink 8s linear forwards;"></div>
-                    </div>
-                </div>
-
-                <div id="deposit-step-2-real" class="hidden space-y-4 mt-6 text-center">
-                    <p class="text-xs text-gray-400 mb-2">Escaneie o QR Code ou cole o código. O saldo cai
-                        automaticamente!</p>
-                    <div class="bg-white p-2 rounded-xl inline-block">
-                        <img id="deposit-qrcode" src="" alt="QR Code" class="w-48 h-48">
-                    </div>
-                    <div class="mt-4 text-left">
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">PIX
-                            Copia e Cola</label>
-                        <div class="flex">
-                            <input type="text" id="pix-code-display" readonly
-                                class="w-full bg-[#110f2d] border border-gray-700 rounded-l p-3 text-[10px] text-gray-300 outline-none">
-                            <button onclick="copyPix()" class="bg-primary text-black px-4 font-bold rounded-r"><span
-                                    class="material-symbols-outlined text-sm">content_copy</span></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Withdraw Modal -->
-        <div id="modal-withdraw" class="hidden fixed inset-0 z-[100] bg-black/90 flex justify-center p-4"
-            style="align-items: center;">
-            <div
-                class="bg-surface-container glass-card rounded-2xl p-6 md:p-8 max-w-sm w-full border border-primary/30 relative">
-                <button onclick="closeWithdrawModal()"
-                    class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
-                        class="material-symbols-outlined">close</span></button>
-                <h3 class="font-headline font-black text-2xl mb-2 text-primary text-center">SAQUE</h3>
-
-                <div class="space-y-4 mt-6">
-                    <p class="text-xs text-center text-gray-400 mb-4">Mínimo de R$ 10,00</p>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor
-                            (R$)</label>
-                        <input type="number" id="withdraw_amount" min="10" step="1"
-                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-4 text-center font-bold text-2xl text-white focus:border-primary outline-none"
-                            placeholder="0,00">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tipo de
-                            Chave PIX</label>
-                        <select id="withdraw_pix_type"
-                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-3 text-white focus:border-primary outline-none text-sm">
-                            <option value="CPF">CPF</option>
-                            <option value="PHONE">Telefone</option>
-                            <option value="EMAIL">E-mail</option>
-                            <option value="EVP">Chave Aleatória</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Sua
-                            Chave PIX</label>
-                        <input type="text" id="withdraw_pix_key"
-                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-3 text-white focus:border-primary outline-none text-sm"
-                            placeholder="Digite a chave PIX">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Senha de
-                            Saque (PIN)</label>
-                        <input type="password" id="withdraw_password" maxlength="4"
-                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-3 text-center text-white focus:border-primary outline-none tracking-[0.5em] text-xl"
-                            placeholder="****">
-                    </div>
-                    <button id="btn-process-withdraw" onclick="processWithdrawal()"
-                        class="w-full mt-4 bg-gradient-to-r from-primary to-primary-container text-black font-black py-4 rounded-xl shadow-[0_0_20px_rgba(223,142,255,0.4)] active:scale-95 transition-all">SOLICITAR
-                        SAQUE</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Create PIN Modal -->
-        <div id="modal-create-pin" class="hidden fixed inset-0 z-[100] bg-black/90 flex justify-center p-4"
-            style="align-items: center;">
-            <div
-                class="bg-surface-container glass-card rounded-2xl p-6 md:p-8 max-w-sm w-full border border-secondary/30 relative">
-                <button onclick="document.getElementById('modal-create-pin').classList.add('hidden')"
-                    class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
-                        class="material-symbols-outlined">close</span></button>
-                <h3 class="font-headline font-black text-xl mb-2 text-secondary text-center">CRIAR SENHA DE SAQUE</h3>
-                <p class="text-xs text-center text-gray-400 mb-6">Você precisa criar uma senha numérica de 4 dígitos
-                    (PIN) para aprovar seus futuros saques.</p>
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Novo PIN
-                            (4 dígitos)</label>
-                        <input type="password" id="new_withdraw_pin" maxlength="4" inputmode="numeric" pattern="[0-9]*"
-                            class="w-full bg-[#110f2d] border border-gray-700 rounded-xl p-4 text-center font-bold text-2xl tracking-[0.5em] text-white focus:border-secondary outline-none"
-                            placeholder="****">
-                    </div>
-                    <button id="btn-create-pin" onclick="createWithdrawPin()"
-                        class="w-full mt-4 bg-secondary text-black font-black py-4 rounded-xl shadow-[0_0_20px_rgba(0,227,253,0.4)] active:scale-95 transition-all">SALVAR
-                        PIN</button>
-                </div>
-            </div>
-        </div>
 
         <style>
             @keyframes shrink {
@@ -748,15 +606,7 @@
             function openDepositModal() {
                 const token = localStorage.getItem('30win_token');
                 if (!token) { window.location.href = '/auth.html'; return; }
-
-                document.getElementById('deposit_amount').value = '';
-                document.getElementById('deposit-step-1').classList.remove('hidden');
-                document.getElementById('deposit-step-2-demo').classList.add('hidden');
-                document.getElementById('deposit-step-2-real').classList.add('hidden');
-                document.getElementById('btn-process-deposit').innerText = 'GERAR PIX';
-                document.getElementById('btn-process-deposit').disabled = false;
-
-                document.getElementById('modal-deposit').classList.remove('hidden');
+                window.location.href = '/deposito.html';
             }
             function closeDepositModal() { document.getElementById('modal-deposit').classList.add('hidden'); }
 
@@ -811,85 +661,7 @@
             function openWithdrawModal() {
                 const token = localStorage.getItem('30win_token');
                 if (!token) { window.location.href = '/auth.html'; return; }
-
-                if (window.currentUser) {
-                    if (!window.currentUser.has_withdraw_password) {
-                        document.getElementById('modal-create-pin').classList.remove('hidden');
-                        return;
-                    }
-                    if (window.currentUser.rollover_required > 0 && window.currentUser.rollover_progress < window.currentUser.rollover_required) {
-                        const remaining = window.currentUser.rollover_required - window.currentUser.rollover_progress;
-                        showToast(`Rollover pendente! Faltam R$ ${remaining.toFixed(2)} em apostas para liberar o saque.`, 'warning');
-                    }
-                }
-
-                document.getElementById('withdraw_amount').value = '';
-                document.getElementById('withdraw_pix_key').value = '';
-                const pwInput = document.getElementById('withdraw_password');
-                if (pwInput) pwInput.value = '';
-                document.getElementById('btn-process-withdraw').innerText = 'SOLICITAR SAQUE';
-                document.getElementById('btn-process-withdraw').disabled = false;
-                document.getElementById('modal-withdraw').classList.remove('hidden');
-            }
-            function closeWithdrawModal() { document.getElementById('modal-withdraw').classList.add('hidden'); }
-
-            async function createWithdrawPin() {
-                const pin = document.getElementById('new_withdraw_pin').value;
-                if (!pin || pin.length !== 4) { showToast('Sua senha deve ter exatamente 4 dígitos numéricos.', 'error'); return; }
-
-                const btn = document.getElementById('btn-create-pin');
-                btn.innerText = 'Salvando...'; btn.disabled = true;
-
-                try {
-                    const res = await fetch('/api/finance/withdraw-password', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
-                        body: JSON.stringify({ withdraw_password: pin })
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        showToast('Senha de saque criada com sucesso!', 'success');
-                        document.getElementById('modal-create-pin').classList.add('hidden');
-                        window.currentUser.has_withdraw_password = true;
-                        openWithdrawModal(); // re-open the withdraw modal now that PIN is set
-                    } else {
-                        showToast(data.error || 'Erro ao criar PIN.', 'error');
-                    }
-                } catch (e) { showToast('Erro na conexão.', 'error'); }
-                finally {
-                    btn.innerText = 'SALVAR PIN'; btn.disabled = false;
-                }
-            }
-
-            async function processWithdrawal() {
-                const amount = parseFloat(document.getElementById('withdraw_amount').value);
-                const pix_type = document.getElementById('withdraw_pix_type').value;
-                const pix_key = document.getElementById('withdraw_pix_key').value;
-                const password = document.getElementById('withdraw_password').value;
-
-                if (!amount || amount < 10) { showToast('Valor mínimo não atingido', 'error'); return; }
-                if (!pix_key) { showToast('Chave PIX é obrigatória', 'error'); return; }
-                if (!password) { showToast('Senha de saque (PIN) é obrigatória', 'error'); return; }
-
-                const btn = document.getElementById('btn-process-withdraw');
-                btn.innerText = 'Enviando...'; btn.disabled = true;
-
-                try {
-                    const res = await fetch('/api/withdraw', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('30win_token') },
-                        body: JSON.stringify({ amount, pix_key, pix_type, withdraw_password: password })
-                    });
-                    const data = await res.json();
-
-                    showToast(data.message || data.error, data.success ? 'success' : 'error');
-                    if (data.success) {
-                        closeWithdrawModal();
-                        window.location.reload();
-                    } else {
-                        btn.innerText = 'SOLICITAR SAQUE'; btn.disabled = false;
-                    }
-                } catch (e) { showToast('Erro de conexão.', 'error'); btn.innerText = 'SOLICITAR SAQUE'; btn.disabled = false; }
+                window.location.href = '/saques.html';
             }
         </script>
 </body>

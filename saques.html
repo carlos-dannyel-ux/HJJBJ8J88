@@ -1,38 +1,230 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html class="dark" lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
     <title>30win - Gestão de Saques</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
     <link rel="stylesheet" href="/public/assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
     <style>
-        html {
-            font-size: 75%;
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
         body {
-            background: #0d0d0d;
-            color: white;
+            background-color: #0e0e0e;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html {
+            font-size: 100%;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .input-f {
+            width: 100%;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 14px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-f:focus {
+            border-color: #FFB800;
+        }
+
+        .btn-withdraw {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #FFB800, #FF8A00);
+            color: #000;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-withdraw:active {
+            transform: scale(0.97);
+        }
+
+        .btn-withdraw:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .rules-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .rules-item span {
+            color: #FFB800;
+            font-size: 14px;
         }
     </style>
 </head>
 
-<body class="flex justify-center min-h-screen">
-    <div class="w-full max-w-[450px] bg-[#0f0f0f] flex flex-col h-screen">
-        <header class="p-4 border-b border-gray-800 flex items-center gap-3">
-            <a href="perfil.html" class="text-gray-400"><i class="fas fa-arrow-left"></i></a>
-            <h1 class="font-bold">Gestão de Saques</h1>
+<body>
+    <div class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0e0e0e] relative flex flex-col">
+        <!-- Header -->
+        <header class="flex items-center px-4 h-14 border-b border-[#1a1a1a] shrink-0">
+            <a href="perfil.html" class="p-2 -ml-2" style="text-decoration:none;color:inherit;">
+                <span class="material-symbols-outlined">arrow_back_ios</span>
+            </a>
+            <h1 class="flex-1 text-center font-bold text-base">Gestão de Saques</h1>
+            <div class="w-8"></div>
         </header>
-        <main class="flex-1 p-6">
-            <div class="bg-[#1a1a1a] p-4 rounded-xl border border-gray-800 flex justify-between items-center mb-4">
-                <span>Saldo Disponível</span>
-                <span class="text-brand-yellow font-bold">R$ 10,00</span>
+
+        <main class="flex-1 px-4 pt-5 pb-8 space-y-5">
+            <!-- Balance Card -->
+            <div class="card flex items-center justify-between border-l-4 border-l-[#FFB800]">
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Saldo Disponível</p>
+                    <p class="text-2xl font-black text-[#FFB800] mt-1">R$ <span id="balanceDisplay">0,00</span></p>
+                </div>
+                <button onclick="syncBalance()"
+                    class="w-10 h-10 rounded-full bg-[#262626] flex items-center justify-center">
+                    <span class="material-symbols-outlined text-gray-400">refresh</span>
+                </button>
             </div>
-            <button class="w-full bg-yellow-500 text-black font-bold py-4 rounded-xl">Solicitar Saque</button>
+
+            <!-- Withdraw Form -->
+            <div id="withdraw-form" class="card space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Valor
+                        do Saque (Min R$ 10)</label>
+                    <input type="number" id="withdraw_amount" class="input-f font-bold text-lg" placeholder="R$ 0,00"
+                        min="10">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Chave
+                        PIX (CPF/Email/Fone)</label>
+                    <input type="text" id="withdraw_pix" class="input-f" placeholder="Sua chave PIX">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">PIN
+                        de Saque (4 dígitos)</label>
+                    <input type="password" id="withdraw_pin" maxlength="4"
+                        class="input-f text-center tracking-[0.5em] font-bold text-xl" placeholder="****">
+                </div>
+                <button id="btn-withdraw" class="btn-withdraw mt-2" onclick="processWithdrawal()">Solicitar
+                    Retirada</button>
+            </div>
+
+            <!-- Rules -->
+            <div class="space-y-3 px-1">
+                <h3 class="text-xs font-bold text-gray-400 mb-2">Regras de Retirada</h3>
+                <div class="rules-item">
+                    <span class="material-symbols-outlined">info</span>
+                    <p>O valor mínimo para saque é de R$ 10,00.</p>
+                </div>
+                <div class="rules-item">
+                    <span class="material-symbols-outlined">info</span>
+                    <p>Você deve cumprir o rollover (volume de apostas) antes de solicitar saques.</p>
+                </div>
+                <div class="rules-item">
+                    <span class="material-symbols-outlined">info</span>
+                    <p>Os saques são processados via PIX e podem levar até 24h em alguns casos.</p>
+                </div>
+            </div>
         </main>
     </div>
+
+    <script>
+        const token = localStorage.getItem('30win_token');
+        if (!token) window.location.href = '/auth.html';
+
+        function showToast(msg, type = 'info') {
+            const existing = document.getElementById('toast-container');
+            if (existing) existing.remove();
+            const colors = { success: 'from-green-600 to-green-800 border-green-400', error: 'from-red-600 to-red-800 border-red-400', info: 'from-yellow-500 to-orange-600 border-yellow-300' };
+            const icons = { success: '✅', error: '❌', info: '💡' };
+            const toast = document.createElement('div');
+            toast.id = 'toast-container';
+            toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-[400px] w-[90%] p-4 rounded-xl bg-gradient-to-r ${colors[type] || colors.info} border text-white shadow-2xl flex items-center gap-3 transition-all duration-500`;
+            toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0';
+            toast.innerHTML = `<span class="text-xl">${icons[type] || '💡'}</span><span class="text-sm font-bold flex-1">${msg}</span>`;
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => { toast.style.transform = 'translate(-50%, 0)'; toast.style.opacity = '1'; });
+            setTimeout(() => { toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+        }
+
+        async function syncBalance() {
+            try {
+                const res = await fetch('/api/user/info', { headers: { 'Authorization': 'Bearer ' + token } });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('balanceDisplay').textContent = parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    window.currentUser = data.user;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function processWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw_amount').value);
+            const pix = document.getElementById('withdraw_pix').value.trim();
+            const pin = document.getElementById('withdraw_pin').value;
+
+            if (!amount || amount < 10) return showToast('Mínimo R$ 10,00', 'error');
+            if (!pix) return showToast('Informe a chave PIX', 'error');
+            if (!pin || pin.length !== 4) return showToast('PIN deve ter 4 dígitos', 'error');
+
+            const btn = document.getElementById('btn-withdraw');
+            btn.textContent = 'Processando...'; btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/finance/withdraw', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ amount, pix_key: pix, withdraw_password: pin })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Saque solicitado com sucesso!', 'success');
+                    setTimeout(() => { window.location.href = '/perfil.html'; }, 1500);
+                } else {
+                    showToast(data.error || 'Erro ao solicitar saque', 'error');
+                    btn.textContent = 'Solicitar Retirada'; btn.disabled = false;
+                }
+            } catch (e) {
+                showToast('Erro de conexão.', 'error');
+                btn.textContent = 'Solicitar Retirada'; btn.disabled = false;
+            }
+        }
+
+        syncBalance();
+    </script>
 </body>
 
 </html>

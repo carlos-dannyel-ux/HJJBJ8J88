@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - Depósito</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            background-color: #0e0e0e;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html {
+            font-size: 100%;
+        }
+
+        .method-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            background: #1a1a1a;
+            color: #999;
+        }
+
+        .method-btn.active {
+            border-color: #FFB800;
+            color: #FFB800;
+            background: #1f1a00;
+        }
+
+        .amount-card {
+            background: #1a1a1a;
+            border: 2px solid #262626;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .amount-card:active {
+            transform: scale(0.95);
+        }
+
+        .amount-card.selected {
+            border-color: #FFB800;
+            background: #1f1a00;
+        }
+
+        .amount-card .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .amount-card .bonus {
+            font-size: 11px;
+            font-weight: 600;
+            color: #00e676;
+            margin-top: 2px;
+        }
+
+        .deposit-input {
+            width: 100%;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 16px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .deposit-input:focus {
+            border-color: #FFB800;
+        }
+
+        .deposit-input::placeholder {
+            color: #555;
+        }
+
+        .btn-deposit {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #FFB800, #FF8A00);
+            color: #000;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-deposit:active {
+            transform: scale(0.97);
+        }
+
+        .btn-deposit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* QR step */
+        .qr-container {
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0e0e0e] relative flex flex-col">
+        <!-- Header -->
+        <header class="flex items-center justify-between px-4 h-14 border-b border-[#1a1a1a] shrink-0">
+            <a href="javascript:history.back()" class="p-2 -ml-2" style="text-decoration:none;color:inherit;">
+                <span class="material-symbols-outlined">arrow_back_ios</span>
+            </a>
+            <h1 class="font-bold text-base">Depósito</h1>
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-gray-500 text-lg">headset_mic</span>
+                <span class="material-symbols-outlined text-gray-500 text-lg">receipt_long</span>
+            </div>
+        </header>
+
+        <!-- Step 1: Choose Amount -->
+        <main id="step-amount" class="flex-1 px-4 pt-5 pb-8 space-y-5">
+            <!-- Balance row -->
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-400">Método de Pagamento</span>
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1 bg-[#1a1a1a] px-3 py-1.5 rounded-full border border-[#262626]">
+                        <img src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/BRL.avif"
+                            class="w-4 h-3 rounded-sm">
+                        <span id="balanceDisplay" class="text-xs font-bold text-[#FFB800]">0.00</span>
+                    </div>
+                    <button onclick="syncBalance()" class="text-gray-500">
+                        <span class="material-symbols-outlined text-sm">refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Method Selection -->
+            <div class="flex gap-2">
+                <button class="method-btn active" id="method-pix" onclick="selectMethod('pix')">
+                    <span style="color:#00e676;">◆</span> PIX (Quente)
+                </button>
+                <button class="method-btn" id="method-pix2" onclick="selectMethod('pix2')">
+                    <span style="color:#00bcd4;">◆</span> PIX (Empresacnpj)
+                </button>
+            </div>
+
+            <!-- Amount Presets -->
+            <div>
+                <span class="text-sm font-medium text-gray-300 mb-2 block">Depósito</span>
+                <div class="grid grid-cols-4 gap-2" id="amounts-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Custom Input -->
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">R$</span>
+                <input type="number" id="custom_amount" class="deposit-input pl-10" placeholder="Mínimo5~Máximo50.000"
+                    min="5" max="50000">
+            </div>
+
+            <!-- Deposit Button -->
+            <button id="btn-deposit" class="btn-deposit" onclick="processDeposit()">Deposite agora</button>
+        </main>
+
+        <!-- Step 2: PIX QR Code (Hidden) -->
+        <main id="step-qr" class="flex-1 px-4 pt-8 pb-8 hidden">
+            <!-- Demo step -->
+            <div id="step-demo" class="hidden text-center space-y-4">
+                <span class="material-symbols-outlined text-6xl text-[#00e6fd] animate-pulse">qr_code_scanner</span>
+                <p class="font-bold text-[#00e6fd]">Depósito Fictício Gerado</p>
+                <p class="text-xs text-gray-400">Aguarde 8 segundos para simular a liquidação bancária...</p>
+                <div class="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden mt-4">
+                    <div class="bg-[#00e6fd] h-1.5 rounded-full"
+                        style="width:100%; animation: shrink 8s linear forwards;"></div>
+                </div>
+            </div>
+
+            <!-- Real PIX step -->
+            <div id="step-real" class="hidden text-center space-y-4">
+                <p class="text-xs text-gray-400">Escaneie o QR Code ou cole o código. O saldo cai automaticamente!</p>
+                <div class="qr-container">
+                    <img id="qr-image" src="" alt="QR Code" class="w-48 h-48">
+                </div>
+                <div class="mt-4 text-left">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">PIX Copia e
+                        Cola</label>
+                    <div class="flex">
+                        <input type="text" id="pix-code" readonly
+                            class="flex-1 bg-[#111] border border-[#333] rounded-l-xl p-3 text-[10px] text-gray-300 outline-none">
+                        <button onclick="copyPix()" class="bg-[#FFB800] text-black px-4 font-bold rounded-r-xl">
+                            <span class="material-symbols-outlined text-sm">content_copy</span>
+                        </button>
+                    </div>
+                </div>
+                <button onclick="window.location.href='/perfil.html'" class="btn-deposit mt-6">Voltar ao Perfil</button>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        @keyframes shrink {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+    </style>
+
+    <script>
+        const token = localStorage.getItem('30win_token');
+        if (!token) window.location.href = '/auth.html';
+
+        // Toast system
+        function showToast(msg, type = 'info') {
+            const existing = document.getElementById('toast-container');
+            if (existing) existing.remove();
+            const colors = { success: 'from-green-600 to-green-800 border-green-400', error: 'from-red-600 to-red-800 border-red-400', info: 'from-yellow-500 to-orange-600 border-yellow-300' };
+            const icons = { success: '✅', error: '❌', info: '💡' };
+            const toast = document.createElement('div');
+            toast.id = 'toast-container';
+            toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-[400px] w-[90%] p-4 rounded-xl bg-gradient-to-r ${colors[type] || colors.info} border text-white shadow-2xl flex items-center gap-3 transition-all duration-500`;
+            toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0';
+            toast.innerHTML = `<span class="text-xl">${icons[type] || '💡'}</span><span class="text-sm font-bold flex-1">${msg}</span>`;
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => { toast.style.transform = 'translate(-50%, 0)'; toast.style.opacity = '1'; });
+            setTimeout(() => { toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+        }
+
+        // Preset amounts with bonus
+        const presets = [
+            { value: 15, bonus: '+2,30' },
+            { value: 35, bonus: '+4,30' },
+            { value: 55, bonus: '+4,30' },
+            { value: 155, bonus: '+9,07' },
+            { value: 555, bonus: '+23,60' },
+            { value: 1555, bonus: '+103,60' },
+            { value: 5555, bonus: '+245,60' },
+            { value: 15555, bonus: '+1.041,30' }
+        ];
+
+        let selectedAmount = null;
+
+        function renderPresets() {
+            const grid = document.getElementById('amounts-grid');
+            grid.innerHTML = presets.map((p, i) => `
+                <div class="amount-card" id="preset-${i}" onclick="selectPreset(${i}, ${p.value})">
+                    <div class="value">${p.value.toLocaleString('pt-BR')}</div>
+                    <div class="bonus">${p.bonus}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectPreset(index, value) {
+            document.querySelectorAll('.amount-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById(`preset-${index}`).classList.add('selected');
+            document.getElementById('custom_amount').value = value;
+            selectedAmount = value;
+        }
+
+        function selectMethod(method) {
+            document.getElementById('method-pix').classList.toggle('active', method === 'pix');
+            document.getElementById('method-pix2').classList.toggle('active', method === 'pix2');
+        }
+
+        async function syncBalance() {
+            try {
+                const res = await fetch('/api/user/info', { headers: { 'Authorization': 'Bearer ' + token } });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('balanceDisplay').textContent = parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    window.currentUser = data.user;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function processDeposit() {
+            const amountStr = document.getElementById('custom_amount').value;
+            const amount = parseFloat(amountStr);
+            if (!amount || amount < 5) return showToast('Valor mínimo é R$ 5,00', 'error');
+            if (amount > 50000) return showToast('Valor máximo é R$ 50.000', 'error');
+
+            const btn = document.getElementById('btn-deposit');
+            btn.textContent = 'Processando...'; btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ amount })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    document.getElementById('step-amount').classList.add('hidden');
+                    document.getElementById('step-qr').classList.remove('hidden');
+
+                    if (data.is_demo) {
+                        document.getElementById('step-demo').classList.remove('hidden');
+                        setTimeout(async () => {
+                            await fetch('/api/fictitious-deposit', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                                body: JSON.stringify({ amount })
+                            });
+                            showToast('Depósito fictício concluído!', 'success');
+                            setTimeout(() => { window.location.href = '/perfil.html'; }, 1500);
+                        }, 8000);
+                    } else {
+                        document.getElementById('step-real').classList.remove('hidden');
+                        document.getElementById('pix-code').value = data.pixCopyPaste;
+                        document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pixCode)}`;
+                    }
+                } else {
+                    showToast('Erro: ' + data.error, 'error');
+                    btn.textContent = 'Deposite agora'; btn.disabled = false;
+                }
+            } catch (e) {
+                showToast('Erro de conexão.', 'error');
+                btn.textContent = 'Deposite agora'; btn.disabled = false;
+            }
+        }
+
+        function copyPix() {
+            const input = document.getElementById('pix-code');
+            input.select(); document.execCommand('copy');
+            showToast('Código PIX Copiado!', 'success');
+        }
+
+        renderPresets();
+        syncBalance();
+    </script>
+</body>
+
+</html>

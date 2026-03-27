@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - Senha de Saque</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            background-color: #0e0e0e;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html {
+            font-size: 100%;
+        }
+
+        .pin-box {
+            width: 48px;
+            height: 52px;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            transition: border-color 0.2s;
+        }
+
+        .pin-box.active {
+            border-color: #FFB800;
+        }
+
+        .pin-box.filled {
+            border-color: #FFB800;
+            background: #1f1a00;
+        }
+
+        .numpad-btn {
+            width: 100%;
+            aspect-ratio: 2/1;
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .numpad-btn:active {
+            background: #262626;
+            transform: scale(0.95);
+        }
+
+        .numpad-btn.special {
+            background: transparent;
+            border-color: transparent;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0e0e0e] relative flex flex-col">
+        <!-- Header -->
+        <header class="flex items-center px-4 h-14 border-b border-[#1a1a1a] shrink-0">
+            <a href="perfil.html" class="p-2 -ml-2" style="text-decoration:none;color:inherit;">
+                <span class="material-symbols-outlined">arrow_back_ios</span>
+            </a>
+            <h1 class="flex-1 text-center font-bold text-base">Senha de Saque</h1>
+            <div class="w-8"></div>
+        </header>
+
+        <main class="flex-1 flex flex-col px-6 pt-6">
+            <!-- Info -->
+            <p class="text-center text-[#FFB800] text-xs mb-6">Para a segurança dos seus fundos, você precisa primeiro
+                definir uma senha de saque!</p>
+
+            <!-- PIN Row 1: Define -->
+            <div class="mb-1">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-300">Defina sua senha de saque</span>
+                    <button onclick="togglePinVisibility('pin1')" class="text-gray-500"><span
+                            class="material-symbols-outlined text-lg" id="eye1">visibility_off</span></button>
+                </div>
+                <div class="flex gap-2 justify-center" id="pin1-boxes">
+                    <div class="pin-box active" id="p1-0"></div>
+                    <div class="pin-box" id="p1-1"></div>
+                    <div class="pin-box" id="p1-2"></div>
+                    <div class="pin-box" id="p1-3"></div>
+                    <div class="pin-box" id="p1-4"></div>
+                    <div class="pin-box" id="p1-5"></div>
+                </div>
+            </div>
+
+            <!-- PIN Row 2: Confirm -->
+            <div class="mb-4 mt-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-300">Confirmar Nova Senha</span>
+                    <button onclick="togglePinVisibility('pin2')" class="text-gray-500"><span
+                            class="material-symbols-outlined text-lg" id="eye2">visibility_off</span></button>
+                </div>
+                <div class="flex gap-2 justify-center" id="pin2-boxes">
+                    <div class="pin-box" id="p2-0"></div>
+                    <div class="pin-box" id="p2-1"></div>
+                    <div class="pin-box" id="p2-2"></div>
+                    <div class="pin-box" id="p2-3"></div>
+                    <div class="pin-box" id="p2-4"></div>
+                    <div class="pin-box" id="p2-5"></div>
+                </div>
+            </div>
+
+            <!-- Warning -->
+            <div class="flex items-start gap-2 p-3 bg-red-900/20 border border-red-800/30 rounded-xl mb-6">
+                <span class="text-red-400 text-lg mt-0.5">⚠️</span>
+                <p class="text-[11px] text-red-300 leading-relaxed">Atenção: A senha de saque protege seus fundos. É
+                    muito importante e deve ser conhecida apenas por você para evitar perdas.</p>
+            </div>
+
+            <!-- Spacer -->
+            <div class="flex-1"></div>
+
+            <!-- Numpad -->
+            <div class="grid grid-cols-3 gap-2 pb-6 max-w-[320px] mx-auto w-full">
+                <button class="numpad-btn" onclick="pressKey('1')">1</button>
+                <button class="numpad-btn" onclick="pressKey('2')">2</button>
+                <button class="numpad-btn" onclick="pressKey('3')">3</button>
+                <button class="numpad-btn" onclick="pressKey('4')">4</button>
+                <button class="numpad-btn" onclick="pressKey('5')">5</button>
+                <button class="numpad-btn" onclick="pressKey('6')">6</button>
+                <button class="numpad-btn" onclick="pressKey('7')">7</button>
+                <button class="numpad-btn" onclick="pressKey('8')">8</button>
+                <button class="numpad-btn" onclick="pressKey('9')">9</button>
+                <button class="numpad-btn special" onclick="switchField()">
+                    <span class="material-symbols-outlined">keyboard</span>
+                </button>
+                <button class="numpad-btn" onclick="pressKey('0')">0</button>
+                <button class="numpad-btn special" onclick="pressBackspace()">
+                    <span class="material-symbols-outlined">backspace</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('30win_token');
+        if (!token) window.location.href = '/auth.html';
+
+        let pin1 = '';
+        let pin2 = '';
+        let activeField = 'pin1'; // 'pin1' or 'pin2'
+        let showPin1 = false;
+        let showPin2 = false;
+
+        function showToast(msg, type = 'info') {
+            const existing = document.getElementById('toast-container');
+            if (existing) existing.remove();
+            const colors = { success: 'from-green-600 to-green-800 border-green-400', error: 'from-red-600 to-red-800 border-red-400', info: 'from-yellow-500 to-orange-600 border-yellow-300' };
+            const icons = { success: '✅', error: '❌', info: '💡' };
+            const toast = document.createElement('div');
+            toast.id = 'toast-container';
+            toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-[400px] w-[90%] p-4 rounded-xl bg-gradient-to-r ${colors[type] || colors.info} border text-white shadow-2xl flex items-center gap-3 transition-all duration-500`;
+            toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0';
+            toast.innerHTML = `<span class="text-xl">${icons[type] || icons.info}</span><span class="text-sm font-bold flex-1">${msg}</span>`;
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => { toast.style.transform = 'translate(-50%, 0)'; toast.style.opacity = '1'; });
+            setTimeout(() => { toast.style.transform = 'translate(-50%, -100px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+        }
+
+        function renderBoxes() {
+            const pinLen = 6;
+            for (let i = 0; i < pinLen; i++) {
+                const b1 = document.getElementById(`p1-${i}`);
+                const b2 = document.getElementById(`p2-${i}`);
+
+                b1.textContent = pin1[i] ? (showPin1 ? pin1[i] : '●') : '';
+                b1.className = 'pin-box' + (pin1[i] ? ' filled' : '') + (activeField === 'pin1' && i === pin1.length ? ' active' : '');
+
+                b2.textContent = pin2[i] ? (showPin2 ? pin2[i] : '●') : '';
+                b2.className = 'pin-box' + (pin2[i] ? ' filled' : '') + (activeField === 'pin2' && i === pin2.length ? ' active' : '');
+            }
+        }
+
+        function pressKey(num) {
+            if (activeField === 'pin1' && pin1.length < 6) {
+                pin1 += num;
+                renderBoxes();
+                if (pin1.length === 6) { activeField = 'pin2'; renderBoxes(); }
+            } else if (activeField === 'pin2' && pin2.length < 6) {
+                pin2 += num;
+                renderBoxes();
+                if (pin2.length === 6) submitPin();
+            }
+        }
+
+        function pressBackspace() {
+            if (activeField === 'pin2') {
+                if (pin2.length > 0) { pin2 = pin2.slice(0, -1); }
+                else { activeField = 'pin1'; pin1 = pin1.slice(0, -1); }
+            } else {
+                pin1 = pin1.slice(0, -1);
+            }
+            renderBoxes();
+        }
+
+        function switchField() {
+            activeField = activeField === 'pin1' ? 'pin2' : 'pin1';
+            renderBoxes();
+        }
+
+        function togglePinVisibility(field) {
+            if (field === 'pin1') { showPin1 = !showPin1; document.getElementById('eye1').textContent = showPin1 ? 'visibility' : 'visibility_off'; }
+            else { showPin2 = !showPin2; document.getElementById('eye2').textContent = showPin2 ? 'visibility' : 'visibility_off'; }
+            renderBoxes();
+        }
+
+        async function submitPin() {
+            if (pin1.length < 4) return showToast('A senha deve ter pelo menos 4 dígitos.', 'error');
+            if (pin1 !== pin2) {
+                showToast('As senhas não coincidem. Tente novamente.', 'error');
+                pin2 = ''; renderBoxes();
+                return;
+            }
+            // Use only first 4 digits as the PIN
+            const finalPin = pin1.substring(0, 4);
+            try {
+                const res = await fetch('/api/finance/withdraw-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ withdraw_password: finalPin })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Senha de saque criada com sucesso!', 'success');
+                    setTimeout(() => { window.location.href = '/perfil.html'; }, 1500);
+                } else {
+                    showToast(data.error || 'Erro ao salvar PIN.', 'error');
+                    pin1 = ''; pin2 = ''; activeField = 'pin1'; renderBoxes();
+                }
+            } catch (e) {
+                showToast('Erro de conexão.', 'error');
+                pin1 = ''; pin2 = ''; activeField = 'pin1'; renderBoxes();
+            }
+        }
+
+        renderBoxes();
+    </script>
+</body>
+
+</html>

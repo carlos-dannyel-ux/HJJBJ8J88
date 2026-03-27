@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - FAQ</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+        }
+
+        body {
+            background: #0e0e0e;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none
+        }
+
+        *::-webkit-scrollbar {
+            display: none
+        }
+
+        .faq-item {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color .3s
+        }
+
+        .faq-item.open {
+            border-color: #FFB800
+        }
+
+        .faq-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        .faq-header span.icon {
+            transition: transform .3s
+        }
+
+        .faq-item.open .faq-header span.icon {
+            transform: rotate(180deg)
+        }
+
+        .faq-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .4s ease, padding .3s
+        }
+
+        .faq-item.open .faq-body {
+            max-height: 500px;
+            padding: 0 16px 16px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0e0e0e] relative flex flex-col">
+        <header class="flex items-center px-4 h-14 border-b border-[#1a1a1a] shrink-0">
+            <a href="perfil.html" class="p-2 -ml-2" style="text-decoration:none;color:inherit;"><span
+                    class="material-symbols-outlined">arrow_back_ios</span></a>
+            <h1 class="flex-1 text-center font-bold text-base">FAQ</h1>
+            <div class="w-8"></div>
+        </header>
+
+        <main class="flex-1 px-4 pt-5 pb-8 space-y-3">
+            <div class="text-center mb-4">
+                <span class="material-symbols-outlined text-[#FFB800] text-4xl"
+                    style="font-variation-settings:'FILL' 1">quiz</span>
+                <p class="text-xs text-gray-400 mt-1">Perguntas frequentes sobre a plataforma</p>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <span class="text-sm font-bold">Como fazer um depósito?</span>
+                    <span class="material-symbols-outlined icon text-gray-500">expand_more</span>
+                </div>
+                <div class="faq-body">
+                    <p class="text-xs text-gray-400 leading-relaxed">Acesse "Depósito" na página inicial ou perfil,
+                        escolha o valor desejado ou insira um valor personalizado (mínimo R$ 5,00). O pagamento é feito
+                        via PIX com confirmação instantânea.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <span class="text-sm font-bold">Como solicitar um saque?</span>
+                    <span class="material-symbols-outlined icon text-gray-500">expand_more</span>
+                </div>
+                <div class="faq-body">
+                    <p class="text-xs text-gray-400 leading-relaxed">Vá em "Gestão de Saques" no perfil. Informe o valor
+                        (mínimo R$ 10,00), sua chave PIX e seu PIN de saque de 4 dígitos. O processamento ocorre em até
+                        24 horas úteis.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <span class="text-sm font-bold">Para que serve o PIN de saque?</span>
+                    <span class="material-symbols-outlined icon text-gray-500">expand_more</span>
+                </div>
+                <div class="faq-body">
+                    <p class="text-xs text-gray-400 leading-relaxed">O PIN é uma senha numérica de 4 dígitos que protege
+                        seus saques. Ele é obrigatório para solicitar qualquer retirada e garante que apenas você
+                        movimente os fundos.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <span class="text-sm font-bold">O que é rollover?</span>
+                    <span class="material-symbols-outlined icon text-gray-500">expand_more</span>
+                </div>
+                <div class="faq-body">
+                    <p class="text-xs text-gray-400 leading-relaxed">Rollover é o valor mínimo em apostas que você
+                        precisa cumprir antes de poder sacar. Ele é calculado com base no valor depositado e eventuais
+                        bônus recebidos.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <span class="text-sm font-bold">É possível jogar de graça?</span>
+                    <span class="material-symbols-outlined icon text-gray-500">expand_more</span>
+                </div>
+                <div class="faq-body">
+                    <p class="text-xs text-gray-400 leading-relaxed">Sim! Contas demo permitem testar os jogos sem
+                        gastar dinheiro real. O saldo demo não pode ser sacado, mas é ótimo para conhecer os jogos antes
+                        de apostar de verdade.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <span class="text-sm font-bold">Como funciona o programa de indicação?</span>
+                    <span class="material-symbols-outlined icon text-gray-500">expand_more</span>
+                </div>
+                <div class="faq-body">
+                    <p class="text-xs text-gray-400 leading-relaxed">Compartilhe seu link de convite. Quando um amigo se
+                        registrar e depositar usando seu link, você recebe uma comissão do depósito dele. Acompanhe suas
+                        recompensas em "Promoção".</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <span class="text-sm font-bold">Meu saldo sumiu, o que fazer?</span>
+                    <span class="material-symbols-outlined icon text-gray-500">expand_more</span>
+                </div>
+                <div class="faq-body">
+                    <p class="text-xs text-gray-400 leading-relaxed">Primeiro, atualize a página. Se o problema
+                        persistir, entre em contato com nosso suporte via chat ao vivo ou WhatsApp informando seu número
+                        de celular cadastrado.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

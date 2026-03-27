@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - Dispositivos</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+        }
+
+        body {
+            background: #0e0e0e;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none
+        }
+
+        *::-webkit-scrollbar {
+            display: none
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 16px;
+            padding: 20px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0e0e0e] relative flex flex-col">
+        <header class="flex items-center px-4 h-14 border-b border-[#1a1a1a] shrink-0">
+            <a href="perfil.html" class="p-2 -ml-2" style="text-decoration:none;color:inherit;"><span
+                    class="material-symbols-outlined">arrow_back_ios</span></a>
+            <h1 class="flex-1 text-center font-bold text-base">Login no Dispositivo</h1>
+            <div class="w-8"></div>
+        </header>
+
+        <main class="flex-1 px-4 pt-6 pb-8 space-y-5">
+            <!-- Banner -->
+            <div class="text-center">
+                <span class="material-symbols-outlined text-[#FFB800] text-5xl"
+                    style="font-variation-settings:'FILL' 1">devices</span>
+                <h2 class="font-bold text-lg mt-2">Seus Dispositivos</h2>
+                <p class="text-xs text-gray-400 mt-1">Gerencie os dispositivos conectados à sua conta</p>
+            </div>
+
+            <!-- Current Device -->
+            <div class="card">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-green-900/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-green-400"
+                            style="font-variation-settings:'FILL' 1">smartphone</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-bold text-sm">Este Dispositivo</p>
+                        <p class="text-[10px] text-gray-500" id="device-info">Carregando...</p>
+                    </div>
+                    <span
+                        class="text-[10px] font-bold text-green-400 bg-green-900/30 px-3 py-1 rounded-full">Ativo</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <div class="bg-[#111] rounded-xl p-3 text-center border border-[#262626]">
+                        <p class="text-[10px] text-gray-500">Navegador</p>
+                        <p class="font-bold text-xs mt-1" id="browser-name">-</p>
+                    </div>
+                    <div class="bg-[#111] rounded-xl p-3 text-center border border-[#262626]">
+                        <p class="text-[10px] text-gray-500">Sistema</p>
+                        <p class="font-bold text-xs mt-1" id="os-name">-</p>
+                    </div>
+                    <div class="bg-[#111] rounded-xl p-3 text-center border border-[#262626]">
+                        <p class="text-[10px] text-gray-500">Tela</p>
+                        <p class="font-bold text-xs mt-1" id="screen-size">-</p>
+                    </div>
+                    <div class="bg-[#111] rounded-xl p-3 text-center border border-[#262626]">
+                        <p class="text-[10px] text-gray-500">Último Login</p>
+                        <p class="font-bold text-xs mt-1">Agora</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Login -->
+            <div class="card text-center">
+                <span class="material-symbols-outlined text-[#FFB800] text-3xl mb-2">qr_code_scanner</span>
+                <h3 class="font-bold text-sm mb-1">Login via QR Code</h3>
+                <p class="text-[11px] text-gray-400 mb-4">Escaneie o QR Code mostrado em outro dispositivo para fazer
+                    login instantâneo sem digitar senha.</p>
+                <div class="bg-[#111] border border-dashed border-[#333] rounded-2xl p-8">
+                    <span class="material-symbols-outlined text-gray-700 text-6xl">qr_code_2</span>
+                    <p class="text-[10px] text-gray-600 mt-2">Funcionalidade em breve</p>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <button onclick="logoutDevice()"
+                class="w-full p-4 rounded-xl border-none bg-gradient-to-r from-red-600 to-red-800 text-white font-bold text-sm cursor-pointer transition-all active:scale-[.97]">
+                <span class="flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">logout</span>
+                    Sair deste Dispositivo
+                </span>
+            </button>
+        </main>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('30win_token');
+        if (!token) window.location.href = '/auth.html';
+
+        function showToast(msg, type = 'info') {
+            const existing = document.getElementById('toast-container'); if (existing) existing.remove();
+            const colors = { success: 'from-green-600 to-green-800 border-green-400', error: 'from-red-600 to-red-800 border-red-400', info: 'from-yellow-500 to-orange-600 border-yellow-300' };
+            const icons = { success: '✅', error: '❌', info: '💡' };
+            const t = document.createElement('div'); t.id = 'toast-container';
+            t.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[9999] max-w-[400px] w-[90%] p-4 rounded-xl bg-gradient-to-r ${colors[type] || colors.info} border text-white shadow-2xl flex items-center gap-3 transition-all duration-500`;
+            t.style.transform = 'translate(-50%,-100px)'; t.style.opacity = '0';
+            t.innerHTML = `<span class="text-xl">${icons[type] || '💡'}</span><span class="text-sm font-bold flex-1">${msg}</span>`;
+            document.body.appendChild(t);
+            requestAnimationFrame(() => { t.style.transform = 'translate(-50%,0)'; t.style.opacity = '1'; });
+            setTimeout(() => { t.style.transform = 'translate(-50%,-100px)'; t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 3000);
+        }
+
+        // Detect device info
+        (function () {
+            const ua = navigator.userAgent;
+            let browser = 'Desconhecido', os = 'Desconhecido';
+            if (ua.includes('Chrome') && !ua.includes('Edge')) browser = 'Chrome';
+            else if (ua.includes('Firefox')) browser = 'Firefox';
+            else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+            else if (ua.includes('Edge')) browser = 'Edge';
+
+            if (ua.includes('Windows')) os = 'Windows';
+            else if (ua.includes('Mac')) os = 'macOS';
+            else if (ua.includes('Linux') && !ua.includes('Android')) os = 'Linux';
+            else if (ua.includes('Android')) os = 'Android';
+            else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+
+            document.getElementById('device-info').textContent = `${browser} em ${os}`;
+            document.getElementById('browser-name').textContent = browser;
+            document.getElementById('os-name').textContent = os;
+            document.getElementById('screen-size').textContent = `${screen.width}×${screen.height}`;
+        })();
+
+        function logoutDevice() {
+            localStorage.removeItem('30win_token');
+            localStorage.removeItem('30win_user');
+            showToast('Sessão encerrada!', 'success');
+            setTimeout(() => { window.location.href = '/auth.html'; }, 1500);
+        }
+    </script>
+</body>
+
+</html>
