@@ -99,7 +99,7 @@
         <!-- Header -->
         <header class="bg-[#141414] px-4 py-3 flex items-center justify-between border-b border-[#0F0F0F] shrink-0">
             <div class="flex items-center gap-3">
-                <a href="HOME.HTML" class="text-gray-400">
+                <a href="index.html" class="text-gray-400">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                         </path>
@@ -283,7 +283,7 @@
         <!-- Footer Navigation -->
         <footer
             class="absolute bottom-0 w-full bg-[#141414] border-t border-[#0F0F0F] flex items-center justify-around py-3 z-50">
-            <a href="HOME.HTML" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+            <a href="index.html" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
                 <div class="text-gray-600 group-hover:text-white transition-colors">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -293,26 +293,26 @@
                 </div>
                 <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Começar</span>
             </a>
-            <a href="OFERTAS.HTML" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+            <a href="ofertas.html" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
                 <div class="text-gray-600 group-hover:text-white transition-colors">
                     <span class="material-symbols-outlined">redeem</span>
                 </div>
                 <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Ofertas</span>
             </a>
-            <a href="SUPORTE.HTML" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
+            <a href="suporte.html" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
                 <div class="text-gray-600 group-hover:text-white transition-colors">
                     <span class="material-symbols-outlined">support_agent</span>
                 </div>
                 <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Suporte</span>
             </a>
-            <a href="PERFIL.HTML" id="nav-perfil" class="flex flex-col items-center gap-1 group py-1"
+            <a href="perfil.html" id="nav-perfil" class="flex flex-col items-center gap-1 group py-1"
                 style="text-decoration:none;">
                 <div class="text-gray-600 group-hover:text-white transition-colors">
                     <span class="material-symbols-outlined">person</span>
                 </div>
                 <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Perfil</span>
             </a>
-            <a href="AUTH.HTML" id="nav-login" class="flex flex-col items-center gap-1"
+            <a href="auth.html" id="nav-login" class="flex flex-col items-center gap-1"
                 style="text-decoration:none; display:none;">
                 <div class="text-gray-500">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -429,7 +429,7 @@
         async function initConvite() {
             const token = localStorage.getItem('30win_token');
             if (!token) {
-                window.location.href = '/AUTH.HTML';
+                window.location.href = '/auth.html';
                 return;
             }
 

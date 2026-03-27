@@ -156,7 +156,7 @@
                         <span class="font-headline uppercase tracking-wide text-sm">Configs Globais</span>
                     </div>
                     <div class="mt-40 flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:text-error transition-all"
-                        onclick="localStorage.removeItem('30win_token'); window.location.href='/PAINEL_LOGIN.HTML'">
+                        onclick="localStorage.removeItem('30win_token'); window.location.href='/admin.html'">
                         <span class="material-symbols-outlined">logout</span>
                         <span class="font-headline uppercase tracking-wide text-sm">Logout</span>
                     </div>
@@ -429,20 +429,61 @@
                     <div class="flex-1">
                         <h3 class="font-headline font-bold text-xl mb-2 text-[#00e3fd]">Gerenciar Jogos</h3>
                         <p class="text-sm text-on-surface-variant mb-6">Extraia todos os jogos da provedora ou remova os
-                            jogos atuais do banco de dados local. As imagens serão baixadas para o servidor. Este
-                            processo pode demorar alguns minutos.</p>
+                            jogos atuais do banco de dados local. As imagens serão servidas via proxy.</p>
                         <div class="flex gap-4">
                             <button id="btn-extract" onclick="extractGames()"
                                 class="bg-secondary hover:bg-secondary-dim text-on-secondary font-bold py-3 px-6 rounded-lg shadow-[0_0_15px_rgba(0,227,253,0.4)] transition-all flex items-center gap-2">
                                 <span class="material-symbols-outlined text-sm" id="icon-extract">download</span>
                                 <span id="text-extract">EXTRAIR JOGOS DA API</span>
                             </button>
+                            <button onclick="updatePopular(true)"
+                                class="bg-primary/20 hover:bg-primary/30 text-primary border border-primary/50 font-bold py-3 px-6 rounded-lg transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">star</span>
+                                ENVIAR PARA POPULAR
+                            </button>
+                            <button onclick="updatePopular(false)"
+                                class="bg-surface-container-highest hover:bg-white/10 text-white border border-outline-variant/30 font-bold py-3 px-6 rounded-lg transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">star_outline</span>
+                                REMOVER DO POPULAR
+                            </button>
                             <button onclick="removeGames()"
-                                class="bg-error/20 hover:bg-error/30 text-error border border-error/50 font-bold py-3 px-6 rounded-lg transition-all flex items-center gap-2">
+                                class="bg-error/20 hover:bg-error/30 text-error border border-error/50 font-bold py-3 px-6 rounded-lg transition-all flex items-center gap-2 ml-auto">
                                 <span class="material-symbols-outlined text-sm">delete</span>
-                                REMOVER JOGOS
+                                LIMPAR TUDO
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl overflow-hidden mt-6">
+                    <div class="px-8 py-6 border-b border-outline-variant/10 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-primary">casino</span>
+                            <h3 class="font-headline font-bold text-lg uppercase tracking-wider">Jogos Extraídos (<span
+                                    id="count-games">0</span>)</h3>
+                        </div>
+                        <button onclick="loadAdminGames()"
+                            class="text-xs font-bold text-secondary uppercase tracking-widest hover:underline">Atualizar
+                            Lista</button>
+                    </div>
+                    <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-surface-container-low sticky top-0">
+                                <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant">
+                                    <th class="px-8 py-4 w-10">
+                                        <input type="checkbox" id="select-all-games" onclick="toggleSelectAll(this)"
+                                            class="accent-primary">
+                                    </th>
+                                    <th class="px-8 py-4">Thumbnail</th>
+                                    <th class="px-8 py-4">Jogo</th>
+                                    <th class="px-8 py-4">Popular?</th>
+                                    <th class="px-8 py-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="games-tbody" class="divide-y divide-outline-variant/5">
+                                <!-- Games will be loaded here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -771,11 +812,134 @@
             [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings].forEach(t => { if (t) t.className = inactiveClass; });
 
             if (tab === 'dashboard') { dashboardView.classList.remove('hidden'); tabDashboard.className = activeClass; }
-            else if (tab === 'api') { apiView.classList.remove('hidden'); tabApi.className = activeClass; }
+            else if (tab === 'api') { apiView.classList.remove('hidden'); tabApi.className = activeClass; loadAdminGames(); }
             else if (tab === 'users') { usersView.classList.remove('hidden'); tabUsers.className = activeClass; loadUsers(); }
             else if (tab === 'finance') { financeView.classList.remove('hidden'); tabFinance.className = activeClass; loadFinance(); }
             else if (tab === 'settings') { settingsView.classList.remove('hidden'); tabSettings.className = activeClass; loadSystemSettings(); }
         }
+
+        async function loadAdminGames() {
+            try {
+                const res = await fetch('/api/games');
+                const data = await res.json();
+                if (data.success) {
+                    const tbody = document.getElementById('games-tbody');
+                    const countSpan = document.getElementById('count-games');
+                    tbody.innerHTML = '';
+
+                    let total = 0;
+                    for (const [provider, games] of Object.entries(data.providers)) {
+                        tbody.innerHTML += `
+                        <tr class="bg-white/5">
+                            <td colspan="5" class="px-8 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-secondary border-y border-outline-variant/10">
+                                PROVEDOR: ${provider}
+                            </td>
+                        </tr>
+                        `;
+
+                        total += games.length;
+                        games.forEach(g => {
+                            const isPopHtml = g.is_popular
+                                ? `<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>`
+                                : `<span class="material-symbols-outlined text-gray-600 text-sm">star</span>`;
+
+                            tbody.innerHTML += `
+                            <tr class="hover:bg-white/5 transition-colors">
+                                <td class="px-8 py-3">
+                                    <input type="checkbox" class="game-checkbox accent-primary" value="${g.game_code}">
+                                </td>
+                                <td class="px-8 py-3">
+                                    <img src="${g.banner_path}" class="w-12 h-16 object-cover rounded border border-white/10" onerror="this.src='https://via.placeholder.com/100x150?text=ERR'">
+                                </td>
+                                <td class="px-8 py-3">
+                                    <span class="block font-bold text-sm text-on-background">${g.game_name}</span>
+                                    <span class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">${g.game_code}</span>
+                                </td>
+                                <td class="px-8 py-3 text-center">${isPopHtml}</td>
+                                <td class="px-8 py-3 text-right relative">
+                                    <button onclick="toggleGameMenu(event, '${g.game_code}')" class="p-1 hover:bg-white/10 rounded-full transition-colors">
+                                        <span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+                                    </button>
+                                    <div id="menu-${g.game_code}" class="hidden absolute right-12 top-0 z-50 bg-surface-container-high border border-outline-variant/20 rounded shadow-xl py-2 w-48 text-left">
+                                        <button onclick="updateSinglePopular('${g.game_code}', true)" class="w-full px-4 py-2 text-xs hover:bg-white/5 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-sm">star</span> Enviar para Popular
+                                        </button>
+                                        <button onclick="updateSinglePopular('${g.game_code}', false)" class="w-full px-4 py-2 text-xs hover:bg-white/5 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-sm">star_outline</span> Remover do Popular
+                                        </button>
+                                        <div class="h-px bg-outline-variant/10 my-1"></div>
+                                        <button class="w-full px-4 py-2 text-xs hover:bg-white/5 flex items-center gap-2 text-error">
+                                            <span class="material-symbols-outlined text-sm">delete</span> Desativar Jogo
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            `;
+                        });
+                    }
+                    countSpan.innerText = total;
+                }
+            } catch (err) { console.error('Load admin games error:', err); }
+        }
+
+        function toggleSelectAll(source) {
+            const checkboxes = document.getElementsByClassName('game-checkbox');
+            for (let i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+
+        async function updatePopular(isPopular) {
+            const checkboxes = document.getElementsByClassName('game-checkbox');
+            const selected = [];
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    selected.push(checkboxes[i].value);
+                }
+            }
+
+            if (selected.length === 0) return alert('Selecione pelo menos um jogo.');
+
+            try {
+                const res = await fetch('/api/admin/games/update-popular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ gameCodes: selected, isPopular: isPopular })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    loadAdminGames();
+                    document.getElementById('select-all-games').checked = false;
+                }
+                alert(data.message || data.error);
+            } catch (err) { alert('Erro ao atualizar status'); }
+        }
+
+        function toggleGameMenu(event, code) {
+            event.stopPropagation();
+            const allMenus = document.querySelectorAll('[id^="menu-"]');
+            allMenus.forEach(m => { if (m.id !== `menu-${code}`) m.classList.add('hidden'); });
+
+            const menu = document.getElementById(`menu-${code}`);
+            menu.classList.toggle('hidden');
+        }
+
+        async function updateSinglePopular(code, isPopular) {
+            try {
+                const res = await fetch('/api/admin/games/update-popular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ gameCodes: [code], isPopular: isPopular })
+                });
+                const data = await res.json();
+                if (data.success) loadAdminGames();
+            } catch (err) { alert('Erro'); }
+        }
+
+        // Close menus on click outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
+        });
 
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
@@ -1117,6 +1281,7 @@
                 const res = await fetch('/api/admin/games/extract', { method: 'POST' });
                 const data = await res.json();
                 alert(data.message || data.error);
+                loadAdminGames();
             } catch (err) {
                 alert('Timeout ou Erro na conexão! As imagens podem demorar.');
             } finally {
@@ -1134,6 +1299,7 @@
                 const res = await fetch('/api/admin/games/remove', { method: 'POST' });
                 const data = await res.json();
                 alert(data.message || data.error);
+                loadAdminGames();
             } catch (err) {
                 alert('Erro ao remover jogos.');
             }

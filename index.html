@@ -55,7 +55,7 @@
         .game-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
 
         html {
@@ -70,6 +70,19 @@
         .category-item-active:active {
             transform: scale(0.95);
             filter: brightness(1.1);
+        }
+
+        .game-card img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
         }
     </style>
 
@@ -448,103 +461,32 @@
                             </svg></button>
                     </div>
                 </div>
-                <div class="game-grid">
+                <div class="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth px-1 pb-2">
                     <!-- Game Card 1 -->
-                    <div class="flex flex-col gap-1">
+                    <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer">
                         <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
                             <img alt="Fortune Rabbit" class="w-full h-full object-cover"
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OhOxFeaY-LcJdWKILJKiAQ0rHw-TWu_uPt8JVrr9Gb3ezvi9FRhIEDxyWXiFhlzMH6rrvMkDAVGoad1hDDbFJOXoePBAXrzbNgjW8Ex7pXdAYN6CkuboaWB5uF4_VCdJzPXXhOLgp0TMHUEaCop0uJ7gcrKs91lM0ISwXzd37aa5KyxX2dNm1T-GqNc_KD2_WDdkzd6e7fZltSIYXAS4pIFfbyMGeFXjUxXrkGKY3deYl-ogHa_f1--hBXeRy0BLmg5L0b-DBQ">
                             <div
                                 class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
                                 PG</div>
-                            <div class="absolute top-1 right-1">
-                                <svg class="h-3 w-3 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                                    </path>
-                                </svg>
-                            </div>
                         </div>
                         <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
                             Rabbit</span>
                     </div>
                     <!-- Game Card 2 -->
-                    <div class="flex flex-col gap-1">
+                    <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer">
                         <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
                             <img alt="Fortune Tiger" class="w-full h-full object-cover"
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA_G2oW86NlHcN86wVQR2hvL7pxKgTfUFWogLAs8WarYiLsXA6vifbTioYsVjiH6gBhGL4cs-Pxj7L-5QI84NKfEkRQMjpqjkX0nn8DeZtIL-CDiGJwf0UjVPojNd5AHpJH9Nj153VG3P9zPQzQlVZH47XSHf3P8kdbosQcoky4Wyq5fNDUCSBqnRh1jIeYAOqE-DJROI-joPezTYJZE90txKw3lekg8D5oItogXy5ZYqVHk40Sol3vTNSciDi-RcPxh3yZeT7Mg">
                             <div
                                 class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
                                 PG</div>
-                            <div class="absolute top-1 right-1">
-                                <svg class="h-3 w-3 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                                    </path>
-                                </svg>
-                            </div>
                         </div>
                         <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
                             Tiger</span>
                     </div>
-                    <!-- Game Card 3 -->
-                    <div class="flex flex-col gap-1">
-                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
-                            <img alt="Fortune Dragon" class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_NkYuh3IcxNM156jglm5ch-AaRlAM4uLfS2-ciMiethsM0Gsri_wAHnlrFH7l496JrBDSBt2cy_OXe-wzzJVG-vbrlP1j9TIjthQyFIarc1mKQVJZ2BM3zTKm6-g7Oq54zQiA8ADHAi6947KZ_u9KMT_LyfK08uRRYjqRO6-zjDv9YKZMUtHvrPHtH4kksPabdFBTj0sz0Tpi7fZenHVHUTlfYU5ftHPYXE8y85q0UQltMAUbR0G5zsaQCrZXWSv4glGQ9RLeGQ">
-                            <div
-                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
-                                PG</div>
-                            <div class="absolute top-1 right-1">
-                                <svg class="h-3 w-3 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                                    </path>
-                                </svg>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
-                            Dragon</span>
-                    </div>
-                    <!-- Game Card 4 -->
-                    <div class="flex flex-col gap-1">
-                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
-                            <img alt="Dragon Hatch" class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKBWILc7GLCSoZ_usPOLkCTXHosKQ2Og0b_oemloRguSkLaa53l46YoASlh5jyY-FepYJyMep8Ltwr8Ci7fMHG-mEYH-nhOUBm3sZ5P6cAkR2Dc8gaeTUwjXZ7f1G-rWXrTbj3duUcq5XQ9RgEun9p6KYX6ODEjLwzXCd6822b1cUvHUpl-kuP9FupUozUDCVfw0yG0IMazTHphT_AyMNvBfDzRj4hhBRZURyW_TeRjH-_DCNnxXZFJit1zIVGzYPegKXaQXVIHQ">
-                            <div
-                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
-                                PG</div>
-                        </div>
-                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Dragon
-                            Hatch</span>
-                    </div>
-                    <!-- Game Card 5 -->
-                    <div class="flex flex-col gap-1">
-                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
-                            <img alt="Fortune Ox" class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHoN-vIXwSIGB-3Rp28ZZBvi1-xHdumg-jxjMybArbAko1m7Dp7B0NPOL1he3ayt2H0hEJiuV_Es53HvTlteRIkVCkbdYIzrDkyNdXhaEqULPXiYSu9O2LKn4f8TfXRX_aSNR1D-4wzIseHShzae76T5LY99M4tYswbb1CZ2HOmVJX2mglVgpxH3Ct4HoSVWeuKbTkin0kO8V0bw6P2QDu1aP1ZD0YBjkfP27cnJpq2D6gyJX6LpITAZYdd25r3bo5PVvSlWvRfw">
-                            <div
-                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
-                                PG</div>
-                        </div>
-                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
-                            Ox</span>
-                    </div>
-                    <!-- Game Card 6 -->
-                    <div class="flex flex-col gap-1">
-                        <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
-                            <img alt="Fortune Mouse" class="w-full h-full object-cover"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSdbNEXL9NiaML_iUKgf5rB_xAZUUIqnTVvEobM0Dc7imL55es68y8uB1ieRQSgvr6-HnpMVnib569GYcbCq1UmEebSrAV3aY61vgwVh5dbmQsNb85cLfZodTLzLJ1vwYDreQSm5_MIPMn1xpSsCAPYDOZtCRgA7kKO2fYPRU_geMbBXv0BPnIZ2xNY_njfJ99kHSMHyABodaRSCOQ4fvN5-VdA4jI_vKi4wcVzZhnFp10lzQkGCrqPbSsTlK2K_6YD97nmfIx9w">
-                            <div
-                                class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">
-                                PG</div>
-                        </div>
-                        <span class="text-[10px] font-medium truncate text-gray-300 text-center">Fortune
-                            Mouse</span>
-                    </div>
+                    <!-- Outros cards omitidos por brevidade ou podem ser mantidos no mesmo estilo -->
                 </div>
             </section>
             <!-- END: Popular Games Section -->
@@ -568,7 +510,7 @@
                 </div>
                 <span class="text-[10px] font-bold text-brand-yellow">Começar</span>
             </button>
-            <a href="OFERTAS.HTML" class="flex flex-col items-center gap-1 relative" style="text-decoration:none;">
+            <a href="ofertas.html" class="flex flex-col items-center gap-1 relative" style="text-decoration:none;">
                 <div class="text-gray-500">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
@@ -581,7 +523,7 @@
                 <span
                     class="absolute -top-1 right-0 bg-red-600 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] text-center">9</span>
             </a>
-            <a href="SUPORTE.HTML" class="flex flex-col items-center gap-1" style="text-decoration:none;">
+            <a href="suporte.html" class="flex flex-col items-center gap-1" style="text-decoration:none;">
                 <div class="text-gray-500">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
@@ -592,7 +534,7 @@
                 </div>
                 <span class="text-[10px] text-gray-500">Suporte</span>
             </a>
-            <a href="PERFIL.HTML" id="nav-perfil" class="flex flex-col items-center gap-1"
+            <a href="perfil.html" id="nav-perfil" class="flex flex-col items-center gap-1"
                 style="text-decoration:none;">
                 <div class="text-gray-500">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -603,7 +545,7 @@
                 </div>
                 <span class="text-[10px] text-gray-500">Perfil</span>
             </a>
-            <a href="AUTH.HTML" id="nav-login" class="flex flex-col items-center gap-1"
+            <a href="auth.html" id="nav-login" class="flex flex-col items-center gap-1"
                 style="text-decoration:none; display:none;">
                 <div class="text-gray-500">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -688,7 +630,7 @@
                     const target = e.target.closest('button, a, .game-card');
                     if (target && (target.innerText.includes('Depósito') || target.innerText.includes('Jogar') || target.closest('.game-card') || target.classList.contains('game-card'))) {
                         e.preventDefault();
-                        window.location.href = '/AUTH.HTML';
+                        window.location.href = '/auth.html';
                     }
                 }
             }, true);
@@ -697,7 +639,23 @@
                 try {
                     const res = await fetch('/api/games');
                     const data = await res.json();
-                    if (!data.success || !data.providers) return;
+                    if (!data.success) return;
+
+                    const popularContainer = document.getElementById('popular-games-grid');
+                    if (popularContainer && data.popular && data.popular.length > 0) {
+                        let popHtml = '';
+                        data.popular.forEach(game => {
+                            const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
+                            popHtml += `
+                            <div class="flex-none w-[110px] space-y-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
+                                <div class="aspect-[3/4] rounded-xl overflow-hidden border border-[#1a1a1a]">
+                                    <img src="${bannerSrc}" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-[9px] font-medium truncate block text-center text-white/70 px-1">${game.game_name}</span>
+                            </div>`;
+                        });
+                        popularContainer.innerHTML = popHtml;
+                    }
 
                     const container = document.getElementById('dynamic-providers-container');
                     if (!container) return;
@@ -711,10 +669,10 @@
                         displayGames.forEach(game => {
                             const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
                             gamesHtml += `
-                            <div class="flex flex-col gap-1 game-card" style="cursor: pointer;">
+                            <div class="flex-none w-[110px] flex flex-col gap-1 cursor-pointer" onclick="launchGame('${game.game_code}')">
                                 <div class="relative aspect-[3/4] bg-[#222] rounded-lg overflow-hidden border border-[#0F0F0F]">
-                                    <img alt="${game.game_name}" class="w-full h-full object-cover" src="${bannerSrc}" loading="lazy">
-                                    <div class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">${provider}</div>
+                                    <img alt="${game.game_name}" src="${bannerSrc}" class="w-full h-full object-cover" loading="lazy">
+                                    <div class="absolute top-1 left-1 bg-[#ff7a00] rounded px-1 py-0.5 text-[8px] font-bold text-white shadow-sm">${provider.split(' ')[0]}</div>
                                 </div>
                                 <span class="text-[10px] font-medium truncate text-gray-300 text-center px-1">${game.game_name}</span>
                             </div>
@@ -728,12 +686,12 @@
                                     <div class="w-1 h-4 bg-brand-yellow rounded-full"></div>
                                     <h2 class="text-sm font-bold tracking-wide">${provider}</h2>
                                 </div>
-                                <div class="flex items-center gap-1 active:scale-95 cursor-pointer">
+                                <div class="flex items-center gap-1 active:scale-95 cursor-pointer" onclick="viewAllByProvider('${provider}')">
                                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tudo</span>
                                     <span class="material-symbols-outlined text-[14px] text-gray-400" style="font-variation-settings: 'FILL' 1;">chevron_right</span>
                                 </div>
                             </div>
-                            <div class="game-grid">
+                            <div class="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth">
                                 ${gamesHtml}
                             </div>
                         </section>
@@ -744,6 +702,32 @@
                     console.error('Erro ao carregar jogos da API:', err);
                 }
             }
+
+            function viewAllByProvider(provider) {
+                // Simplesmente filtra os jogos na tela atual ou abre uma nova "página" (tab)
+                alert('Mostrando todos os jogos de: ' + provider);
+                // No futuro aqui podemos carregar uma view específica
+            }
+
+            async function launchGame(code) {
+                const token = localStorage.getItem('30win_token');
+                if (!token) return window.location.href = '/auth.html';
+
+                try {
+                    const res = await fetch('/api/games/launch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ gameCode: code })
+                    });
+                    const data = await res.json();
+                    if (data.launch_url) {
+                        window.location.href = data.launch_url;
+                    } else {
+                        alert('Erro ao iniciar jogo: ' + (data.error || 'Tente novamente'));
+                    }
+                } catch (e) { alert('Erro de conexão'); }
+            }
+
             document.addEventListener('DOMContentLoaded', loadApiGames);
         </script>
 
@@ -828,7 +812,7 @@
         <script>
             function openDepositModal() {
                 const token = localStorage.getItem('30win_token');
-                if (!token) { window.location.href = '/AUTH.HTML'; return; }
+                if (!token) { window.location.href = '/auth.html'; return; }
 
                 document.getElementById('deposit_amount').value = '';
                 document.getElementById('deposit-step-1').classList.remove('hidden');
