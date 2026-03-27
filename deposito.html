@@ -150,27 +150,27 @@
             <a href="javascript:history.back()" class="p-2 -ml-2" style="text-decoration:none;color:inherit;">
                 <span class="material-symbols-outlined">arrow_back_ios</span>
             </a>
-            <h1 class="font-bold text-base">Depósito</h1>
+            <h1 class="font-bold text-base flex-1 text-center pr-4">Depósito</h1>
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-gray-500 text-lg">headset_mic</span>
                 <span class="material-symbols-outlined text-gray-500 text-lg">receipt_long</span>
             </div>
         </header>
 
-        <!-- Step 1: Choose Amount -->
-        <main id="step-amount" class="flex-1 px-4 pt-5 pb-8 space-y-5">
-            <!-- Balance row -->
-            <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-gray-400">Método de Pagamento</span>
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1 bg-[#1a1a1a] px-3 py-1.5 rounded-full border border-[#262626]">
-                        <img src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/BRL.avif"
-                            class="w-4 h-3 rounded-sm">
-                        <span id="balanceDisplay" class="text-xs font-bold text-[#FFB800]">0.00</span>
+        <!-- Main Content -->
+        <main id="step-amount" class="flex-1 px-4 pt-4 pb-8 space-y-5">
+            <!-- New Premium Balance Pill (Matches Image 2) -->
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Método de Pagamento</span>
+                <div onclick="syncBalance()"
+                    class="cursor-pointer flex items-center gap-2 bg-[#1a1a1a] border border-[#333] rounded-full pl-1.5 pr-3 py-1 animate-in fade-in zoom-in duration-300">
+                    <div class="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-[#262626]">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg"
+                            class="w-full h-full object-cover">
                     </div>
-                    <button onclick="syncBalance()" class="text-gray-500">
-                        <span class="material-symbols-outlined text-sm">refresh</span>
-                    </button>
+                    <span id="balanceDisplay"
+                        class="text-sm font-black text-[#FFB800] min-w-[30px] text-center">0,00</span>
+                    <span class="material-symbols-outlined text-[#FFB800] text-sm font-bold">refresh</span>
                 </div>
             </div>
 

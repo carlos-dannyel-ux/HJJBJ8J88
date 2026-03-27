@@ -658,6 +658,18 @@ app.post('/api/admin/withdrawals/:id/reject', async (req, res) => {
 });
 
 // --- GGPIX & PAYMENTS (CLIENTS) ---
+function getBonusForAmount(amount) {
+    const amountVal = parseFloat(amount);
+    if (amountVal === 15) return 2.30;
+    if (amountVal === 35) return 4.30;
+    if (amountVal === 55) return 4.30;
+    if (amountVal === 155) return 9.07;
+    if (amountVal === 555) return 23.60;
+    if (amountVal === 1555) return 103.60;
+    if (amountVal === 5555) return 245.60;
+    if (amountVal === 15555) return 1041.30;
+    return 0;
+}
 
 app.post('/api/deposit', authenticateToken, async (req, res) => {
     const { amount } = req.body;
@@ -713,7 +725,10 @@ app.post('/api/fictitious-deposit', authenticateToken, async (req, res) => {
         const uRow = await pool.query('SELECT is_demo FROM users WHERE id = $1', [req.user.id]);
         if (!uRow.rows[0].is_demo) return res.status(403).json({ success: false, error: 'Restrito para modo demo.' });
 
-        await pool.query('UPDATE users SET balance = balance + $1 WHERE id = $2', [amount, req.user.id]);
+        const bonus = getBonusForAmount(amount);
+        const totalCredited = parseFloat(amount) + bonus;
+
+        await pool.query('UPDATE users SET balance = balance + $1 WHERE id = $2', [totalCredited, req.user.id]);
         await pool.query('INSERT INTO deposits (user_id, amount, method, status) VALUES ($1, $2, $3, $4)',
             [req.user.id, amount, 'FICTITICIO', 'completed']);
 
@@ -738,46 +753,21 @@ app.post('/api/ggpix/webhook', async (req, res) => {
             }
 
             if (dep.rows.length > 0) {
-                const amount = parseFloat(dep.rows[0].amount);
+                const bonus = getBonusForAmount(amount);
+                const totalBalanceCredit = amount + bonus;
 
-                // Get system settings for deposit bonus
-                const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('deposit_bonus_val', 'deposit_rollover_mult', 'deposit_bonus_rules')");
-                let bonusVal = 0;
+                // Get system settings for deposit bonus (Legacy settings kept for compatibility)
+                const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('deposit_rollover_mult')");
                 let rollMult = 1;
-                let bonusRules = [];
-
                 sRows.rows.forEach(r => {
-                    if (r.key_name === 'deposit_bonus_val') bonusVal = parseFloat(r.key_value) || 0;
                     if (r.key_name === 'deposit_rollover_mult') rollMult = parseFloat(r.key_value) || 1;
-                    if (r.key_name === 'deposit_bonus_rules') {
-                        try {
-                            bonusRules = JSON.parse(r.key_value);
-                        } catch (e) { bonusRules = []; }
-                    }
                 });
 
-                // Apply Dynamic Rules if they exist
-                if (Array.isArray(bonusRules) && bonusRules.length > 0) {
-                    // Sort rules by min amount descending to find the highest applicable rule
-                    const applicableRule = bonusRules
-                        .filter(rule => amount >= rule.min)
-                        .sort((a, b) => b.min - a.min)[0];
-
-                    if (applicableRule) {
-                        bonusVal = parseFloat(applicableRule.bonus) || 0;
-                        rollMult = parseFloat(applicableRule.rollover) || 1;
-                    }
-                }
-
-                let addedRollover = 0;
-                // Rollover applies if bonus is given
-                if (bonusVal > 0) {
-                    addedRollover = (amount + bonusVal) * rollMult;
-                }
+                let addedRollover = (amount + bonus) * rollMult;
 
                 await pool.query(
-                    'UPDATE users SET balance = balance + $1, bonus_balance = bonus_balance + $2, rollover_required = rollover_required + $3 WHERE id = $4',
-                    [amount, bonusVal, addedRollover, dep.rows[0].user_id]
+                    'UPDATE users SET balance = balance + $1, rollover_required = rollover_required + $2 WHERE id = $3',
+                    [totalBalanceCredit, addedRollover, dep.rows[0].user_id]
                 );
                 await pool.query('UPDATE deposits SET status = \'completed\' WHERE id = $1', [dep.rows[0].id]);
             }
