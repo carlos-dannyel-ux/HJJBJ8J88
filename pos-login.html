@@ -788,9 +788,22 @@
             <button onclick="closeModal('modal-edit-user')"
                 class="absolute top-4 right-4 text-on-surface-variant hover:text-white"><span
                     class="material-symbols-outlined">close</span></button>
-            <h3 class="font-headline font-bold text-xl mb-6 text-primary">Editar Usuário</h3>
-            <div class="space-y-4">
-                <input type="hidden" id="edit_user_id">
+            <h3 class="font-headline font-bold text-xl mb-4 text-primary">Editar Usuário</h3>
+
+            <!-- Tab Headers -->
+            <div class="flex border-b border-outline-variant/20 mb-6">
+                <button onclick="switchEditTab('info')" id="btn-edit-tab-info"
+                    class="px-4 py-2 text-xs font-bold border-b-2 border-primary text-primary transition-all">DADOS
+                    BÁSICOS</button>
+                <button onclick="switchEditTab('balance')" id="btn-edit-tab-balance"
+                    class="px-4 py-2 text-xs font-bold border-b-2 border-transparent text-on-surface-variant hover:text-white transition-all">ADICIONAR
+                    SALDO</button>
+            </div>
+
+            <input type="hidden" id="edit_user_id">
+
+            <!-- Tab: Info -->
+            <div id="edit-tab-info" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-1">Nome</label>
                     <input type="text" id="edit_name"
@@ -802,12 +815,41 @@
                     <input type="text" id="edit_pass"
                         class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
                         placeholder="Nova senha">
-                    <p class="text-[10px] text-gray-500 mt-1">Senha atual salva no banco (plain_password): <span
+                    <p class="text-[10px] text-gray-500 mt-1">Senha atual salva no banco: <span
                             id="current_pass_display" class="font-mono text-gray-300">...</span></p>
                 </div>
                 <button onclick="saveEditUser()"
                     class="w-full bg-primary hover:bg-primary-dim text-white font-bold py-3 rounded mt-4 transition-colors">SALVAR
-                    ALTERAÇÕES</button>
+                    DADOS</button>
+            </div>
+
+            <!-- Tab: Balance [NEW] -->
+            <div id="edit-tab-balance" class="hidden space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Valor a Adicionar (R$)</label>
+                    <input type="number" id="adjust_amount"
+                        class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                        placeholder="Ex: 100.00">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Multiplicador de Rollover (X)</label>
+                    <input type="number" id="rollover_mult"
+                        class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                        placeholder="Ex: 2 (para 2x rollover)" value="1">
+                    <p class="text-[10px] text-gray-500 mt-1">O saldo será adicionado e o rollover será calculado como:
+                        Valor * Multiplicador.</p>
+                </div>
+                <button onclick="adjustUserBalance()"
+                    class="w-full bg-secondary hover:bg-secondary-dim text-on-primary-container font-bold py-3 rounded mt-4 transition-colors uppercase italic">ADICIONAR
+                    SALDO AGORA</button>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="mt-8 pt-6 border-t border-outline-variant/10">
+                <button onclick="deleteUser(document.getElementById('edit_user_id').value)"
+                    class="w-full bg-error/10 hover:bg-error text-error hover:text-white border border-error/30 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all">
+                    EXCLUIR PERMANENTEMENTE ESTE USUÁRIO
+                </button>
             </div>
         </div>
     </div>
@@ -1098,7 +1140,51 @@
             document.getElementById('edit_name').value = name;
             document.getElementById('edit_pass').value = '';
             document.getElementById('current_pass_display').innerText = plain_password || 'Desconhecida (Foi criptografada antes)';
+            document.getElementById('adjust_amount').value = '';
+            document.getElementById('rollover_mult').value = '1';
+            switchEditTab('info');
             openModal('modal-edit-user');
+        }
+
+        function switchEditTab(tab) {
+            const infoTab = document.getElementById('edit-tab-info');
+            const balanceTab = document.getElementById('edit-tab-balance');
+            const btnInfo = document.getElementById('btn-edit-tab-info');
+            const btnBalance = document.getElementById('btn-edit-tab-balance');
+
+            if (tab === 'info') {
+                infoTab.classList.remove('hidden');
+                balanceTab.classList.add('hidden');
+                btnInfo.className = "px-4 py-2 text-xs font-bold border-b-2 border-primary text-primary transition-all";
+                btnBalance.className = "px-4 py-2 text-xs font-bold border-b-2 border-transparent text-on-surface-variant hover:text-white transition-all";
+            } else {
+                infoTab.classList.add('hidden');
+                balanceTab.classList.remove('hidden');
+                btnInfo.className = "px-4 py-2 text-xs font-bold border-b-2 border-transparent text-on-surface-variant hover:text-white transition-all";
+                btnBalance.className = "px-4 py-2 text-xs font-bold border-b-2 border-secondary text-secondary transition-all";
+            }
+        }
+
+        async function adjustUserBalance() {
+            const id = document.getElementById('edit_user_id').value;
+            const amount = document.getElementById('adjust_amount').value;
+            const rollover_multiplier = document.getElementById('rollover_mult').value;
+
+            if (!amount || isNaN(amount)) return alert('Informe um valor válido.');
+
+            try {
+                const res = await fetch(`/api/admin/users/${id}/adjust-balance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, rollover_multiplier })
+                });
+                const data = await res.json();
+                alert(data.message || data.error);
+                if (data.success) {
+                    loadUsers();
+                    closeModal('modal-edit-user');
+                }
+            } catch (e) { alert('Erro ao ajustar saldo'); }
         }
 
         async function deleteUser(id) {

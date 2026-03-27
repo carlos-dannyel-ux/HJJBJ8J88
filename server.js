@@ -492,11 +492,38 @@ app.put('/api/admin/users/:id', async (req, res) => {
 app.delete('/api/admin/users/:id', async (req, res) => {
     const { id } = req.params;
     try {
+        // Limpar transações relacionadas primeiro para evitar erros de FK (opcional, dependendo do design, mas seguro)
+        await pool.query('DELETE FROM deposits WHERE user_id = $1', [id]);
+        await pool.query('DELETE FROM withdrawals WHERE user_id = $1', [id]);
         await pool.query('DELETE FROM users WHERE id = $1', [id]);
         res.json({ success: true, message: 'Usuário excluído com sucesso!' });
     } catch (err) {
         console.error('Delete User Err:', err);
-        res.status(500).json({ success: false, error: 'Erro ao excluir usuário (verifique relações externas).' });
+        res.status(500).json({ success: false, error: 'Erro ao excluir usuário.' });
+    }
+});
+
+app.post('/api/admin/users/:id/adjust-balance', async (req, res) => {
+    const { id } = req.params;
+    const { amount, rollover_multiplier } = req.body;
+
+    if (isNaN(amount)) return res.status(400).json({ success: false, error: 'Valor inválido.' });
+
+    try {
+        const addedRollover = parseFloat(amount) * (parseFloat(rollover_multiplier) || 0);
+
+        await pool.query(
+            'UPDATE users SET balance = balance + $1, rollover_required = rollover_required + $2 WHERE id = $3',
+            [parseFloat(amount), addedRollover, id]
+        );
+
+        res.json({
+            success: true,
+            message: `Saldo ajustado em R$ ${parseFloat(amount).toFixed(2)}. Rollover adicionado: R$ ${addedRollover.toFixed(2)}`
+        });
+    } catch (err) {
+        console.error('Adjust Balance Err:', err);
+        res.status(500).json({ success: false, error: 'Erro ao ajustar saldo.' });
     }
 });
 
