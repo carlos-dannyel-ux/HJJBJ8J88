@@ -369,7 +369,8 @@
             </div>
         </aside>
         <!-- BEGIN: Top Banner (Collection Offer) -->
-        <header class="bg-[#1a1a1a] px-3 py-1 flex items-center justify-between text-[10px] sticky top-0 z-50">
+        <header id="top-banner"
+            class="bg-[#1a1a1a] px-3 py-1 flex items-center justify-between text-[10px] sticky top-0 z-50">
             <div class="flex items-center gap-2">
                 <button class="text-gray-400">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -390,7 +391,7 @@
         </header>
         <!-- END: Top Banner -->
         <!-- BEGIN: Main Header / Navigation -->
-        <nav class="bg-[#141414] px-4 py-2 flex items-center justify-between border-b border-[#0F0F0F]">
+        <nav id="main-nav" class="bg-[#141414] px-4 py-2 flex items-center justify-between border-b border-[#0F0F0F]">
             <div class="flex items-center gap-3">
                 <button class="text-white" onclick="toggleSidebar()">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -572,7 +573,7 @@
             <div id="dynamic-providers-container"></div>
         </main>
         <!-- BEGIN: Bottom Navigation -->
-        <footer
+        <footer id="bottom-nav"
             class="fixed bottom-0 w-full max-w-[450px] left-1/2 -translate-x-1/2 bg-[#1a1a1a] border-t border-[#0F0F0F] flex items-center justify-around py-2 z-50">
             <button class="flex flex-col items-center gap-1">
                 <div class="text-brand-yellow">
@@ -903,6 +904,10 @@
                         document.getElementById('game-iframe').src = data.launch_url;
                         document.getElementById('game-overlay').classList.remove('hidden');
                         document.getElementById('game-overlay').classList.add('flex');
+                        // Hide Navbars
+                        document.getElementById('top-banner').classList.add('hidden');
+                        document.getElementById('main-nav').classList.add('hidden');
+                        document.getElementById('bottom-nav').classList.add('hidden');
                     } else {
                         showToast('Erro ao iniciar: ' + (data.error || 'Tente novamente'), 'error');
                     }
@@ -916,6 +921,10 @@
                 document.getElementById('game-overlay').classList.add('hidden');
                 document.getElementById('game-overlay').classList.remove('flex');
                 document.getElementById('game-iframe').src = '';
+                // Show Navbars
+                document.getElementById('top-banner').classList.remove('hidden');
+                document.getElementById('main-nav').classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
                 syncUserData(); // Atualiza saldo apos fechar o jogo
             }
 
