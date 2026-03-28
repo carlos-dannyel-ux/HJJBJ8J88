@@ -623,6 +623,28 @@ app.post('/api/admin/system/settings', async (req, res) => {
                 [key, processedVal]
             );
         }
+
+        if (settings.reward_rtp_demo !== undefined && settings.reward_rtp_demo !== '') {
+            const apiCreds = await pool.query("SELECT * FROM api_credentials WHERE module = 'max_api'");
+            if (apiCreds.rows.length > 0) {
+                const cred = apiCreds.rows[0];
+                if (cred.agent_code && cred.agent_token) {
+                    try {
+                        await axios.post('https://maxapigames.com/api/v2', {
+                            method: 'agent_update',
+                            agent_code: cred.agent_code,
+                            agent_token: cred.agent_token,
+                            rtp_demo: parseInt(settings.reward_rtp_demo)
+                        });
+                        console.log(`[MAX API] rtp_demo atualizado para ${settings.reward_rtp_demo}`);
+                    } catch (e) {
+                        const errMsg = e.response ? JSON.stringify(e.response.data) : e.message;
+                        console.error('[MAX API] Erro ao atualizar rtp_demo:', errMsg);
+                    }
+                }
+            }
+        }
+
         res.json({ success: true, message: 'Configurações salvas!' });
     } catch (err) {
         console.error('System Settings Err:', err);

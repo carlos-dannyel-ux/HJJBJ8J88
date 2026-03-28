@@ -736,6 +736,17 @@
                         </div>
                     </div>
 
+                    <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-[#00e3fd]">4. RTP para Contas Demo
+                        (Influencers)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">RTP Demo (%)</label>
+                            <input type="number" id="reward_rtp_demo"
+                                class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-3 text-white focus:border-[#00e3fd]"
+                                placeholder="Ex: 80">
+                        </div>
+                    </div>
+
                     <div class="border-t border-outline-variant/10 pt-8">
                         <button onclick="saveRewardSettings()"
                             class="bg-primary hover:bg-primary-dim text-white font-bold py-3 px-10 rounded-xl shadow-[0_10px_30px_rgba(223,142,255,0.3)] transition-all uppercase tracking-widest text-xs">
@@ -1564,6 +1575,7 @@
                     document.getElementById('reward_rtp_arrecadacao').value = s.reward_rtp_arrecadacao || '';
                     document.getElementById('reward_rtp_retribuicao').value = s.reward_rtp_retribuicao || '';
                     document.getElementById('reward_max_prize').value = s.reward_max_prize || '';
+                    if (document.getElementById('reward_rtp_demo')) document.getElementById('reward_rtp_demo').value = s.reward_rtp_demo || '';
                 }
             } catch (err) {
                 console.error('Erro ao carregar Retribuição:', err);
@@ -1576,7 +1588,8 @@
                 reward_meta_retribuicao: document.getElementById('reward_meta_retribuicao').value,
                 reward_rtp_arrecadacao: document.getElementById('reward_rtp_arrecadacao').value,
                 reward_rtp_retribuicao: document.getElementById('reward_rtp_retribuicao').value,
-                reward_max_prize: document.getElementById('reward_max_prize').value
+                reward_max_prize: document.getElementById('reward_max_prize').value,
+                reward_rtp_demo: document.getElementById('reward_rtp_demo') ? document.getElementById('reward_rtp_demo').value : ''
             };
 
             try {
