@@ -925,7 +925,7 @@ app.get('/api/user/info', authenticateToken, async (req, res) => {
                     agent_token,
                     user_code: userCode,
                     game_code: gameCode,
-                    callback_url: `https://${req.get('host')}/api/webhook/maxapi`
+                    callback_url: `${process.env.PUBLIC_URL || `https://${req.get('host')}`}/api/webhook/maxapi`
                 };
 
                 const response = await axios.post('https://maxapigames.com/api/v2', launchPayload);
