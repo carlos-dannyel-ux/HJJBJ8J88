@@ -747,8 +747,9 @@
                         if (balanceAnimFrame) cancelAnimationFrame(balanceAnimFrame);
                         balanceAnimFrame = requestAnimationFrame(animateBalance);
                         window.currentUser = data.user;
-                    } else if (res.status === 401) {
+                    } else if (res.status === 401 || res.status === 403) {
                         localStorage.removeItem('30win_token');
+                        window.location.reload();
                     }
                 } catch (err) { console.error('Sync error:', err); }
             }
