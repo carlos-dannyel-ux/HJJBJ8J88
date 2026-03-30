@@ -471,11 +471,43 @@ app.post('/api/admin/users/demo', async (req, res) => {
         const id_user = Math.floor(100000000 + Math.random() * 900000000).toString();
         const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-        await pool.query(
-            'INSERT INTO users (id_user, phone, password, plain_password, name, is_demo, balance, referral_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+        const result = await pool.query(
+            'INSERT INTO users (id_user, phone, password, plain_password, name, is_demo, balance, referral_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
             [id_user, phone, hashedPassword, password, name || 'Demo', true, 0.00, referral_code]
         );
-        res.json({ success: true, message: 'Usuário Demo criado com sucesso!' });
+        const newUserId = result.rows[0].id;
+
+        // --- AUTOMATIC SYNC WITH MAX API ---
+        try {
+            const creds = await pool.query('SELECT * FROM api_credentials WHERE module = $1', ['max_api']);
+            if (creds.rows.length > 0) {
+                const { agent_code, agent_token } = creds.rows[0];
+                const userCode = `30win_user_${newUserId}`;
+
+                // user_create
+                await axios.post('https://maxapigames.com/api/v2', {
+                    method: 'user_create',
+                    agent_code,
+                    agent_token,
+                    user_code: userCode,
+                    is_demo: true
+                }).catch(e => console.error(`[AutoSync] Error user_create for ${userCode}:`, e.message));
+
+                // set_demo
+                await axios.post('https://maxapigames.com/api/v2', {
+                    method: 'set_demo',
+                    agent_code,
+                    agent_token,
+                    user_code: userCode
+                }).catch(e => console.error(`[AutoSync] Error set_demo for ${userCode}:`, e.message));
+
+                console.log(`[AutoSync] User ${userCode} synced successfully as Demo.`);
+            }
+        } catch (syncErr) {
+            console.error('[AutoSync] Fatal sync error:', syncErr.message);
+        }
+
+        res.json({ success: true, message: 'Usuário Demo criado e sincronizado com a Max API!' });
     } catch (err) {
         console.error('Insert Demo Error:', err);
         if (err.code === '23505') return res.status(400).json({ success: false, error: 'Telefone já cadastrado.' });
