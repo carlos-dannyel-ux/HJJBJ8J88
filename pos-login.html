@@ -842,7 +842,7 @@
                         class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
                         placeholder="Ex: 100.00">
                 </div>
-                <div>
+                <div id="rollover_container">
                     <label class="block text-xs font-bold text-gray-400 mb-1">Multiplicador de Rollover (X)</label>
                     <input type="number" id="rollover_mult"
                         class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
@@ -1119,7 +1119,7 @@
                             <td class="px-6 py-4 font-bold text-primary">R$ ${parseFloat(u.balance).toFixed(2)}</td>
                             <td class="px-6 py-4 text-center">${typeHtml}</td>
                             <td class="px-6 py-4 text-right">
-                                <button onclick="openEditUser(${u.id}, '${(u.name || '').replace(/'/g, "\\'").trim()}', '${(u.plain_password || '').replace(/'/g, "\\'").trim()}')" class="text-xs bg-surface-container-high px-3 py-1.5 rounded hover:bg-primary/20 hover:text-primary transition-colors">Editar</button>
+                                <button onclick="openEditUser(${u.id}, '${(u.name || '').replace(/'/g, "\\'").trim()}', '${(u.plain_password || '').replace(/'/g, "\\'").trim()}', ${u.is_demo})" class="text-xs bg-surface-container-high px-3 py-1.5 rounded hover:bg-primary/20 hover:text-primary transition-colors">Editar</button>
                                 <button onclick="openUserDetails(${u.id})" class="text-xs bg-surface-container-high px-3 py-1.5 rounded hover:bg-secondary/20 hover:text-secondary transition-colors ml-1">Detalhes</button>
                                 <button onclick="deleteUser(${u.id})" class="text-xs bg-error/10 text-error px-3 py-1.5 rounded hover:bg-error hover:text-white transition-colors ml-1">X</button>
                             </td>
@@ -1146,13 +1146,23 @@
             } catch (e) { alert('Erro'); }
         }
 
-        function openEditUser(id, name, plain_password) {
+        function openEditUser(id, name, plain_password, isDemo) {
             document.getElementById('edit_user_id').value = id;
             document.getElementById('edit_name').value = name;
             document.getElementById('edit_pass').value = '';
             document.getElementById('current_pass_display').innerText = plain_password || 'Desconhecida (Foi criptografada antes)';
             document.getElementById('adjust_amount').value = '';
             document.getElementById('rollover_mult').value = '1';
+
+            const rolloverContainer = document.getElementById('rollover_container');
+            if (isDemo) {
+                rolloverContainer.style.display = 'none';
+                document.getElementById('rollover_mult').value = '0';
+            } else {
+                rolloverContainer.style.display = 'block';
+                document.getElementById('rollover_mult').value = '1';
+            }
+
             switchEditTab('info');
             openModal('modal-edit-user');
         }
