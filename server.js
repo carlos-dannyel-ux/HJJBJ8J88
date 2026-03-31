@@ -301,6 +301,33 @@ app.get('/api/admin/stats', async (req, res) => {
               AND DATE_TRUNC('month', d.created_at) = DATE_TRUNC('month', NOW())
         `);
 
+        // Faturamento de ontem para a %
+        const yesterdayBilling = await pool.query(`
+            SELECT COALESCE(SUM(d.amount), 0) as total
+            FROM deposits d
+            WHERE d.status = 'completed'
+              AND d.method = 'PIX'
+              AND DATE_TRUNC('day', d.created_at) = DATE_TRUNC('day', NOW() - INTERVAL '1 day')
+        `);
+
+        // Faturamento de hoje (para comparar com ontem)
+        const todayBilling = await pool.query(`
+            SELECT COALESCE(SUM(d.amount), 0) as total
+            FROM deposits d
+            WHERE d.status = 'completed'
+              AND d.method = 'PIX'
+              AND DATE_TRUNC('day', d.created_at) = DATE_TRUNC('day', NOW())
+        `);
+
+        const tToday = parseFloat(todayBilling.rows[0].total) || 0;
+        const tYesterday = parseFloat(yesterdayBilling.rows[0].total) || 0;
+        let pChange = 0;
+        if (tYesterday > 0) {
+            pChange = ((tToday - tYesterday) / tYesterday) * 100;
+        } else if (tToday > 0) {
+            pChange = 100; // se ontem foi 0 e hoje > 0, 100% de aumento
+        }
+
         // Jogadores ativos: usuários com last_active nos últimos 5 minutos
         const activeResult = await pool.query(`
             SELECT COUNT(*) as count FROM users
@@ -310,11 +337,19 @@ app.get('/api/admin/stats', async (req, res) => {
         // Usuários cadastrados: total de usuários reais (não demo)
         const usersCount = await pool.query('SELECT COUNT(*) as count FROM users WHERE is_demo = false OR is_demo IS NULL');
 
+        // Capacidade do Servidor base (ex: 50% mock base + variação baseada em players)
+        const activePlayers = parseInt(activeResult.rows[0].count) || 0;
+        // Formula exemplo: 10% fixo + (active / 2000) * 90%, min 10 max 100
+        let serverCap = 10 + Math.floor((activePlayers / 2000) * 90);
+        if (serverCap > 100) serverCap = 100;
+
         res.json({
             success: true,
             stats: {
                 totalBilling: Number(billingResult.rows[0].total || 0).toFixed(2),
-                activePlayers: parseInt(activeResult.rows[0].count) || 0,
+                billingPercentChange: pChange.toFixed(1),
+                activePlayers: activePlayers,
+                serverCapacity: serverCap,
                 registeredUsers: parseInt(usersCount.rows[0].count)
             }
         });

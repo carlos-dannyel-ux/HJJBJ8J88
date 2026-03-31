@@ -224,9 +224,9 @@
                                 class="text-5xl md:text-6xl font-black text-on-background tracking-tighter -mt-2 drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)]">0,00</span>
                         </div>
                     </div>
-                    <div class="mt-8 flex items-center gap-2 text-secondary font-bold">
-                        <span class="material-symbols-outlined text-sm">trending_up</span>
-                        <span class="text-sm">+12.5% em relação a ontem</span>
+                    <div id="billing_percent_container" class="mt-8 flex items-center gap-2 text-secondary font-bold">
+                        <span id="billing_percent_icon" class="material-symbols-outlined text-sm">trending_up</span>
+                        <span id="billing_percent_text" class="text-sm">+0.0% em relação a ontem</span>
                     </div>
                 </div>
                 <!-- Usuários Ativos Card -->
@@ -253,12 +253,13 @@
                         <div
                             class="flex justify-between text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">
                             <span>Capacidade do Servidor</span>
-                            <span>74%</span>
+                            <span id="server_capacity_text">10%</span>
                         </div>
                         <div
                             class="h-3 w-full bg-surface-container rounded-full overflow-hidden p-0.5 border border-outline-variant/10">
-                            <div class="h-full bg-gradient-to-r from-secondary-container to-secondary rounded-full"
-                                style="width: 74%"></div>
+                            <div id="server_capacity_bar"
+                                class="h-full bg-gradient-to-r from-secondary-container to-secondary rounded-full"
+                                style="width: 10%"></div>
                         </div>
                     </div>
                 </div>
@@ -266,18 +267,7 @@
                 <div
                     class="md:col-span-12 lg:col-span-3 glass-card rounded-xl p-8 flex flex-col items-center justify-center text-center">
                     <div class="relative mb-6">
-                        <!-- Circle Progress -->
-                        <svg class="w-32 h-32 transform -rotate-90">
-                            <circle class="text-surface-container" cx="64" cy="64" fill="transparent" r="58"
-                                stroke="currentColor" stroke-width="8"></circle>
-                            <circle class="text-tertiary drop-shadow-[0_0_8px_rgba(255,107,152,0.5)]" cx="64" cy="64"
-                                fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4"
-                                stroke-dashoffset="65.6" stroke-linecap="round" stroke-width="8"></circle>
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center rotate-90">
-                            <span class="text-2xl font-black text-on-background">82%</span>
-                            <span class="text-[8px] font-black text-tertiary tracking-tighter uppercase">Metas</span>
-                        </div>
+                        <!-- Circle Removed as requested -->
                     </div>
                     <span
                         class="font-headline text-xs font-bold tracking-widest text-on-surface-variant uppercase mb-1">USUÁRIOS
@@ -310,7 +300,7 @@
                             <tbody id="dashboard-deposits-tbody" class="divide-y divide-outline-variant/5">
                                 <tr>
                                     <td colspan="5"
-                                        class="px-8 py-10 text-center text-on-surface-variant text-xs uppercase tracking-widest">
+                                        class="px-8 py-10 text-center text-on-surface-variant text-[10px] uppercase font-black tracking-widest">
                                         <span
                                             class="material-symbols-outlined animate-spin block mx-auto mb-2">sync</span>
                                         Carregando...
@@ -1443,10 +1433,33 @@
                 const response = await fetch('/api/admin/stats');
                 const data = await response.json();
                 if (data.success) {
-                    const billing = parseFloat(data.stats.totalBilling);
+                    const billing = parseFloat(data.stats.totalBilling || 0);
                     document.getElementById('total_billing').innerText = billing.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                    document.getElementById('active_players').innerText = data.stats.activePlayers;
-                    document.getElementById('registered_users').innerText = data.stats.registeredUsers;
+                    document.getElementById('active_players').innerText = data.stats.activePlayers || 0;
+                    document.getElementById('registered_users').innerText = data.stats.registeredUsers || 0;
+
+                    const pChange = parseFloat(data.stats.billingPercentChange || 0);
+                    const pContainer = document.getElementById('billing_percent_container');
+                    const pIcon = document.getElementById('billing_percent_icon');
+                    const pText = document.getElementById('billing_percent_text');
+
+                    if (pChange > 0) {
+                        pContainer.className = "mt-8 flex items-center gap-2 text-secondary font-bold";
+                        pIcon.innerText = "trending_up";
+                        pText.innerText = `+${pChange.toFixed(1)}% em relação a ontem`;
+                    } else if (pChange < 0) {
+                        pContainer.className = "mt-8 flex items-center gap-2 text-error font-bold";
+                        pIcon.innerText = "trending_down";
+                        pText.innerText = `${pChange.toFixed(1)}% em relação a ontem`;
+                    } else {
+                        pContainer.className = "mt-8 flex items-center gap-2 text-on-surface-variant font-bold";
+                        pIcon.innerText = "trending_flat";
+                        pText.innerText = `0.0% em relação a ontem`;
+                    }
+
+                    const cap = data.stats.serverCapacity || 10;
+                    document.getElementById('server_capacity_text').innerText = `${cap}%`;
+                    document.getElementById('server_capacity_bar').style.width = `${cap}%`;
                 }
             } catch (err) {
                 console.error('Erro ao buscar estatísticas:', err);
@@ -1460,7 +1473,7 @@
                 const res = await fetch('/api/admin/dashboard-deposits');
                 const data = await res.json();
                 if (!data.success || data.deposits.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-10 text-center text-on-surface-variant text-xs uppercase tracking-widest">Nenhum depósito PIX encontrado.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-10 text-center text-on-surface-variant text-[10px] uppercase font-black tracking-widest">NENHUM DEPÓSITO PIX ENCONTRADO.</td></tr>`;
                     return;
                 }
                 tbody.innerHTML = '';
