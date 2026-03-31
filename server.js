@@ -1046,8 +1046,8 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             sRows.rows.forEach(r => settings[r.key_name] = r.key_value);
 
             const maxPrize = parseFloat(settings['reward_max_prize']) || 99999.00;
-            if (win > maxPrize && maxPrize > 0) {
-                win = maxPrize; // Capping win
+            if (!isDemo && win > maxPrize && maxPrize > 0) {
+                win = maxPrize; // Capping win only for REAL players
             }
 
             // Update local balance
