@@ -194,9 +194,9 @@
                     <p class="text-on-surface-variant font-medium text-sm ml-5 uppercase tracking-[0.2em]">Visão Geral
                         da Plataforma</p>
                 </div>
-                <button
+                <button onclick="refreshDashboard()"
                     class="bg-primary hover:bg-primary-dim text-on-primary font-headline font-bold px-6 py-3 rounded-xl active:scale-95 transition-all shadow-[0_0_20px_rgba(223,142,255,0.4)] flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">refresh</span>
+                    <span class="material-symbols-outlined text-sm" id="btn-refresh-icon">refresh</span>
                     ATUALIZAR DADOS
                 </button>
             </div>
@@ -307,89 +307,13 @@
                                     <th class="px-8 py-4 text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-outline-variant/5">
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold text-primary">
-                                                UL</div>
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-sm text-on-background">UltraLord_99</span>
-                                                <span class="text-[10px] text-on-surface-variant">ID: #85921</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5 text-sm font-medium">Hoje, 14:23</td>
-                                    <td class="px-8 py-5 font-headline font-bold text-on-background">R$ 1.500,00</td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center gap-2">
-                                            <span
-                                                class="material-symbols-outlined text-xs text-on-surface-variant">account_balance_wallet</span>
-                                            <span class="text-xs font-medium uppercase">PIX Fast</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex justify-center">
-                                            <span
-                                                class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-secondary/10 text-secondary border border-secondary/20 shadow-[0_0_10px_rgba(0,227,253,0.1)]">COMPLETED</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold text-primary">
-                                                NK</div>
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-sm text-on-background">NeonKnight</span>
-                                                <span class="text-[10px] text-on-surface-variant">ID: #44012</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5 text-sm font-medium">Hoje, 14:15</td>
-                                    <td class="px-8 py-5 font-headline font-bold text-on-background">R$ 50,00</td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center gap-2">
-                                            <span
-                                                class="material-symbols-outlined text-xs text-on-surface-variant">credit_card</span>
-                                            <span class="text-xs font-medium uppercase">Card</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex justify-center">
-                                            <span
-                                                class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-tertiary/10 text-tertiary border border-tertiary/20 shadow-[0_0_10px_rgba(255,107,152,0.1)]">PENDING</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold text-primary">
-                                                CZ</div>
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-sm text-on-background">CryptoZez</span>
-                                                <span class="text-[10px] text-on-surface-variant">ID: #10293</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5 text-sm font-medium">Hoje, 14:02</td>
-                                    <td class="px-8 py-5 font-headline font-bold text-on-background">R$ 2.450,00</td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center gap-2">
-                                            <span
-                                                class="material-symbols-outlined text-xs text-on-surface-variant">currency_bitcoin</span>
-                                            <span class="text-xs font-medium uppercase">USDT</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex justify-center">
-                                            <span
-                                                class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-secondary/10 text-secondary border border-secondary/20">COMPLETED</span>
-                                        </div>
+                            <tbody id="dashboard-deposits-tbody" class="divide-y divide-outline-variant/5">
+                                <tr>
+                                    <td colspan="5"
+                                        class="px-8 py-10 text-center text-on-surface-variant text-xs uppercase tracking-widest">
+                                        <span
+                                            class="material-symbols-outlined animate-spin block mx-auto mb-2">sync</span>
+                                        Carregando...
                                     </td>
                                 </tr>
                             </tbody>
@@ -1519,7 +1443,8 @@
                 const response = await fetch('/api/admin/stats');
                 const data = await response.json();
                 if (data.success) {
-                    document.getElementById('total_billing').innerText = data.stats.totalBilling.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    const billing = parseFloat(data.stats.totalBilling);
+                    document.getElementById('total_billing').innerText = billing.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                     document.getElementById('active_players').innerText = data.stats.activePlayers;
                     document.getElementById('registered_users').innerText = data.stats.registeredUsers;
                 }
@@ -1528,10 +1453,84 @@
             }
         }
 
+        async function loadDashboardDeposits() {
+            const tbody = document.getElementById('dashboard-deposits-tbody');
+            if (!tbody) return;
+            try {
+                const res = await fetch('/api/admin/dashboard-deposits');
+                const data = await res.json();
+                if (!data.success || data.deposits.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-10 text-center text-on-surface-variant text-xs uppercase tracking-widest">Nenhum depósito PIX encontrado.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = '';
+                data.deposits.forEach(d => {
+                    const initials = (d.name || d.phone || '?').substring(0, 2).toUpperCase();
+                    const displayName = d.name || d.phone || 'Desconhecido';
+                    const userId = d.id_user || d.id;
+
+                    const dateObj = new Date(d.created_at);
+                    const now = new Date();
+                    const isToday = dateObj.toDateString() === now.toDateString();
+                    const timeStr = isToday
+                        ? 'Hoje, ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                        : dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ', ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+                    const amountFmt = parseFloat(d.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+                    let statusHtml = '';
+                    if (d.status === 'completed') {
+                        statusHtml = `<span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-secondary/10 text-secondary border border-secondary/20 shadow-[0_0_10px_rgba(0,227,253,0.1)]">COMPLETO</span>`;
+                    } else if (d.status === 'pending') {
+                        statusHtml = `<span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-tertiary/10 text-tertiary border border-tertiary/20 shadow-[0_0_10px_rgba(255,107,152,0.1)]">PENDENTE</span>`;
+                    } else {
+                        statusHtml = `<span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-error/10 text-error border border-error/20">FALHOU</span>`;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold text-primary">${initials}</div>
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-sm text-on-background">${displayName}${d.is_demo ? ' <span class="text-secondary text-[9px]">(Demo)</span>' : ''}</span>
+                                        <span class="text-[10px] text-on-surface-variant">ID: #${userId}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5 text-sm font-medium">${timeStr}</td>
+                            <td class="px-8 py-5 font-headline font-bold text-on-background">R$ ${amountFmt}</td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-xs text-on-surface-variant">pix</span>
+                                    <span class="text-xs font-medium uppercase">PIX</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex justify-center">${statusHtml}</div>
+                            </td>
+                        </tr>`;
+                });
+            } catch (err) {
+                console.error('Erro ao carregar depósitos do dashboard:', err);
+                tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-6 text-center text-error text-xs">Erro ao carregar dados.</td></tr>`;
+            }
+        }
+
+        async function refreshDashboard() {
+            const icon = document.getElementById('btn-refresh-icon');
+            if (icon) { icon.classList.add('animate-spin'); }
+            await Promise.all([fetchStats(), loadDashboardDeposits()]);
+            if (icon) { icon.classList.remove('animate-spin'); }
+        }
+
         // Fetch on load
         fetchStats();
-        // Refresh every 30 seconds
-        setInterval(fetchStats, 30000);
+        loadDashboardDeposits();
+        // Refresh every 10 seconds (real-time)
+        setInterval(fetchStats, 10000);
+        // Refresh deposits table every 30 seconds
+        setInterval(loadDashboardDeposits, 30000);
 
         // Atualização em tempo real do Painel de Retribuição (Sem focar no input)
         async function pollRewardStatus() {

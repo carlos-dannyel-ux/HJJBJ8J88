@@ -110,6 +110,9 @@ app.post('/api/auth/login', async (req, res) => {
         const validPass = await bcrypt.compare(password, user.password);
         if (!validPass) return res.status(400).json({ success: false, error: 'Senha incorreta.' });
 
+        // Update last_active for real-time active players tracking
+        await pool.query('UPDATE users SET last_active = NOW() WHERE id = $1', [user.id]).catch(() => { });
+
         const token = jwt.sign({ id: user.id, phone: user.phone, referral_code: user.referral_code }, SECRET_KEY, { expiresIn: '24h' });
         res.json({ success: true, token, user: { phone: user.phone, balance: user.balance, id_user: user.id_user } });
     } catch (err) {
@@ -289,19 +292,63 @@ app.post('/api/admin/login', async (req, res) => {
 
 app.get('/api/admin/stats', async (req, res) => {
     try {
-        const usersCount = await pool.query('SELECT COUNT(*) as count FROM users');
-        const totalBilling = await pool.query('SELECT SUM(balance) as total FROM users');
+        // Faturamento mensal: soma de depósitos PIX concluídos no mês atual
+        const billingResult = await pool.query(`
+            SELECT COALESCE(SUM(d.amount), 0) as total
+            FROM deposits d
+            WHERE d.status = 'completed'
+              AND d.method = 'PIX'
+              AND DATE_TRUNC('month', d.created_at) = DATE_TRUNC('month', NOW())
+        `);
+
+        // Jogadores ativos: usuários com last_active nos últimos 5 minutos
+        const activeResult = await pool.query(`
+            SELECT COUNT(*) as count FROM users
+            WHERE last_active >= NOW() - INTERVAL '5 minutes'
+        `);
+
+        // Usuários cadastrados: total de usuários reais (não demo)
+        const usersCount = await pool.query('SELECT COUNT(*) as count FROM users WHERE is_demo = false OR is_demo IS NULL');
+
         res.json({
             success: true,
             stats: {
-                totalBilling: Number(totalBilling.rows[0].total || 0).toFixed(2),
-                activePlayers: Math.floor(Math.random() * 2000) + 500, // Placeholder simulado
+                totalBilling: Number(billingResult.rows[0].total || 0).toFixed(2),
+                activePlayers: parseInt(activeResult.rows[0].count) || 0,
                 registeredUsers: parseInt(usersCount.rows[0].count)
             }
         });
     } catch (err) {
         console.error('Error in /api/admin/stats:', err);
         res.status(500).json({ success: false, error: 'Erro ao buscar estatísticas.' });
+    }
+});
+
+// Endpoint: Histórico de Depósitos PIX para o Dashboard
+app.get('/api/admin/dashboard-deposits', async (req, res) => {
+    try {
+        const rows = await pool.query(`
+            SELECT
+                d.id,
+                d.amount,
+                d.method,
+                d.status,
+                d.created_at,
+                u.name,
+                u.phone,
+                u.id_user,
+                u.is_demo
+            FROM deposits d
+            JOIN users u ON d.user_id = u.id
+            WHERE d.method = 'PIX'
+              AND d.status IN ('completed', 'pending', 'failed')
+            ORDER BY d.created_at DESC
+            LIMIT 20
+        `);
+        res.json({ success: true, deposits: rows.rows });
+    } catch (err) {
+        console.error('Dashboard Deposits Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao buscar histórico de depósitos.' });
     }
 });
 
@@ -949,6 +996,9 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
 
         const { agent_code, agent_token } = creds.rows[0];
         const userCode = `30win_user_${req.user.id}`;
+
+        // Atualizar last_active para rastreamento de jogadores ativos
+        pool.query('UPDATE users SET last_active = NOW() WHERE id = $1', [req.user.id]).catch(() => { });
 
         // Verifica se o usuario e demo no nosso banco
         const userRow = await pool.query('SELECT is_demo FROM users WHERE id = $1', [req.user.id]);
