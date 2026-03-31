@@ -242,7 +242,7 @@
 </head>
 
 <body>
-    <div
+    <div id="main-container"
         class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0f0f0f] relative shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden border-x-2 border-[#0F0F0F]">
 
         <!-- Sticky Header -->
@@ -474,6 +474,7 @@
                     iframe.src = data.launch_url;
                     document.getElementById('game-overlay').classList.remove('hidden');
                     document.getElementById('game-overlay').classList.add('flex');
+                    document.getElementById('main-container').style.display = 'none';
                 } else {
                     showToast('Erro ao iniciar: ' + (data.error || 'Tente novamente'), 'error');
                 }
@@ -488,6 +489,7 @@
             if (iframe) iframe.remove();
             document.getElementById('game-overlay').classList.add('hidden');
             document.getElementById('game-overlay').classList.remove('flex');
+            document.getElementById('main-container').style.display = 'flex';
         }
 
         document.addEventListener('DOMContentLoaded', loadProviderGames);
