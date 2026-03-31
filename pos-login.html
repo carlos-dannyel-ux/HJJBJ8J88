@@ -58,6 +58,19 @@
         html {
             font-size: 75%;
         }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        * {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
     </style>
     <style>
         body {
@@ -80,19 +93,9 @@
                     style="font-variation-settings: 'FILL' 1;">sports_esports</span>
                 <h1
                     class="font-['Lexend'] font-bold tracking-wider uppercase text-xl text-[#df8eff] drop-shadow-[0_0_8px_rgba(223,142,255,0.6)]">
-                    ARCADE ADMIN</h1>
+                    PAINEL ADMIN</h1>
             </div>
             <div class="flex items-center gap-6">
-                <div class="hidden md:flex gap-8">
-                    <span
-                        class="font-['Lexend'] font-bold tracking-wider uppercase text-[#00e3fd] drop-shadow-[0_0_5px_rgba(0,227,253,0.8)] cursor-pointer">Dashboard</span>
-                    <span
-                        class="font-['Lexend'] font-bold tracking-wider uppercase text-[#e6e2ff]/60 hover:text-[#ff6b98] transition-all duration-300 cursor-pointer">Games</span>
-                    <span
-                        class="font-['Lexend'] font-bold tracking-wider uppercase text-[#e6e2ff]/60 hover:text-[#ff6b98] transition-all duration-300 cursor-pointer">Players</span>
-                    <span
-                        class="font-['Lexend'] font-bold tracking-wider uppercase text-[#e6e2ff]/60 hover:text-[#ff6b98] transition-all duration-300 cursor-pointer">Shop</span>
-                </div>
                 <div class="flex items-center gap-4 text-[#df8eff]">
                     <span
                         class="material-symbols-outlined cursor-pointer active:scale-95 hover:text-[#ff6b98] transition-all"
@@ -834,23 +837,19 @@
             <div
                 class="flex flex-col items-center justify-center text-[#e6e2ff]/40 p-3 hover:text-[#df8eff] transition-colors active:scale-90 duration-150">
                 <span class="material-symbols-outlined text-2xl">videogame_asset</span>
-                <span class="font-['Lexend'] text-[10px] font-medium uppercase tracking-tighter mt-1">Games</span>
             </div>
             <div
                 class="flex flex-col items-center justify-center text-[#00e3fd] bg-[#232148] rounded-full p-4 shadow-[0_0_15px_rgba(0,227,253,0.3)] active:scale-90 duration-150 -translate-y-4">
                 <span class="material-symbols-outlined text-2xl"
                     style="font-variation-settings: 'FILL' 1;">dashboard_customize</span>
-                <span class="font-['Lexend'] text-[10px] font-medium uppercase tracking-tighter mt-1">Dashboard</span>
             </div>
             <div
                 class="flex flex-col items-center justify-center text-[#e6e2ff]/40 p-3 hover:text-[#df8eff] transition-colors active:scale-90 duration-150">
                 <span class="material-symbols-outlined text-2xl">group</span>
-                <span class="font-['Lexend'] text-[10px] font-medium uppercase tracking-tighter mt-1">Players</span>
             </div>
             <div
                 class="flex flex-col items-center justify-center text-[#e6e2ff]/40 p-3 hover:text-[#df8eff] transition-colors active:scale-90 duration-150">
                 <span class="material-symbols-outlined text-2xl">shopping_cart</span>
-                <span class="font-['Lexend'] text-[10px] font-medium uppercase tracking-tighter mt-1">Shop</span>
             </div>
         </div>
     </footer>
