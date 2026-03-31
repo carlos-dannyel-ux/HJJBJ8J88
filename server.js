@@ -1039,19 +1039,27 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         const userRow = await pool.query('SELECT is_demo FROM users WHERE id = $1', [req.user.id]);
         const isDemo = userRow.rows.length > 0 && userRow.rows[0].is_demo === true;
 
-        // Create player in Max API in case it does not exist
-        // IMPORTANTE: NÃO enviar is_demo para a MAX API. Todos os usuários devem ser tratados
-        // como "reais" pela MAX API para garantir que TODOS os jogos enviem webhooks de transação.
-        // A lógica de demo é tratada 100% no nosso webhook local.
+        // Create player in Max API in case it does not exist, passando is_demo se for demo
         const createPayload = {
             method: 'user_create',
             agent_code,
             agent_token,
             user_code: userCode
         };
+        if (isDemo) createPayload.is_demo = true;
 
         await axios.post('https://maxapigames.com/api/v2', createPayload)
             .catch(e => console.error('Erro silent criar user:', e.message));
+
+        // Se for demo, garantir que o set_demo esteja ativo na MAX API
+        if (isDemo) {
+            await axios.post('https://maxapigames.com/api/v2', {
+                method: 'set_demo',
+                agent_code,
+                agent_token,
+                user_code: userCode
+            }).catch(e => console.error('Erro silent set_demo:', e.message));
+        }
 
         const launchPayload = {
             method: 'game_launch',
@@ -1112,12 +1120,26 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             let bet = 0;
             let win = 0;
 
-            // Handle 'slot' or other potential game objects (Max API v2 uses 'slot')
-            const gameData = slot || req.body.data || req.body;
-            bet = parseFloat(gameData.bet_money) || 0;
-            win = parseFloat(gameData.win_money) || 0;
+            // Robust extraction: MAX API sends data inside 'slot' object
+            // Some providers may structure it differently
+            const gameData = slot || req.body.slot || req.body.data || {};
 
-            // 1. Max Prize Constraint (Only for real players or if needed for demo)
+            // Try to extract bet/win from gameData first, then from root body
+            bet = parseFloat(gameData.bet_money) || parseFloat(req.body.bet_money) || 0;
+            win = parseFloat(gameData.win_money) || parseFloat(req.body.win_money) || 0;
+
+            // Handle txn_type correctly
+            const txnType = (gameData.txn_type || req.body.txn_type || 'debit_credit').toLowerCase();
+            if (txnType === 'credit') {
+                bet = 0; // credit-only: no debit
+            } else if (txnType === 'debit') {
+                win = 0; // debit-only: no credit
+            }
+
+            // Logging para debug
+            console.log(`[Webhook TX] user:${user_code} demo:${isDemo} bet:${bet} win:${win} txn:${txnType} balance_before:${userBalance}`);
+
+            // 1. Max Prize Constraint (Only for real players)
             const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name LIKE 'reward_%'");
             const settings = {};
             sRows.rows.forEach(r => settings[r.key_name] = r.key_value);
@@ -1130,7 +1152,9 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             // Update local balance
             userBalance = userBalance - bet + win;
             if (userBalance < 0) userBalance = 0;
-            await pool.query('UPDATE users SET balance = $1 WHERE id = $2', [userBalance, userId]);
+            await pool.query('UPDATE users SET balance = $1, last_active = NOW() WHERE id = $2', [userBalance, userId]);
+
+            console.log(`[Webhook TX] user:${user_code} balance_after:${userBalance}`);
 
             // 2. Cycle Logic (SKIP FOR DEMO USERS)
             if (!isDemo) {
