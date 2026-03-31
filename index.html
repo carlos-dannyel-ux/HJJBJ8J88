@@ -908,8 +908,13 @@
                             document.getElementById('game-overlay').appendChild(iframe);
                         }
                         iframe.src = data.launch_url;
-                        document.getElementById('game-overlay').classList.remove('hidden');
-                        document.getElementById('game-overlay').classList.add('block');
+                        const overlay = document.getElementById('game-overlay');
+                        overlay.classList.remove('hidden');
+                        overlay.classList.add('block');
+
+                        // Mover o botão para o final do overlay para garantir que fique por cima no DOM
+                        const btn = overlay.querySelector('button');
+                        if (btn) overlay.appendChild(btn);
                         // Hide Navbars and Main Content with style for extra safety
                         document.getElementById('top-banner').style.display = 'none';
                         document.getElementById('main-nav').style.display = 'none';
@@ -944,8 +949,9 @@
 
         <!-- Jogo Overlay Fullscreen -->
         <div id="game-overlay" class="fixed inset-0 bg-black z-[10000] hidden overflow-hidden">
-            <button onclick="closeGameOverlay()"
-                class="fixed left-0 top-1/2 -translate-y-1/2 !z-[9999999] w-10 h-20 bg-white/10 backdrop-blur-lg border border-white/20 rounded-r-2xl flex items-center justify-center active:scale-95 transition-all shadow-[10px_0_30px_rgba(0,0,0,0.5)] group">
+            <!-- Fullscreen Iframe will be appended before the button -->
+            <button onclick="closeGameOverlay()" style="z-index: 999999999 !important;"
+                class="fixed left-0 top-1/2 -translate-y-1/2 w-10 h-20 bg-white/10 backdrop-blur-lg border border-white/20 rounded-r-2xl flex items-center justify-center active:scale-95 transition-all shadow-[10px_0_30px_rgba(0,0,0,0.5)] group">
                 <div class="flex flex-col items-center gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
                     <span class="material-symbols-outlined text-white text-2xl"
                         style="font-variation-settings: 'FILL' 1;">home</span>
