@@ -1020,34 +1020,32 @@ app.post('/api/webhook/maxapi', async (req, res) => {
         const userId = parseInt(user_code.replace('30win_user_', ''));
         if (isNaN(userId)) return res.status(400).json({ status: 0, msg: 'INVALID_USER' });
 
-        const userRows = await pool.query('SELECT balance FROM users WHERE id = $1', [userId]);
+        const userRows = await pool.query('SELECT balance, is_demo FROM users WHERE id = $1', [userId]);
         if (userRows.rows.length === 0) return res.status(400).json({ status: 0, msg: 'INVALID_USER' });
 
-        let userBalance = parseFloat(userRows.rows[0].balance);
+        const user = userRows.rows[0];
+        const isDemo = user.is_demo === true;
+        let userBalance = parseFloat(user.balance);
 
         if (method === 'user_balance') {
             return res.json({ status: 1, user_balance: userBalance });
         }
 
-        if (method === 'transaction' && slot) {
-            let bet = parseFloat(slot.bet_money) || 0;
-            let win = parseFloat(slot.win_money) || 0;
+        if (method === 'transaction') {
+            let bet = 0;
+            let win = 0;
 
-            // Fetch current Reward System settings
+            // Handle 'slot' or other potential game objects (Max API v2 uses 'slot')
+            const gameData = slot || req.body.data || req.body;
+            bet = parseFloat(gameData.bet_money) || 0;
+            win = parseFloat(gameData.win_money) || 0;
+
+            // 1. Max Prize Constraint (Only for real players or if needed for demo)
             const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name LIKE 'reward_%'");
             const settings = {};
             sRows.rows.forEach(r => settings[r.key_name] = r.key_value);
 
-            let phase = settings['reward_system_phase'] || 'arrecadacao';
-            const metaArrecadacao = parseFloat(settings['reward_meta_arrecadacao']) || 1000.00;
-            const metaRetribuicao = parseFloat(settings['reward_meta_retribuicao']) || 500.00;
-            let currentArrecadacao = parseFloat(settings['reward_current_arrecadacao']) || 0.00;
-            let currentRetribuicao = parseFloat(settings['reward_current_retribuicao']) || 0.00;
             const maxPrize = parseFloat(settings['reward_max_prize']) || 99999.00;
-            const rtpArrecadacao = settings['reward_rtp_arrecadacao'] || '5';
-            const rtpRetribuicao = settings['reward_rtp_retribuicao'] || '95';
-
-            // 1. Max Prize Constraint
             if (win > maxPrize && maxPrize > 0) {
                 win = maxPrize; // Capping win
             }
@@ -1057,59 +1055,69 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             if (userBalance < 0) userBalance = 0;
             await pool.query('UPDATE users SET balance = $1 WHERE id = $2', [userBalance, userId]);
 
-            // 2. Cycle Logic
-            let transitionOccurred = false;
-            let nextRtp = null;
-            let profit = bet - win; // Negative if player wins more than bet
+            // 2. Cycle Logic (SKIP FOR DEMO USERS)
+            if (!isDemo) {
+                let phase = settings['reward_system_phase'] || 'arrecadacao';
+                const metaArrecadacao = parseFloat(settings['reward_meta_arrecadacao']) || 1000.00;
+                const metaRetribuicao = parseFloat(settings['reward_meta_retribuicao']) || 500.00;
+                let currentArrecadacao = parseFloat(settings['reward_current_arrecadacao']) || 0.00;
+                let currentRetribuicao = parseFloat(settings['reward_current_retribuicao']) || 0.00;
+                const rtpArrecadacao = settings['reward_rtp_arrecadacao'] || '5';
+                const rtpRetribuicao = settings['reward_rtp_retribuicao'] || '95';
 
-            if (phase === 'arrecadacao') {
-                currentArrecadacao += profit;
-                if (currentArrecadacao >= metaArrecadacao) {
-                    phase = 'retribuicao';
-                    currentArrecadacao = 0;
-                    currentRetribuicao = 0;
-                    transitionOccurred = true;
-                    nextRtp = rtpRetribuicao;
+                let transitionOccurred = false;
+                let nextRtp = null;
+                let profit = bet - win;
+
+                if (phase === 'arrecadacao') {
+                    currentArrecadacao += profit;
+                    if (currentArrecadacao >= metaArrecadacao) {
+                        phase = 'retribuicao';
+                        currentArrecadacao = 0;
+                        currentRetribuicao = 0;
+                        transitionOccurred = true;
+                        nextRtp = rtpRetribuicao;
+                    }
+                } else if (phase === 'retribuicao') {
+                    currentRetribuicao += (win - bet > 0 ? win - bet : 0);
+                    if (currentRetribuicao >= metaRetribuicao) {
+                        phase = 'arrecadacao';
+                        currentRetribuicao = 0;
+                        currentArrecadacao = 0;
+                        transitionOccurred = true;
+                        nextRtp = rtpArrecadacao;
+                    }
                 }
-            } else if (phase === 'retribuicao') {
-                currentRetribuicao += (win - bet > 0 ? win - bet : 0); // Accumulate net player wins
 
-                if (currentRetribuicao >= metaRetribuicao) {
-                    phase = 'arrecadacao';
-                    currentRetribuicao = 0;
-                    currentArrecadacao = 0;
-                    transitionOccurred = true;
-                    nextRtp = rtpArrecadacao;
+                // Save metrics tracking to database
+                const updates = {
+                    reward_system_phase: phase,
+                    reward_current_arrecadacao: String(currentArrecadacao.toFixed(2)),
+                    reward_current_retribuicao: String(currentRetribuicao.toFixed(2))
+                };
+
+                for (const [k, v] of Object.entries(updates)) {
+                    await pool.query('UPDATE system_settings SET key_value = $1 WHERE key_name = $2', [v, k]);
                 }
-            }
 
-            // Save metrics tracking to database
-            const updates = {
-                reward_system_phase: phase,
-                reward_current_arrecadacao: String(currentArrecadacao.toFixed(2)),
-                reward_current_retribuicao: String(currentRetribuicao.toFixed(2))
-            };
-
-            for (const [k, v] of Object.entries(updates)) {
-                await pool.query('UPDATE system_settings SET key_value = $1 WHERE key_name = $2', [v, k]);
-            }
-
-            // 3. Trigger API RTP control on Phase Change
-            if (transitionOccurred && nextRtp !== null) {
-                try {
-                    await axios.post('https://maxapigames.com/api/v2', {
-                        method: 'control_rtp',
-                        agent_code: agentSettings.agent_code,
-                        agent_token: agentSettings.agent_token,
-                        rtp: parseInt(nextRtp)
-                    });
-                } catch (apiErr) {
-                    console.error('Failed to command RTP to MAX API:', apiErr.message);
+                // 3. Trigger API RTP control on Phase Change
+                if (transitionOccurred && nextRtp !== null) {
+                    try {
+                        await axios.post('https://maxapigames.com/api/v2', {
+                            method: 'control_rtp',
+                            agent_code: agentSettings.agent_code,
+                            agent_token: agentSettings.agent_token,
+                            rtp: parseInt(nextRtp)
+                        });
+                    } catch (apiErr) {
+                        console.error('Failed to command RTP to MAX API:', apiErr.message);
+                    }
                 }
             }
 
             return res.json({ status: 1, user_balance: userBalance });
         }
+
 
         return res.status(400).json({ status: 0, msg: 'INVALID_METHOD' });
     } catch (err) {
