@@ -904,7 +904,7 @@
                         if (!iframe) {
                             iframe = document.createElement('iframe');
                             iframe.id = 'game-iframe';
-                            iframe.className = 'w-screen h-screen border-none shadow-2xl';
+                            iframe.className = 'absolute inset-0 w-full h-full border-none';
                             document.getElementById('game-overlay').appendChild(iframe);
                         }
                         iframe.src = data.launch_url;
