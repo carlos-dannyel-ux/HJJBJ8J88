@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>30win - Jogos</title>
+    <link rel="icon" type="image/png" href="/public/FAV.png">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <style>
+        html,
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F0F0F !important;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        .text-brand-yellow {
+            color: #ffcc00;
+        }
+
+        .bg-brand-yellow {
+            background-color: #ffcc00;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+
+        /* --- Premium Game Card --- */
+        .game-card {
+            width: 100%;
+            aspect-ratio: 3/4;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: #1c1c2e;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-card:hover,
+        .game-card:active {
+            transform: scale(1.04);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 55%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .game-card .card-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: linear-gradient(135deg, #ff7a00, #ff5500);
+            color: #fff;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 2px 5px;
+            border-radius: 5px;
+            z-index: 2;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-card .card-star {
+            position: absolute;
+            top: 5px;
+            right: 6px;
+            z-index: 2;
+            font-size: 14px;
+            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+        }
+
+        .game-card .card-name {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+            padding: 0 6px;
+            z-index: 2;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Page-specific styles */
+        .provider-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: linear-gradient(180deg, #0F0F0F 0%, rgba(15, 15, 15, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .provider-hero {
+            position: relative;
+            padding: 24px 16px 32px;
+            overflow: hidden;
+        }
+
+        .provider-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 204, 0, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .provider-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255, 85, 0, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .stats-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.15);
+            font-size: 10px;
+            font-weight: 700;
+            color: #ffcc00;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 14px 10px 40px;
+            font-size: 13px;
+            color: #fff;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .search-box:focus {
+            border-color: rgba(255, 204, 0, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-card-animated {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #1c1c2e 25%, #2a2a3e 50%, #1c1c2e 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 16px;
+            aspect-ratio: 3/4;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div
+        class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0f0f0f] relative shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden border-x-2 border-[#0F0F0F]">
+
+        <!-- Sticky Header -->
+        <div class="provider-header">
+            <div class="flex items-center justify-between px-4 py-3">
+                <button onclick="window.location.href='/'"
+                    class="w-9 h-9 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-all active:scale-90">
+                    <span class="material-symbols-outlined text-white text-lg">arrow_back</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <img alt="30win" class="h-5 w-auto object-contain"
+                        src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/1880941958243016705.avif">
+                </div>
+                <div class="w-9 h-9"></div> <!-- spacer -->
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="provider-hero">
+            <div class="relative z-10">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-1.5 h-6 bg-brand-yellow rounded-full"></div>
+                    <h1 id="provider-title" class="text-xl font-black tracking-tight uppercase">Carregando...</h1>
+                </div>
+                <div class="flex items-center gap-2 mt-3">
+                    <div class="stats-pill">
+                        <span class="material-symbols-outlined text-xs"
+                            style="font-variation-settings: 'FILL' 1;">stadia_controller</span>
+                        <span id="game-count">0 jogos</span>
+                    </div>
+                    <div class="stats-pill"
+                        style="background: rgba(255,85,0,0.1); border-color: rgba(255,85,0,0.15); color: #ff7a00;">
+                        <span class="material-symbols-outlined text-xs"
+                            style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                        <span>HOT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="px-4 pb-4 relative">
+            <span class="material-symbols-outlined absolute left-7 top-1/2 -translate-y-1/2 text-white/30 text-lg"
+                style="margin-top: -8px;">search</span>
+            <input id="search-input" class="search-box" type="text" placeholder="Buscar jogo..."
+                oninput="filterGames(this.value)">
+        </div>
+
+        <!-- Games Grid -->
+        <div class="flex-1 overflow-y-auto px-4 pb-8">
+            <div id="games-grid" class="grid grid-cols-3 gap-2.5">
+                <!-- Skeleton loading -->
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+            <div id="no-results" class="hidden text-center py-16">
+                <span class="material-symbols-outlined text-5xl text-white/10 block mb-3">search_off</span>
+                <p class="text-white/30 text-sm font-medium">Nenhum jogo encontrado</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Game Overlay Fullscreen -->
+    <div id="game-overlay" class="fixed inset-0 bg-black z-[10000] hidden items-center justify-center">
+        <button onclick="closeGameOverlay()"
+            class="fixed left-0 top-1/2 -translate-y-1/2 z-[10001] w-10 h-20 bg-white/10 backdrop-blur-lg border border-white/20 rounded-r-2xl flex items-center justify-center active:scale-95 transition-all shadow-[10px_0_30px_rgba(0,0,0,0.5)] group">
+            <div class="flex flex-col items-center gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
+                <span class="text-[8px] font-bold text-white uppercase tracking-tighter">Sair</span>
+            </div>
+        </button>
+    </div>
+
+    <!-- Toast System -->
+    <script>
+        function showToast(msg, type = 'info') {
+            const existing = document.getElementById('toast-container');
+            if (existing) existing.remove();
+            const colors = {
+                success: 'from-green-600 to-green-800 border-green-400',
+                error: 'from-red-600 to-red-800 border-red-400',
+                info: 'from-yellow-500 to-orange-600 border-yellow-300',
+                warning: 'from-orange-500 to-red-600 border-orange-300'
+            };
+            const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
+            const toast = document.createElement('div');
+            toast.id = 'toast-container';
+            toast.className = `fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] max-w-[400px] w-[90%] p-6 rounded-2xl bg-gradient-to-br ${colors[type] || colors.info} border-2 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-4 transition-all duration-500`;
+            toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            toast.style.opacity = '0';
+            toast.innerHTML = `
+                <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl shadow-inner animate-pulse">${icons[type] || icons.info}</div>
+                <span class="text-lg font-black tracking-tight uppercase">${msg}</span>
+            `;
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.style.transform = 'translate(-50%, -50%) scale(1)';
+                toast.style.opacity = '1';
+            });
+            setTimeout(() => {
+                toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+    </script>
+
+    <script>
+        let allGames = [];
+
+        async function loadProviderGames() {
+            const params = new URLSearchParams(window.location.search);
+            const provider = params.get('provider');
+
+            if (!provider) {
+                window.location.href = '/';
+                return;
+            }
+
+            document.title = `30win - ${provider}`;
+            document.getElementById('provider-title').textContent = provider;
+
+            try {
+                const res = await fetch('/api/games');
+                const data = await res.json();
+
+                if (!data.success || !data.providers || !data.providers[provider]) {
+                    showToast('Provedor não encontrado', 'error');
+                    setTimeout(() => window.location.href = '/', 2000);
+                    return;
+                }
+
+                allGames = data.providers[provider];
+                document.getElementById('game-count').textContent = `${allGames.length} jogos`;
+                renderGames(allGames);
+            } catch (err) {
+                console.error('Erro ao carregar jogos:', err);
+                showToast('Erro ao carregar jogos', 'error');
+            }
+        }
+
+        function renderGames(games) {
+            const grid = document.getElementById('games-grid');
+            const noResults = document.getElementById('no-results');
+
+            if (games.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            let html = '';
+            games.forEach((game, i) => {
+                const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
+                const delay = Math.min(i * 40, 600);
+                html += `
+                <div class="game-card game-card-animated" style="animation-delay: ${delay}ms" onclick="launchGame('${game.game_code}')">
+                    <img alt="${game.game_name}" src="${bannerSrc}" loading="lazy">
+                    <span class="card-badge">${(game.provider || 'HOT').split(' ')[0]}</span>
+                    <span class="card-star">⭐</span>
+                    <span class="card-name">${game.game_name}</span>
+                </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        function filterGames(query) {
+            const q = query.toLowerCase().trim();
+            if (!q) {
+                renderGames(allGames);
+                return;
+            }
+            const filtered = allGames.filter(g =>
+                g.game_name.toLowerCase().includes(q) || g.game_code.toLowerCase().includes(q)
+            );
+            renderGames(filtered);
+        }
+
+        async function launchGame(code) {
+            const token = localStorage.getItem('30win_token');
+            if (!token) return window.location.href = '/auth.html';
+
+            try {
+                // Check balance
+                const infoRes = await fetch('/api/user/info', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const infoData = await infoRes.json();
+                if (infoData.success && parseFloat(infoData.user.balance) <= 0) {
+                    showToast('Saldo insuficiente. Realize um depósito para jogar!', 'warning');
+                    setTimeout(() => window.location.href = '/deposito.html', 2000);
+                    return;
+                }
+
+                const res = await fetch('/api/games/launch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ gameCode: code })
+                });
+
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    let errorJson = {};
+                    try { errorJson = JSON.parse(errorText); } catch (i) { }
+                    showToast('Erro no servidor: ' + (errorJson.error || 'Falha ao iniciar'), 'error');
+                    return;
+                }
+
+                const data = await res.json();
+                if (data.launch_url) {
+                    let iframe = document.getElementById('game-iframe');
+                    if (!iframe) {
+                        iframe = document.createElement('iframe');
+                        iframe.id = 'game-iframe';
+                        iframe.className = 'w-screen h-screen border-none shadow-2xl';
+                        document.getElementById('game-overlay').appendChild(iframe);
+                    }
+                    iframe.src = data.launch_url;
+                    document.getElementById('game-overlay').classList.remove('hidden');
+                    document.getElementById('game-overlay').classList.add('flex');
+                } else {
+                    showToast('Erro ao iniciar: ' + (data.error || 'Tente novamente'), 'error');
+                }
+            } catch (e) {
+                console.error('Launch error:', e);
+                showToast('Erro de conexão. Verifique sua rede.', 'error');
+            }
+        }
+
+        function closeGameOverlay() {
+            const iframe = document.getElementById('game-iframe');
+            if (iframe) iframe.remove();
+            document.getElementById('game-overlay').classList.add('hidden');
+            document.getElementById('game-overlay').classList.remove('flex');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProviderGames);
+    </script>
+</body>
+
+</html>

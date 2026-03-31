@@ -845,56 +845,8 @@
                 }
             }
 
-            async function viewAllByProvider(provider) {
-                try {
-                    const res = await fetch('/api/games');
-                    const data = await res.json();
-                    if (!data.success || !data.providers || !data.providers[provider]) {
-                        showToast('Provedor não encontrado', 'error');
-                        return;
-                    }
-
-                    const games = data.providers[provider];
-                    const mainContent = document.getElementById('main-content');
-
-                    let gamesHtml = '';
-                    games.forEach(game => {
-                        const bannerSrc = game.banner_path || 'https://via.placeholder.com/300x400/222/555?text=' + encodeURIComponent(game.game_name);
-                        gamesHtml += `
-                        <div class="game-card" onclick="launchGame('${game.game_code}')">
-                            <img alt="${game.game_name}" src="${bannerSrc}" loading="lazy">
-                            <span class="card-badge">${provider.split(' ')[0]}</span>
-                            <span class="card-star">⭐</span>
-                        </div>`;
-                    });
-
-                    mainContent.innerHTML = `
-                    <section class="px-4 py-4">
-                        <div class="flex items-center gap-3 mb-4">
-                            <button onclick="restoreMainContent()" class="w-8 h-8 bg-[#222] rounded-full flex items-center justify-center active:scale-90 transition-all">
-                                <span class="material-symbols-outlined text-white text-lg">arrow_back</span>
-                            </button>
-                            <div class="flex items-center gap-2">
-                                <div class="w-1 h-5 bg-brand-yellow rounded-full"></div>
-                                <h2 class="text-lg font-bold tracking-tight">${provider}</h2>
-                                <span class="text-xs text-gray-500 font-medium">(${games.length} jogos)</span>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            ${gamesHtml}
-                        </div>
-                    </section>`;
-
-                    mainContent.scrollTop = 0;
-                } catch (err) {
-                    console.error('Erro ao carregar jogos do provedor:', err);
-                    showToast('Erro ao carregar jogos', 'error');
-                }
-            }
-
-            function restoreMainContent() {
-                // Recarrega a página para restaurar o conteúdo original
-                window.location.reload();
+            function viewAllByProvider(provider) {
+                window.location.href = '/provider-games.html?provider=' + encodeURIComponent(provider);
             }
 
             function toggleDepositMenu() {

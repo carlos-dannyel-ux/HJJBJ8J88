@@ -1231,6 +1231,7 @@ app.post('/api/webhook/maxapi', async (req, res) => {
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/auth', (req, res) => res.sendFile(path.join(__dirname, 'auth.html')));
+app.get('/provider-games.html', (req, res) => res.sendFile(path.join(__dirname, 'provider-games.html')));
 
 // --- EXPORT FOR NETLIFY ---
 module.exports = app;
