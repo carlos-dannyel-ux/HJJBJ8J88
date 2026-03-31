@@ -1039,27 +1039,19 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         const userRow = await pool.query('SELECT is_demo FROM users WHERE id = $1', [req.user.id]);
         const isDemo = userRow.rows.length > 0 && userRow.rows[0].is_demo === true;
 
-        // Create player in Max API in case it does not exist, passando is_demo se for demo
+        // Create player in Max API in case it does not exist
+        // IMPORTANTE: NÃO enviar is_demo para a MAX API. Todos os usuários devem ser tratados
+        // como "reais" pela MAX API para garantir que TODOS os jogos enviem webhooks de transação.
+        // A lógica de demo é tratada 100% no nosso webhook local.
         const createPayload = {
             method: 'user_create',
             agent_code,
             agent_token,
             user_code: userCode
         };
-        if (isDemo) createPayload.is_demo = true;
 
         await axios.post('https://maxapigames.com/api/v2', createPayload)
             .catch(e => console.error('Erro silent criar user:', e.message));
-
-        // Se for demo, garantir que o set_demo esteja ativo na MAX API
-        if (isDemo) {
-            await axios.post('https://maxapigames.com/api/v2', {
-                method: 'set_demo',
-                agent_code,
-                agent_token,
-                user_code: userCode
-            }).catch(e => console.error('Erro silent set_demo:', e.message));
-        }
 
         const launchPayload = {
             method: 'game_launch',
