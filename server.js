@@ -28,6 +28,10 @@ const dbUrl = (process.env.DATABASE_URL || '').trim();
 
 if (!dbUrl) {
     console.error('CRITICAL: DATABASE_URL is not defined!');
+} else {
+    // Log partially masked URL for debugging in Netlify
+    const maskedUrl = dbUrl.replace(/:([^@]+)@/, ':****@');
+    console.log(`Database URL detected: ${maskedUrl}`);
 }
 
 const pool = new Pool({
@@ -42,6 +46,13 @@ const pool = new Pool({
 pool.on('error', (err) => {
     console.error('Unexpected error on idle client', err);
 });
+
+// Test connection on startup
+if (process.env.NODE_ENV === 'production') {
+    pool.query('SELECT NOW()')
+        .then(() => console.log('Database connected successfully on startup'))
+        .catch(err => console.error('Database connection failed on startup:', err.message));
+}
 
 // --- Middleware: Verify JWT ---
 const authenticateToken = (req, res, next) => {
@@ -513,7 +524,13 @@ app.get('/api/games', async (req, res) => {
 
         res.json({ success: true, providers: grouped, popular: popular });
     } catch (err) {
-        res.status(500).json({ success: false, error: 'Erro ao buscar jogos.' });
+        console.error('Error in /api/games:', {
+            message: err.message,
+            code: err.code,
+            detail: err.detail,
+            stack: err.stack
+        });
+        res.status(500).json({ success: false, error: 'Erro ao buscar jogos.', debug: err.message });
     }
 });
 
