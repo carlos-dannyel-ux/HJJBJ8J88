@@ -1198,15 +1198,29 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             console.log(`[Webhook TX] user:${user_code} demo:${isDemo} bet:${bet} win:${win} txn:${txnType} txnId:${txnId} current_db_balance:${userBalance}`);
 
             // 1. Max Prize Constraint (Only for real players)
+            // 1. Max Prize Constraint (Only for real players)
             const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name LIKE 'reward_%'");
             const settings = {};
             sRows.rows.forEach(r => settings[r.key_name] = r.key_value);
 
             const maxPrize = parseFloat(settings['reward_max_prize']) || 99999.00;
-            console.log(`[Webhook DEBUG] user_type:${user.user_type} win:${win} maxPrize:${maxPrize} should_cap:${(!isDemo || user.user_type === 'standard') && win > maxPrize}`);
+            const phase = settings['reward_system_phase'] || 'arrecadacao';
+            const rtpArrecadacao = parseFloat(settings['reward_rtp_arrecadacao']) || 5;
 
+            console.log(`[Webhook DEBUG] user_type:${user.user_type} win:${win} maxPrize:${maxPrize} phase:${phase}`);
+
+            // 1. PHASE HARD-CAP (Winning Blocker for Arrecadação)
+            if (phase === 'arrecadacao' && user.user_type === 'standard') {
+                const maxWinInArrecadacao = bet * (rtpArrecadacao / 100);
+                if (win > maxWinInArrecadacao) {
+                    console.log(`[Webhook PHASE-CAP] Capping win from ${win} to ${maxWinInArrecadacao.toFixed(2)} (RTP:${rtpArrecadacao}%) for standard user ${user_code}`);
+                    win = maxWinInArrecadacao;
+                }
+            }
+
+            // 2. GLOBAL MAX PRIZE CAP
             if ((!isDemo || user.user_type === 'standard') && win > maxPrize && maxPrize > 0) {
-                console.log(`[Webhook CAP] Capping win from ${win} to ${maxPrize} for user ${user_code}`);
+                console.log(`[Webhook MAX-CAP] Capping win from ${win} to ${maxPrize} for user ${user_code}`);
                 win = maxPrize;
             }
 
