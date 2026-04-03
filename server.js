@@ -1078,7 +1078,7 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         await axios.post('https://maxapigames.com/api/v2', createPayload)
             .catch(e => console.error('Erro silent criar user:', e.message));
 
-        // Se for influencer, garantir que o set_demo esteja ativo na MAX API para usar o RTP demo fixo
+        // Se for influencer, usa o RTP Demo fixo (Step 4)
         if (isDemo && userType === 'influencer') {
             try {
                 await axios.post('https://maxapigames.com/api/v2', {
@@ -1087,9 +1087,24 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
                     agent_token,
                     user_code: userCode
                 });
-                console.log(`[MAX API] user ${userCode} flagged as demo for launch.`);
             } catch (e) {
-                console.error(`[MAX API] Erro silent set_demo: ${e.message}`);
+                console.error(`[MAX API] Erro set_demo influencer: ${e.message}`);
+            }
+        }
+        // Se for standard e DEMO (Save GGR), tentamos forçar o RTP do ciclo via set_demo
+        else if (isDemo && userType === 'standard') {
+            try {
+                const sRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = 'reward_system_phase'");
+                const phase = sRow.rows[0]?.key_value || 'arrecadacao';
+                const rtpRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = $1", [phase === 'arrecadacao' ? 'reward_rtp_arrecadacao' : 'reward_rtp_retribuicao']);
+                const currentRtp = rtpRow.rows[0]?.key_value || '50';
+
+                // Usamos agent_update para mudar o rtp_demo GLOBAL e depois chamamos set_demo?
+                // CUIDADO: Isso pode afetar influencers. Mas se o usuário quer Standard seguindo o ciclo...
+                // Atualmente a MAX API não permite RTP por usuário demo. 
+                // Então Standard SEMPRE terá o mesmo RTP que Influencer se ambos forem demo.
+            } catch (e) {
+                console.error(`[MAX API] Erro rtp sync standard: ${e.message}`);
             }
         }
 
@@ -1188,8 +1203,11 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             sRows.rows.forEach(r => settings[r.key_name] = r.key_value);
 
             const maxPrize = parseFloat(settings['reward_max_prize']) || 99999.00;
+            console.log(`[Webhook DEBUG] user_type:${user.user_type} win:${win} maxPrize:${maxPrize} should_cap:${(!isDemo || user.user_type === 'standard') && win > maxPrize}`);
+
             if ((!isDemo || user.user_type === 'standard') && win > maxPrize && maxPrize > 0) {
-                win = maxPrize; // Capping win only for REAL players
+                console.log(`[Webhook CAP] Capping win from ${win} to ${maxPrize} for user ${user_code}`);
+                win = maxPrize;
             }
 
             // Update local balance ATOMICALLY to avoid race conditions and force sync
