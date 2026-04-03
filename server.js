@@ -98,10 +98,11 @@ app.post('/api/auth/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-        const defaultDemoType = process.env.DEFAULT_DEMO_TYPE || 'standard'; // standard ou influencer
+        const user_type = process.env.DEFAULT_DEMO_TYPE || 'standard'; // standard ou influencer
+        const isDemo = (user_type === 'influencer');
         await pool.query(
             'INSERT INTO users (id_user, phone, password, name, balance, is_demo, user_type, referral_code, invited_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-            [id_user, phone, hashedPassword, name, 0.00, true, defaultDemoType, referral_code, invitedBy || null]
+            [id_user, phone, hashedPassword, name, 0.00, isDemo, user_type, referral_code, invitedBy || null]
         );
 
         res.json({ success: true, message: 'Cadastro realizado com sucesso!' });
@@ -571,9 +572,10 @@ app.post('/api/admin/users/demo', async (req, res) => {
         const id_user = Math.floor(100000000 + Math.random() * 900000000).toString();
         const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
+        const isDemo = (user_type === 'influencer');
         const result = await pool.query(
             'INSERT INTO users (id_user, phone, password, plain_password, name, is_demo, user_type, balance, referral_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
-            [id_user, phone, hashedPassword, password, name || 'Demo', true, user_type || 'standard', 0.00, referral_code]
+            [id_user, phone, hashedPassword, password, name || 'Demo', isDemo, user_type || 'standard', 0.00, referral_code]
         );
         const newUserId = result.rows[0].id;
 
@@ -590,18 +592,20 @@ app.post('/api/admin/users/demo', async (req, res) => {
                     agent_code,
                     agent_token,
                     user_code: userCode,
-                    is_demo: true
+                    is_demo: isDemo
                 }).catch(e => console.error(`[AutoSync] Error user_create for ${userCode}:`, e.message));
 
-                // set_demo
-                await axios.post('https://maxapigames.com/api/v2', {
-                    method: 'set_demo',
-                    agent_code,
-                    agent_token,
-                    user_code: userCode
-                }).catch(e => console.error(`[AutoSync] Error set_demo for ${userCode}:`, e.message));
+                // set_demo (ONLY FOR INFLUENCERS)
+                if (isDemo) {
+                    await axios.post('https://maxapigames.com/api/v2', {
+                        method: 'set_demo',
+                        agent_code,
+                        agent_token,
+                        user_code: userCode
+                    }).catch(e => console.error(`[AutoSync] Error set_demo for ${userCode}:`, e.message));
+                }
 
-                console.log(`[AutoSync] User ${userCode} synced successfully as Demo.`);
+                console.log(`[AutoSync] User ${userCode} synced successfully as ${isDemo ? 'Demo/Influencer' : 'Real/Standard'}.`);
             }
         } catch (syncErr) {
             console.error('[AutoSync] Fatal sync error:', syncErr.message);
