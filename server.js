@@ -1345,6 +1345,16 @@ app.get('/api/admin/reward/total-stats', async (req, res) => {
     }
 });
 
+app.post('/api/admin/reward/total-stats/reset', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM game_history');
+        res.json({ success: true, message: 'Histórico resetado com sucesso.' });
+    } catch (err) {
+        console.error('Reset Stats Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao resetar histórico.' });
+    }
+});
+
 app.post('/api/admin/reward/reset', async (req, res) => {
     try {
         await pool.query("UPDATE system_settings SET key_value = 'arrecadacao' WHERE key_name = 'reward_system_phase'");

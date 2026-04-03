@@ -629,6 +629,13 @@
                             <p class="text-[10px] text-gray-500">Soma total de todas as jogadas reais (100% Precisão)
                             </p>
                         </div>
+                        <!-- BOTAO RESETAR -->
+                        <div class="ml-4">
+                            <button onclick="resetTotalStats()"
+                                class="px-3 py-1 bg-error/10 hover:bg-error text-error hover:text-white border border-error/50 rounded text-[9px] font-bold uppercase transition-all">
+                                Resetar Histórico
+                            </button>
+                        </div>
                     </div>
                     <div class="flex gap-8">
                         <div class="text-right">
@@ -1695,6 +1702,36 @@
                 }
             } catch (err) {
                 alert('Erro na requisição de reset.');
+            }
+        }
+
+        async function toggleRealtime() {
+            try {
+                const response = await fetch('/api/admin/toggle-realtime', { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    isRealtimeEnabled = data.enabled;
+                    updateRealtimeUI();
+                }
+            } catch (err) {
+                console.error('Toggle Realtime Error:', err);
+            }
+        }
+
+        async function resetTotalStats() {
+            if (!confirm('Você tem certeza que deseja RESETAR TODO O HISTÓRICO DE JOGADAS? Esta ação é irreversível e zerará as estatísticas reais.')) return;
+            try {
+                const response = await fetch('/api/admin/reward/total-stats/reset', { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Histórico zerado com sucesso!');
+                    loadRewardSettings();
+                } else {
+                    alert('Erro ao zerar histórico: ' + data.error);
+                }
+            } catch (err) {
+                console.error('Reset Stats Error:', err);
+                alert('Erro na conexão.');
             }
         }
 
