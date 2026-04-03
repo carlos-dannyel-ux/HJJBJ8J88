@@ -1070,7 +1070,8 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
             agent_token,
             user_code: userCode
         };
-        if (isDemo) createPayload.is_demo = true;
+        if (isDemo && userType === 'influencer') createPayload.is_demo = true;
+        // Se for standard, NÃO passamos is_demo: true para a API, para seguir o RTP Real do Ciclo
 
         await axios.post('https://maxapigames.com/api/v2', createPayload)
             .catch(e => console.error('Erro silent criar user:', e.message));
@@ -1185,7 +1186,7 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             sRows.rows.forEach(r => settings[r.key_name] = r.key_value);
 
             const maxPrize = parseFloat(settings['reward_max_prize']) || 99999.00;
-            if (!isDemo && win > maxPrize && maxPrize > 0) {
+            if ((!isDemo || user.user_type === 'standard') && win > maxPrize && maxPrize > 0) {
                 win = maxPrize; // Capping win only for REAL players
             }
 
@@ -1204,8 +1205,8 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                 [userId, gameData.game_code || req.body.game_code || 'unknown', bet, win, txnId || `auto-${Date.now()}-${Math.random().toString(36).substring(7)}`, txnType, gameData.provider_code || req.body.provider_code || 'unknown', isDemo]
             );
 
-            // 1.6 Update Rollover Progress (Real money only)
-            if (!isDemo && bet > 0) {
+            // 1.6 Update Rollover Progress (Real money and Standard Demo)
+            if ((!isDemo || user.user_type === 'standard') && bet > 0) {
                 await pool.query('UPDATE users SET rollover_progress = rollover_progress + $1 WHERE id = $2', [bet, userId]);
             }
 
@@ -1296,11 +1297,12 @@ app.get('/api/admin/reward/total-stats', async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT 
-                COALESCE(SUM(bet), 0) as total_bet, 
-                COALESCE(SUM(win), 0) as total_win,
-                COALESCE(SUM(bet - win), 0) as total_profit
-            FROM game_history 
-            WHERE is_demo = false
+                COALESCE(SUM(h.bet), 0) as total_bet, 
+                COALESCE(SUM(h.win), 0) as total_win,
+                COALESCE(SUM(h.bet - h.win), 0) as total_profit
+            FROM game_history h
+            JOIN users u ON h.user_id = u.id
+            WHERE u.is_demo = false OR u.user_type = 'standard'
         `);
         res.json({ success: true, stats: result.rows[0] });
     } catch (err) {
