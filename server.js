@@ -763,23 +763,31 @@ app.post('/api/admin/system/settings', async (req, res) => {
             );
         }
 
-        if (settings.reward_rtp_demo !== undefined && settings.reward_rtp_demo !== '') {
-            const apiCreds = await pool.query("SELECT * FROM api_credentials WHERE module = 'max_api'");
-            if (apiCreds.rows.length > 0) {
-                const cred = apiCreds.rows[0];
-                if (cred.agent_code && cred.agent_token) {
-                    try {
-                        await axios.post('https://maxapigames.com/api/v2', {
-                            method: 'agent_update',
-                            agent_code: cred.agent_code,
-                            agent_token: cred.agent_token,
-                            rtp_demo: parseInt(settings.reward_rtp_demo)
-                        });
-                        console.log(`[MAX API] rtp_demo atualizado para ${settings.reward_rtp_demo}`);
-                    } catch (e) {
-                        const errMsg = e.response ? JSON.stringify(e.response.data) : e.message;
-                        console.error('[MAX API] Erro ao atualizar rtp_demo:', errMsg);
-                    }
+        // Sincronização em tempo real com a MAX API para o RTP Demo (Standard seguindo o Ciclo)
+        const allSettingsRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name LIKE 'reward_%'");
+        const allSettings = {};
+        allSettingsRows.rows.forEach(r => allSettings[r.key_name] = r.key_value);
+
+        const currentPhase = allSettings.reward_system_phase || 'arrecadacao';
+        let rtpToSync = allSettings.reward_rtp_arrecadacao || '5';
+        if (currentPhase === 'retribuicao') {
+            rtpToSync = allSettings.reward_rtp_retribuicao || '98';
+        }
+
+        const apiCreds = await pool.query("SELECT * FROM api_credentials WHERE module = 'max_api'");
+        if (apiCreds.rows.length > 0) {
+            const cred = apiCreds.rows[0];
+            if (cred.agent_code && cred.agent_token) {
+                try {
+                    await axios.post('https://maxapigames.com/api/v2', {
+                        method: 'agent_update',
+                        agent_code: cred.agent_code,
+                        agent_token: cred.agent_token,
+                        rtp_demo: parseInt(rtpToSync)
+                    });
+                    console.log(`[MAX API] RTP Demo Sincronizado via Painel: ${rtpToSync}% (Phase: ${currentPhase})`);
+                } catch (e) {
+                    console.error('[MAX API] Erro ao sincronizar RTP no Save:', e.message);
                 }
             }
         }
