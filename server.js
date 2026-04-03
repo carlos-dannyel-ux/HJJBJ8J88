@@ -1058,8 +1058,10 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         pool.query('UPDATE users SET last_active = NOW() WHERE id = $1', [req.user.id]).catch(() => { });
 
         // Verifica se o usuario e demo no nosso banco
-        const userRow = await pool.query('SELECT is_demo FROM users WHERE id = $1', [req.user.id]);
-        const isDemo = userRow.rows.length > 0 && userRow.rows[0].is_demo === true;
+        const userRow = await pool.query('SELECT is_demo, user_type FROM users WHERE id = $1', [req.user.id]);
+        const userFound = userRow.rows[0] || {};
+        const isDemo = userFound.is_demo === true;
+        const userType = userFound.user_type || 'standard';
 
         // Create player in Max API in case it does not exist, passando is_demo se for demo
         const createPayload = {
@@ -1073,8 +1075,8 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         await axios.post('https://maxapigames.com/api/v2', createPayload)
             .catch(e => console.error('Erro silent criar user:', e.message));
 
-        // Se for demo, garantir que o set_demo esteja ativo na MAX API para usar o RTP demo
-        if (isDemo) {
+        // Se for influencer, garantir que o set_demo esteja ativo na MAX API para usar o RTP demo fixo
+        if (isDemo && userType === 'influencer') {
             try {
                 await axios.post('https://maxapigames.com/api/v2', {
                     method: 'set_demo',
@@ -1132,7 +1134,7 @@ app.post('/api/webhook/maxapi', async (req, res) => {
         const userId = parseInt(user_code.replace('30win_user_', ''));
         if (isNaN(userId)) return res.status(400).json({ status: 0, msg: 'INVALID_USER' });
 
-        const userRows = await pool.query('SELECT balance, is_demo FROM users WHERE id = $1', [userId]);
+        const userRows = await pool.query('SELECT balance, is_demo, user_type FROM users WHERE id = $1', [userId]);
         if (userRows.rows.length === 0) return res.status(400).json({ status: 0, msg: 'INVALID_USER' });
 
         const user = userRows.rows[0];
@@ -1207,8 +1209,8 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                 await pool.query('UPDATE users SET rollover_progress = rollover_progress + $1 WHERE id = $2', [bet, userId]);
             }
 
-            // 2. Cycle Logic (SKIP FOR DEMO USERS)
-            if (!isDemo) {
+            // 2. Cycle Logic (INCLUDE STANDARD DEMO USERS)
+            if (!isDemo || user.user_type === 'standard') {
                 let phase = settings['reward_system_phase'] || 'arrecadacao';
                 const metaArrecadacao = parseFloat(settings['reward_meta_arrecadacao']) || 1000.00;
                 const metaRetribuicao = parseFloat(settings['reward_meta_retribuicao']) || 500.00;

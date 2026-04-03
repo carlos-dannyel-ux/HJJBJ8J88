@@ -1082,7 +1082,7 @@
                         tbody.innerHTML += `
                         <tr class="hover:bg-white/5 transition-colors">
                             <td class="px-6 py-4">
-                                <span class="block font-bold">${u.name || 'Sem Nome'}</span>
+                                <span class="block font-bold">${u.user_type === 'influencer' ? '<span class="text-primary">INFLUENCER</span>' : (u.name || 'Sem Nome')}</span>
                                 <span class="text-[10px] text-gray-500">ID: ${u.id_user}</span>
                             </td>
                             <td class="px-6 py-4 text-sm">${u.phone}</td>
