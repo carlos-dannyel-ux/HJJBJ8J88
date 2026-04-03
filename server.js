@@ -1081,6 +1081,18 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         // Se for influencer, usa o RTP Demo fixo (Step 4)
         if (isDemo && userType === 'influencer') {
             try {
+                const rtpRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = 'reward_rtp_demo'");
+                const influencerRtp = rtpRow.rows[0]?.key_value || '95';
+
+                // Atualiza o RTP Demo GLOBAL para o modo Influencer
+                await axios.post('https://maxapigames.com/api/v2', {
+                    method: 'agent_update',
+                    agent_code,
+                    agent_token,
+                    rtp_demo: parseInt(influencerRtp)
+                });
+
+                // Flag como demo
                 await axios.post('https://maxapigames.com/api/v2', {
                     method: 'set_demo',
                     agent_code,
@@ -1088,23 +1100,34 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
                     user_code: userCode
                 });
             } catch (e) {
-                console.error(`[MAX API] Erro set_demo influencer: ${e.message}`);
+                console.error(`[MAX API] Erro sync influencer: ${e.message}`);
             }
         }
-        // Se for standard e DEMO (Save GGR), tentamos forçar o RTP do ciclo via set_demo
+        // Se for standard e DEMO (Save GGR), forçamos o RTP do CICLO via agent_update
         else if (isDemo && userType === 'standard') {
             try {
                 const sRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = 'reward_system_phase'");
                 const phase = sRow.rows[0]?.key_value || 'arrecadacao';
                 const rtpRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = $1", [phase === 'arrecadacao' ? 'reward_rtp_arrecadacao' : 'reward_rtp_retribuicao']);
-                const currentRtp = rtpRow.rows[0]?.key_value || '50';
+                const currentRtp = rtpRow.rows[0]?.key_value || '5';
 
-                // Usamos agent_update para mudar o rtp_demo GLOBAL e depois chamamos set_demo?
-                // CUIDADO: Isso pode afetar influencers. Mas se o usuário quer Standard seguindo o ciclo...
-                // Atualmente a MAX API não permite RTP por usuário demo. 
-                // Então Standard SEMPRE terá o mesmo RTP que Influencer se ambos forem demo.
+                // Atualiza o RTP Demo GLOBAL para seguir o Ciclo do Painel
+                await axios.post('https://maxapigames.com/api/v2', {
+                    method: 'agent_update',
+                    agent_code,
+                    agent_token,
+                    rtp_demo: parseInt(currentRtp)
+                });
+
+                // Flag como demo
+                await axios.post('https://maxapigames.com/api/v2', {
+                    method: 'set_demo',
+                    agent_code,
+                    agent_token,
+                    user_code: userCode
+                });
             } catch (e) {
-                console.error(`[MAX API] Erro rtp sync standard: ${e.message}`);
+                console.error(`[MAX API] Erro sync standard: ${e.message}`);
             }
         }
 
