@@ -1142,8 +1142,18 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                 win = 0; // debit-only: no credit
             }
 
+            // --- IDEMPOTENCY CHECK ---
+            const txnId = gameData.txn_id || gameData.transaction_id || req.body.txn_id || req.body.transactionId;
+            if (txnId) {
+                const existingTx = await pool.query('SELECT id FROM game_history WHERE txn_id = $1', [txnId]);
+                if (existingTx.rows.length > 0) {
+                    console.log(`[Webhook TX] Duplicate transaction IGNORED: ${txnId}`);
+                    return res.json({ status: 1, user_balance: userBalance });
+                }
+            }
+
             // Logging para debug (Essencial para identificar provedores que falham)
-            console.log(`[Webhook TX] user:${user_code} demo:${isDemo} bet:${bet} win:${win} txn:${txnType} current_db_balance:${userBalance}`);
+            console.log(`[Webhook TX] user:${user_code} demo:${isDemo} bet:${bet} win:${win} txn:${txnType} txnId:${txnId} current_db_balance:${userBalance}`);
 
             // 1. Max Prize Constraint (Only for real players)
             const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name LIKE 'reward_%'");
@@ -1163,6 +1173,17 @@ app.post('/api/webhook/maxapi', async (req, res) => {
 
             userBalance = parseFloat(result.rows[0].balance);
             console.log(`[Webhook TX] user:${user_code} sync_balance_after:${userBalance}`);
+
+            // 1.5 Record Transaction in History
+            await pool.query(
+                'INSERT INTO game_history (user_id, game_code, bet, win, txn_id, txn_type, provider_code, is_demo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+                [userId, gameData.game_code || req.body.game_code || 'unknown', bet, win, txnId || `auto-${Date.now()}-${Math.random().toString(36).substring(7)}`, txnType, gameData.provider_code || req.body.provider_code || 'unknown', isDemo]
+            );
+
+            // 1.6 Update Rollover Progress (Real money only)
+            if (!isDemo && bet > 0) {
+                await pool.query('UPDATE users SET rollover_progress = rollover_progress + $1 WHERE id = $2', [bet, userId]);
+            }
 
             // 2. Cycle Logic (SKIP FOR DEMO USERS)
             if (!isDemo) {

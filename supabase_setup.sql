@@ -83,6 +83,20 @@ CREATE TABLE IF NOT EXISTS games (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabela de Histórico de Jogos (Auditoria e Idempotência)
+CREATE TABLE IF NOT EXISTS game_history (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    game_code VARCHAR(100),
+    bet DECIMAL(15, 2) DEFAULT 0.00,
+    win DECIMAL(15, 2) DEFAULT 0.00,
+    txn_id VARCHAR(100) UNIQUE NOT NULL,
+    txn_type VARCHAR(50),
+    provider_code VARCHAR(50),
+    is_demo BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Criar tabela de Configurações do Sistema
 CREATE TABLE IF NOT EXISTS system_settings (
     id SERIAL PRIMARY KEY,
