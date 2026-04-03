@@ -87,9 +87,10 @@ app.post('/api/auth/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
+        const defaultDemoType = process.env.DEFAULT_DEMO_TYPE || 'standard'; // standard ou influencer
         await pool.query(
-            'INSERT INTO users (id_user, phone, password, name, balance, bonus_balance, rollover_required, rollover_progress, referral_code, invited_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
-            [id_user, phone, hashedPassword, name, 0.00, signupBonus, rolloverReq, 0.00, referral_code, invitedBy || null]
+            'INSERT INTO users (id_user, phone, password, name, balance, is_demo, user_type, referral_code, invited_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+            [id_user, phone, hashedPassword, name, 0.00, true, defaultDemoType, referral_code, invitedBy || null]
         );
 
         res.json({ success: true, message: 'Cadastro realizado com sucesso!' });
@@ -536,7 +537,7 @@ app.post('/api/admin/games/update-popular', async (req, res) => {
 
 app.get('/api/admin/users', async (req, res) => {
     try {
-        const rows = await pool.query('SELECT id, id_user, phone, name, is_demo, plain_password, balance, bonus_balance, rollover_required, rollover_progress, (withdraw_password IS NOT NULL) as has_pin, created_at FROM users ORDER BY id DESC');
+        const rows = await pool.query('SELECT id, id_user, phone, name, is_demo, user_type, plain_password, balance, bonus_balance, rollover_required, rollover_progress, (withdraw_password IS NOT NULL) as has_pin, created_at FROM users ORDER BY id DESC');
         res.json({ success: true, users: rows.rows });
     } catch (err) {
         console.error('Get Users Error:', err);
@@ -545,7 +546,7 @@ app.get('/api/admin/users', async (req, res) => {
 });
 
 app.post('/api/admin/users/demo', async (req, res) => {
-    const { phone, password, name } = req.body;
+    const { phone, password, name, user_type } = req.body;
     if (!phone || !password) return res.status(400).json({ success: false, error: 'Telefone e senha são obrigatórios.' });
 
     try {
@@ -554,8 +555,8 @@ app.post('/api/admin/users/demo', async (req, res) => {
         const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
         const result = await pool.query(
-            'INSERT INTO users (id_user, phone, password, plain_password, name, is_demo, balance, referral_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
-            [id_user, phone, hashedPassword, password, name || 'Demo', true, 0.00, referral_code]
+            'INSERT INTO users (id_user, phone, password, plain_password, name, is_demo, user_type, balance, referral_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
+            [id_user, phone, hashedPassword, password, name || 'Demo', true, user_type || 'standard', 0.00, referral_code]
         );
         const newUserId = result.rows[0].id;
 
@@ -599,7 +600,7 @@ app.post('/api/admin/users/demo', async (req, res) => {
 
 app.put('/api/admin/users/:id', async (req, res) => {
     const { id } = req.params;
-    const { password, name } = req.body;
+    const { password, name, user_type } = req.body;
     try {
         const updates = [];
         const values = [];
@@ -611,6 +612,10 @@ app.put('/api/admin/users/:id', async (req, res) => {
         if (name !== undefined) {
             updates.push('name = ?');
             values.push(name);
+        }
+        if (user_type !== undefined) {
+            updates.push('user_type = ?');
+            values.push(user_type);
         }
 
         if (updates.length > 0) {
