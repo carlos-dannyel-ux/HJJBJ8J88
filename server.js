@@ -1051,14 +1051,19 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         await axios.post('https://maxapigames.com/api/v2', createPayload)
             .catch(e => console.error('Erro silent criar user:', e.message));
 
-        // Se for demo, garantir que o set_demo esteja ativo na MAX API
+        // Se for demo, garantir que o set_demo esteja ativo na MAX API para usar o RTP demo
         if (isDemo) {
-            await axios.post('https://maxapigames.com/api/v2', {
-                method: 'set_demo',
-                agent_code,
-                agent_token,
-                user_code: userCode
-            }).catch(e => console.error('Erro silent set_demo:', e.message));
+            try {
+                await axios.post('https://maxapigames.com/api/v2', {
+                    method: 'set_demo',
+                    agent_code,
+                    agent_token,
+                    user_code: userCode
+                });
+                console.log(`[MAX API] user ${userCode} flagged as demo for launch.`);
+            } catch (e) {
+                console.error(`[MAX API] Erro silent set_demo: ${e.message}`);
+            }
         }
 
         const launchPayload = {
@@ -1113,6 +1118,7 @@ app.post('/api/webhook/maxapi', async (req, res) => {
         let userBalance = parseFloat(user.balance);
 
         if (method === 'user_balance') {
+            console.log(`[Webhook Balance] user:${user_code} balance:${userBalance}`);
             return res.json({ status: 1, user_balance: userBalance });
         }
 
@@ -1121,12 +1127,12 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             let win = 0;
 
             // Robust extraction: MAX API sends data inside 'slot' object
-            // Some providers may structure it differently
-            const gameData = slot || req.body.slot || req.body.data || {};
+            // Some providers may structure it differently (data, slot, root, etc.)
+            const gameData = slot || req.body.slot || req.body.data || req.body || {};
 
-            // Try to extract bet/win from gameData first, then from root body
-            bet = parseFloat(gameData.bet_money) || parseFloat(req.body.bet_money) || 0;
-            win = parseFloat(gameData.win_money) || parseFloat(req.body.win_money) || 0;
+            // More comprehensive field extraction for different providers
+            bet = parseFloat(gameData.bet_money) || parseFloat(gameData.bet) || parseFloat(gameData.amount) || parseFloat(req.body.bet_money) || parseFloat(req.body.bet) || 0;
+            win = parseFloat(gameData.win_money) || parseFloat(gameData.win) || parseFloat(req.body.win_money) || parseFloat(req.body.win) || 0;
 
             // Handle txn_type correctly
             const txnType = (gameData.txn_type || req.body.txn_type || 'debit_credit').toLowerCase();
@@ -1136,8 +1142,8 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                 win = 0; // debit-only: no credit
             }
 
-            // Logging para debug
-            console.log(`[Webhook TX] user:${user_code} demo:${isDemo} bet:${bet} win:${win} txn:${txnType} balance_before:${userBalance}`);
+            // Logging para debug (Essencial para identificar provedores que falham)
+            console.log(`[Webhook TX] user:${user_code} demo:${isDemo} bet:${bet} win:${win} txn:${txnType} current_db_balance:${userBalance}`);
 
             // 1. Max Prize Constraint (Only for real players)
             const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name LIKE 'reward_%'");
@@ -1149,12 +1155,14 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                 win = maxPrize; // Capping win only for REAL players
             }
 
-            // Update local balance
-            userBalance = userBalance - bet + win;
-            if (userBalance < 0) userBalance = 0;
-            await pool.query('UPDATE users SET balance = $1, last_active = NOW() WHERE id = $2', [userBalance, userId]);
+            // Update local balance ATOMICALLY to avoid race conditions and force sync
+            const result = await pool.query(
+                'UPDATE users SET balance = GREATEST(0, balance - $1 + $2), last_active = NOW() WHERE id = $3 RETURNING balance',
+                [bet, win, userId]
+            );
 
-            console.log(`[Webhook TX] user:${user_code} balance_after:${userBalance}`);
+            userBalance = parseFloat(result.rows[0].balance);
+            console.log(`[Webhook TX] user:${user_code} sync_balance_after:${userBalance}`);
 
             // 2. Cycle Logic (SKIP FOR DEMO USERS)
             if (!isDemo) {
