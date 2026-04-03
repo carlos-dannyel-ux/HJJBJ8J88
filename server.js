@@ -1222,34 +1222,46 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                 let profit = bet - win;
 
                 if (phase === 'arrecadacao') {
-                    currentArrecadacao += profit;
+                    // ATOMIC UPDATE: currentArrecadacao += profit
+                    await pool.query(`
+                        UPDATE system_settings 
+                        SET key_value = (CAST(key_value AS DECIMAL) + $1)::TEXT 
+                        WHERE key_name = 'reward_current_arrecadacao'
+                    `, [profit]);
+
+                    // Re-fetch to check if meta reached
+                    const updatedRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = 'reward_current_arrecadacao'");
+                    currentArrecadacao = parseFloat(updatedRow.rows[0].key_value);
+
                     if (currentArrecadacao >= metaArrecadacao) {
                         phase = 'retribuicao';
-                        currentArrecadacao = 0;
-                        currentRetribuicao = 0;
+                        await pool.query("UPDATE system_settings SET key_value = 'retribuicao' WHERE key_name = 'reward_system_phase'");
+                        await pool.query("UPDATE system_settings SET key_value = '0.00' WHERE key_name = 'reward_current_arrecadacao'");
+                        await pool.query("UPDATE system_settings SET key_value = '0.00' WHERE key_name = 'reward_current_retribuicao'");
                         transitionOccurred = true;
                         nextRtp = rtpRetribuicao;
                     }
                 } else if (phase === 'retribuicao') {
-                    currentRetribuicao += (win - bet > 0 ? win - bet : 0);
+                    const diff = (win - bet > 0 ? win - bet : 0);
+                    // ATOMIC UPDATE: currentRetribuicao += diff
+                    await pool.query(`
+                        UPDATE system_settings 
+                        SET key_value = (CAST(key_value AS DECIMAL) + $1)::TEXT 
+                        WHERE key_name = 'reward_current_retribuicao'
+                    `, [diff]);
+
+                    // Re-fetch to check if meta reached
+                    const updatedRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = 'reward_current_retribuicao'");
+                    currentRetribuicao = parseFloat(updatedRow.rows[0].key_value);
+
                     if (currentRetribuicao >= metaRetribuicao) {
                         phase = 'arrecadacao';
-                        currentRetribuicao = 0;
-                        currentArrecadacao = 0;
+                        await pool.query("UPDATE system_settings SET key_value = 'arrecadacao' WHERE key_name = 'reward_system_phase'");
+                        await pool.query("UPDATE system_settings SET key_value = '0.00' WHERE key_name = 'reward_current_retribuicao'");
+                        await pool.query("UPDATE system_settings SET key_value = '0.00' WHERE key_name = 'reward_current_arrecadacao'");
                         transitionOccurred = true;
                         nextRtp = rtpArrecadacao;
                     }
-                }
-
-                // Save metrics tracking to database
-                const updates = {
-                    reward_system_phase: phase,
-                    reward_current_arrecadacao: String(currentArrecadacao.toFixed(2)),
-                    reward_current_retribuicao: String(currentRetribuicao.toFixed(2))
-                };
-
-                for (const [k, v] of Object.entries(updates)) {
-                    await pool.query('UPDATE system_settings SET key_value = $1 WHERE key_name = $2', [v, k]);
                 }
 
                 // 3. Trigger API RTP control on Phase Change
@@ -1275,6 +1287,36 @@ app.post('/api/webhook/maxapi', async (req, res) => {
     } catch (err) {
         console.error('Webhook Max API Error:', err);
         return res.status(500).json({ status: 0, msg: 'INTERNAL_ERROR' });
+    }
+});
+
+app.get('/api/admin/reward/total-stats', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                COALESCE(SUM(bet), 0) as total_bet, 
+                COALESCE(SUM(win), 0) as total_win,
+                COALESCE(SUM(bet - win), 0) as total_profit
+            FROM game_history 
+            WHERE is_demo = false
+        `);
+        res.json({ success: true, stats: result.rows[0] });
+    } catch (err) {
+        console.error('Total Stats Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao buscar estatísticas totais.' });
+    }
+});
+
+app.post('/api/admin/reward/reset', async (req, res) => {
+    try {
+        await pool.query("UPDATE system_settings SET key_value = 'arrecadacao' WHERE key_name = 'reward_system_phase'");
+        await pool.query("UPDATE system_settings SET key_value = '0.00' WHERE key_name = 'reward_current_arrecadacao'");
+        await pool.query("UPDATE system_settings SET key_value = '0.00' WHERE key_name = 'reward_current_retribuicao'");
+
+        res.json({ success: true, message: 'Ciclo de RTP resetado com sucesso! Iniciando em ARRECADAÇÃO.' });
+    } catch (err) {
+        console.error('Reset Reward Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao resetar ciclo.' });
     }
 });
 

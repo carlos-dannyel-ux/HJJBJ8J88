@@ -579,7 +579,7 @@
                 </div>
 
                 <!-- Status Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                     <div class="glass-card rounded-xl p-6 border-t-4 border-[#ff6b98]">
                         <h4 class="font-bold text-[#e6e2ff]/70 uppercase tracking-widest text-[10px] mb-2">Fase Atual
                         </h4>
@@ -600,6 +600,48 @@
                         <div class="flex items-baseline gap-2">
                             <span class="text-xl font-bold text-white">R$</span>
                             <span id="ui_current_retribuicao" class="text-3xl font-black text-white">0.00</span>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 border-t-4 border-secondary flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-[#e6e2ff]/70 uppercase tracking-widest text-[10px] mb-2">Ações do
+                                Ciclo</h4>
+                            <button onclick="resetRewardCycle()"
+                                class="w-full bg-error/20 hover:bg-error text-error hover:text-white border border-error/30 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all">
+                                Resetar Valores
+                            </button>
+                        </div>
+                        <p class="text-[8px] text-gray-500 mt-2 uppercase tracking-tighter">* Recomeça em Arrecadação
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Estatísticas de Precisão (100% Real) -->
+                <div
+                    class="glass-card rounded-xl p-6 border-l-4 border-secondary flex items-center justify-between mb-6 shadow-[0_0_20px_rgba(0,227,253,0.1)]">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-secondary/10 rounded-xl text-secondary">
+                            <span class="material-symbols-outlined">analytics</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-sm uppercase tracking-widest">Estatísticas Reais
+                                (Histórico)</h4>
+                            <p class="text-[10px] text-gray-500">Soma total de todas as jogadas reais (100% Precisão)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-8">
+                        <div class="text-right">
+                            <p class="text-[9px] text-gray-500 uppercase font-bold">Total Apostas</p>
+                            <p id="total_bets_real" class="text-lg font-black text-white">R$ 0.00</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] text-gray-500 uppercase font-bold">Total Prêmios</p>
+                            <p id="total_wins_real" class="text-lg font-black text-secondary">R$ 0.00</p>
+                        </div>
+                        <div class="text-right border-l border-white/10 pl-8">
+                            <p class="text-[9px] text-gray-500 uppercase font-bold text-primary">Lucro Real (GGR)</p>
+                            <p id="total_profit_real" class="text-lg font-black text-primary">R$ 0.00</p>
                         </div>
                     </div>
                 </div>
@@ -1588,6 +1630,7 @@
         // --- SISTEMA DE RETRIBUIÇÃO ---
         async function loadRewardSettings() {
             try {
+                // Fetch settings
                 const res = await fetch('/api/admin/system/settings');
                 const data = await res.json();
                 if (data.success && data.settings) {
@@ -1616,8 +1659,35 @@
                     document.getElementById('reward_max_prize').value = s.reward_max_prize || '';
                     if (document.getElementById('reward_rtp_demo')) document.getElementById('reward_rtp_demo').value = s.reward_rtp_demo || '';
                 }
+
+                // Fetch Total Stats for Precision Check
+                const statsRes = await fetch('/api/admin/reward/total-stats');
+                const statsData = await statsRes.json();
+                if (statsData.success) {
+                    const st = statsData.stats;
+                    document.getElementById('total_bets_real').innerText = `R$ ${parseFloat(st.total_bet).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                    document.getElementById('total_wins_real').innerText = `R$ ${parseFloat(st.total_win).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                    document.getElementById('total_profit_real').innerText = `R$ ${parseFloat(st.total_profit).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                }
             } catch (err) {
                 console.error('Erro ao carregar Retribuição:', err);
+            }
+        }
+
+        async function resetRewardCycle() {
+            if (!confirm('Tem certeza que deseja resetar o ciclo de RTP? Isso voltará os valores de ARRECADAÇÃO e DISTRIBUIÇÃO para R$ 0.00.')) return;
+
+            try {
+                const res = await fetch('/api/admin/reward/reset', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    loadRewardSettings();
+                } else {
+                    alert('Erro ao resetar: ' + data.error);
+                }
+            } catch (err) {
+                alert('Erro na requisição de reset.');
             }
         }
 
