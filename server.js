@@ -99,10 +99,9 @@ app.post('/api/auth/register', async (req, res) => {
         const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
         const user_type = process.env.DEFAULT_DEMO_TYPE || 'standard'; // standard ou influencer
-        const isDemo = (user_type === 'influencer');
         await pool.query(
             'INSERT INTO users (id_user, phone, password, name, balance, is_demo, user_type, referral_code, invited_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-            [id_user, phone, hashedPassword, name, 0.00, isDemo, user_type, referral_code, invitedBy || null]
+            [id_user, phone, hashedPassword, name, 0.00, true, user_type, referral_code, invitedBy || null]
         );
 
         res.json({ success: true, message: 'Cadastro realizado com sucesso!' });
@@ -572,12 +571,12 @@ app.post('/api/admin/users/demo', async (req, res) => {
         const id_user = Math.floor(100000000 + Math.random() * 900000000).toString();
         const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-        const isDemo = (user_type === 'influencer');
         const result = await pool.query(
             'INSERT INTO users (id_user, phone, password, plain_password, name, is_demo, user_type, balance, referral_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
-            [id_user, phone, hashedPassword, password, name || 'Demo', isDemo, user_type || 'standard', 0.00, referral_code]
+            [id_user, phone, hashedPassword, password, name || 'Demo', true, user_type || 'standard', 0.00, referral_code]
         );
         const newUserId = result.rows[0].id;
+        const isDemo = (user_type === 'influencer'); // For API sync logic below
 
         // --- AUTOMATIC SYNC WITH MAX API ---
         try {
@@ -1074,8 +1073,7 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
             agent_token,
             user_code: userCode
         };
-        if (isDemo && userType === 'influencer') createPayload.is_demo = true;
-        // Se for standard, NÃO passamos is_demo: true para a API, para seguir o RTP Real do Ciclo
+        if (isDemo) createPayload.is_demo = true; // Always true to save GGR
 
         await axios.post('https://maxapigames.com/api/v2', createPayload)
             .catch(e => console.error('Erro silent criar user:', e.message));
