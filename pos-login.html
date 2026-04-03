@@ -1071,12 +1071,12 @@
                     tbody.innerHTML = '';
                     data.users.forEach(u => {
                         let typeHtml = '';
-                        if (!u.is_demo) {
-                            typeHtml = `<span class="px-2 py-1 rounded text-[9px] bg-gray-700 text-gray-300 font-bold uppercase">Real</span>`;
-                        } else if (u.user_type === 'influencer') {
+                        if (u.user_type === 'influencer') {
                             typeHtml = `<span class="px-2 py-1 rounded text-[9px] bg-primary/20 text-primary border border-primary/30 font-bold uppercase">Influencer</span>`;
-                        } else {
+                        } else if (u.is_demo) {
                             typeHtml = `<span class="px-2 py-1 rounded text-[9px] bg-secondary/20 text-secondary border border-secondary/30 font-bold uppercase">Demo Std</span>`;
+                        } else {
+                            typeHtml = `<span class="px-2 py-1 rounded text-[9px] bg-gray-700 text-gray-300 font-bold uppercase">Real</span>`;
                         }
 
                         tbody.innerHTML += `
@@ -1592,7 +1592,8 @@
         async function refreshDashboard() {
             const icon = document.getElementById('btn-refresh-icon');
             if (icon) { icon.classList.add('animate-spin'); }
-            await Promise.all([fetchStats(), loadDashboardDeposits()]);
+            // Refresh everything: stats, deposits, and reward cycle status
+            await Promise.all([fetchStats(), loadDashboardDeposits(), loadRewardSettings()]);
             if (icon) { icon.classList.remove('animate-spin'); }
         }
 

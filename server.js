@@ -346,8 +346,8 @@ app.get('/api/admin/stats', async (req, res) => {
             WHERE last_active >= NOW() - INTERVAL '5 minutes'
         `);
 
-        // Usuários cadastrados: total de usuários reais (não demo)
-        const usersCount = await pool.query('SELECT COUNT(*) as count FROM users WHERE is_demo = false OR is_demo IS NULL');
+        // Usuários cadastrados: total de usuários reais + usuários demo do tipo 'standard'
+        const usersCount = await pool.query("SELECT COUNT(*) as count FROM users WHERE is_demo = false OR user_type = 'standard'");
 
         // Capacidade do Servidor base (ex: 50% mock base + variação baseada em players)
         const activePlayers = parseInt(activeResult.rows[0].count) || 0;
