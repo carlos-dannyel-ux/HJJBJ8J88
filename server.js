@@ -384,7 +384,8 @@ app.get('/api/admin/dashboard-deposits', async (req, res) => {
                 u.name,
                 u.phone,
                 u.id_user,
-                u.is_demo
+                u.is_demo,
+                u.user_type
             FROM deposits d
             JOIN users u ON d.user_id = u.id
             WHERE d.method = 'PIX'
@@ -802,7 +803,7 @@ app.post('/api/admin/system/settings', async (req, res) => {
 app.get('/api/admin/deposits', async (req, res) => {
     try {
         const rows = await pool.query(`
-            SELECT d.id, d.amount, d.status, d.created_at, u.phone, u.name, u.is_demo 
+            SELECT d.id, d.amount, d.status, d.created_at, u.phone, u.name, u.is_demo, u.user_type 
             FROM deposits d JOIN users u ON d.user_id = u.id ORDER BY d.id DESC LIMIT 200
         `);
         res.json({ success: true, deposits: rows.rows });
@@ -815,7 +816,7 @@ app.get('/api/admin/deposits', async (req, res) => {
 app.get('/api/admin/withdrawals', async (req, res) => {
     try {
         const rows = await pool.query(`
-            SELECT w.id, w.amount, w.pix_key, w.pix_type, w.status, w.created_at, u.phone, u.name 
+            SELECT w.id, w.amount, w.pix_key, w.pix_type, w.status, w.created_at, u.phone, u.name, u.is_demo, u.user_type 
             FROM withdrawals w JOIN users u ON w.user_id = u.id ORDER BY w.id DESC
         `);
         res.json({ success: true, withdrawals: rows.rows });
