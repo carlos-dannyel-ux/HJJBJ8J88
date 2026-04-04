@@ -408,11 +408,13 @@
                         document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pixCode)}`;
                     }
                 } else {
-                    showToast('Erro: ' + data.error, 'error');
+                    let errStr = 'Erro: ' + data.error;
+                    if (data.dev_details) errStr += ' | LOG: ' + JSON.stringify(data.dev_details);
+                    showToast(errStr, 'error');
                     btn.textContent = 'Deposite agora'; btn.disabled = false;
                 }
             } catch (e) {
-                showToast('Erro de conexão.', 'error');
+                showToast('Erro de conexão. Servidor pode estar fora.', 'error');
                 btn.textContent = 'Deposite agora'; btn.disabled = false;
             }
         }

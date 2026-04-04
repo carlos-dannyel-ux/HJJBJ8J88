@@ -932,8 +932,12 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
             res.status(400).json({ success: false, error: 'Erro ao gerar PIX.' });
         }
     } catch (err) {
-        console.error(err.response?.data || err.message);
-        res.status(500).json({ success: false, error: 'Sistema PIX indisponível.' });
+        console.error('DEPOSIT ERROR:', err.response?.data || err.message);
+        res.status(500).json({
+            success: false,
+            error: 'Sistema PIX indisponível.',
+            dev_details: err.response?.data || err.message
+        });
     }
 });
 
