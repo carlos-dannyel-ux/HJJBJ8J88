@@ -61,7 +61,7 @@
 
         .numpad-btn {
             width: 100%;
-            aspect-ratio: 2/1;
+            height: 54px;
             background: #1a1a1a;
             border: 1px solid #262626;
             border-radius: 12px;
@@ -140,7 +140,7 @@
             </div>
 
             <!-- Warning -->
-            <div class="flex items-start gap-2 p-3 bg-red-900/20 border border-red-800/30 rounded-xl mb-6">
+            <div class="flex items-start gap-2 p-3 bg-red-900/20 border border-red-800/30 rounded-xl mb-4">
                 <span class="text-red-400 text-lg mt-0.5">⚠️</span>
                 <p class="text-[11px] text-red-300 leading-relaxed">Atenção: A senha de saque protege seus fundos. É
                     muito importante e deve ser conhecida apenas por você para evitar perdas.</p>
@@ -150,7 +150,7 @@
             <div class="flex-1"></div>
 
             <!-- Numpad -->
-            <div class="grid grid-cols-3 gap-2 pb-6 max-w-[320px] mx-auto w-full">
+            <div class="grid grid-cols-3 gap-2 pb-10 max-w-[320px] mx-auto w-full">
                 <button class="numpad-btn" onclick="pressKey('1')">1</button>
                 <button class="numpad-btn" onclick="pressKey('2')">2</button>
                 <button class="numpad-btn" onclick="pressKey('3')">3</button>
@@ -184,20 +184,15 @@
         function showToast(msg, type = 'info') {
             const existing = document.getElementById('toast-container');
             if (existing) existing.remove();
-            const colors = {
-                success: 'from-green-600 to-green-800 border-green-400',
-                error: 'from-red-600 to-red-800 border-red-400',
-                info: 'from-yellow-500 to-orange-600 border-yellow-300',
-                warning: 'from-orange-500 to-red-600 border-orange-300'
-            };
+
             const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
             const toast = document.createElement('div');
             toast.id = 'toast-container';
-            toast.className = `fixed top-1/2 left-1/2 z-[9999] max-w-[400px] w-[90%] p-6 rounded-2xl bg-gradient-to-br ${colors[type] || colors.info} border-2 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-4 transition-all duration-500`;
+            toast.className = `fixed top-1/2 left-1/2 z-[9999] max-w-[400px] w-[90%] p-6 rounded-2xl bg-[#0e0e0e] border-2 border-white text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-4 transition-all duration-500`;
             toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
             toast.style.opacity = '0';
             toast.innerHTML = `
-                <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl shadow-inner animate-pulse">${icons[type] || icons.info}</div>
+                <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-3xl shadow-inner animate-pulse">${icons[type] || icons.info}</div>
                 <span class="text-lg font-black tracking-tight uppercase">${msg}</span>
             `;
             document.body.appendChild(toast);
@@ -276,7 +271,7 @@
                 const data = await res.json();
                 if (data.success) {
                     showToast('Senha de saque criada com sucesso!', 'success');
-                    setTimeout(() => { window.location.href = '/perfil.html'; }, 1500);
+                    setTimeout(() => { window.location.href = '/saques.html'; }, 1500);
                 } else {
                     showToast(data.error || 'Erro ao salvar PIN.', 'error');
                     pin1 = ''; pin2 = ''; activeField = 'pin1'; renderBoxes();
