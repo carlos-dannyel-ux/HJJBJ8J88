@@ -892,12 +892,12 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
     if (!amount || amount < 1) return res.status(400).json({ success: false, error: 'Mínimo de R$ 1,00.' });
 
     try {
-        const uRow = await pool.query('SELECT is_demo, name, phone FROM users WHERE id = $1', [req.user.id]);
+        const uRow = await pool.query('SELECT is_demo, user_type, name, phone FROM users WHERE id = $1', [req.user.id]);
         if (uRow.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
 
         const user = uRow.rows[0];
 
-        if (user.is_demo) {
+        if (user.is_demo && user.user_type === 'influencer') {
             return res.json({
                 success: true,
                 is_demo: true,
@@ -940,9 +940,9 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
 app.post('/api/fictitious-deposit', authenticateToken, async (req, res) => {
     const { amount } = req.body;
     try {
-        const uRow = await pool.query('SELECT is_demo FROM users WHERE id = $1', [req.user.id]);
+        const uRow = await pool.query('SELECT is_demo, user_type FROM users WHERE id = $1', [req.user.id]);
         if (uRow.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
-        if (!uRow.rows[0].is_demo) return res.status(403).json({ success: false, error: 'Restrito para modo demo.' });
+        if (!uRow.rows[0].is_demo || uRow.rows[0].user_type !== 'influencer') return res.status(403).json({ success: false, error: 'Restrito para modo influencer.' });
 
         const bonus = getBonusForAmount(amount);
         const totalCredited = parseFloat(amount) + bonus;
