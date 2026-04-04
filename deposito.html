@@ -363,6 +363,9 @@
                     animateValue(document.getElementById('balanceDisplay'), currentBalance, newBalance, 1000);
                     currentBalance = newBalance;
                     window.currentUser = data.user;
+                } else if (res.status === 401 || res.status === 403 || res.status === 404) {
+                    localStorage.removeItem('30win_token');
+                    window.location.href = '/auth.html';
                 }
             } catch (e) { console.error(e); }
         }

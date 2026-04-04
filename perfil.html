@@ -101,7 +101,7 @@
                         document.getElementById('userId').innerText = 'ID: ' + data.user.id_user;
                         window.currentUser = data.user;
                         playSound();
-                    } else if (res.status === 401 || res.status === 403) {
+                    } else if (res.status === 401 || res.status === 403 || res.status === 404) {
                         localStorage.removeItem('30win_token');
                         window.location.href = '/auth.html';
                     }

@@ -198,6 +198,9 @@
                 if (data.success) {
                     document.getElementById('balanceDisplay').textContent = parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                     window.currentUser = data.user;
+                } else if (res.status === 401 || res.status === 403 || res.status === 404) {
+                    localStorage.removeItem('30win_token');
+                    window.location.href = '/auth.html';
                 }
             } catch (e) { console.error(e); }
         }

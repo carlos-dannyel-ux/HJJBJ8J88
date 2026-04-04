@@ -437,6 +437,10 @@
                     showToast('Saldo insuficiente. Realize um depósito para jogar!', 'warning');
                     setTimeout(() => window.location.href = '/deposito.html', 2000);
                     return;
+                } else if (infoRes.status === 401 || infoRes.status === 403 || infoRes.status === 404) {
+                    localStorage.removeItem('30win_token');
+                    window.location.href = '/auth.html';
+                    return;
                 }
 
                 const res = await fetch('/api/games/launch', {

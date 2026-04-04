@@ -893,6 +893,8 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
 
     try {
         const uRow = await pool.query('SELECT is_demo, name, phone FROM users WHERE id = $1', [req.user.id]);
+        if (uRow.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
+
         const user = uRow.rows[0];
 
         if (user.is_demo) {
@@ -939,6 +941,7 @@ app.post('/api/fictitious-deposit', authenticateToken, async (req, res) => {
     const { amount } = req.body;
     try {
         const uRow = await pool.query('SELECT is_demo FROM users WHERE id = $1', [req.user.id]);
+        if (uRow.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
         if (!uRow.rows[0].is_demo) return res.status(403).json({ success: false, error: 'Restrito para modo demo.' });
 
         const bonus = getBonusForAmount(amount);
@@ -1072,7 +1075,9 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
 
         // Verifica se o usuario e demo no nosso banco
         const userRow = await pool.query('SELECT is_demo, user_type FROM users WHERE id = $1', [req.user.id]);
-        const userFound = userRow.rows[0] || {};
+        if (userRow.rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' });
+
+        const userFound = userRow.rows[0];
         const isDemo = userFound.is_demo === true;
         const userType = userFound.user_type || 'standard';
 

@@ -741,7 +741,7 @@
                         if (balanceAnimFrame) cancelAnimationFrame(balanceAnimFrame);
                         balanceAnimFrame = requestAnimationFrame(animateBalance);
                         window.currentUser = data.user;
-                    } else if (res.status === 401 || res.status === 403) {
+                    } else if (res.status === 401 || res.status === 403 || res.status === 404) {
                         localStorage.removeItem('30win_token');
                         window.location.reload();
                     }
