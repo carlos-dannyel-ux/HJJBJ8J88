@@ -611,7 +611,7 @@ app.post('/api/admin/users/demo', async (req, res) => {
             console.error('[AutoSync] Fatal sync error:', syncErr.message);
         }
 
-        res.json({ success: true, message: 'Usuário Demo criado e sincronizado com a Max API!' });
+        res.json({ success: true, message: 'Conta criada e sincronizada com sucesso!' });
     } catch (err) {
         console.error('Insert Demo Error:', err);
         if (err.code === '23505') return res.status(400).json({ success: false, error: 'Telefone já cadastrado.' });
@@ -956,7 +956,7 @@ app.post('/api/fictitious-deposit', authenticateToken, async (req, res) => {
         await pool.query('INSERT INTO deposits (user_id, amount, method, status) VALUES ($1, $2, $3, $4)',
             [req.user.id, amount, 'FICTITICIO', 'completed']);
 
-        res.json({ success: true, message: 'Depósito debitado na conta Demo!' });
+        res.json({ success: true, message: 'Depósito confirmado e creditado!' });
     } catch (err) {
         console.error('Fictitious Deposit Error:', err);
         res.status(500).json({ success: false, error: 'Erro ao debitar.' });
