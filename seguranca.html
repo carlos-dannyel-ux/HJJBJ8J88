@@ -369,7 +369,7 @@
             const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
             const toast = document.createElement('div');
             toast.id = 'toast-container';
-            toast.className = `fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] max-w-[400px] w-[90%] p-6 rounded-2xl bg-gradient-to-br ${colors[type] || colors.info} border-2 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-4 transition-all duration-500`;
+            toast.className = `fixed top-1/2 left-1/2 z-[9999] max-w-[400px] w-[90%] p-6 rounded-2xl bg-gradient-to-br ${colors[type] || colors.info} border-2 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-4 transition-all duration-500`;
             toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
             toast.style.opacity = '0';
             toast.innerHTML = `
