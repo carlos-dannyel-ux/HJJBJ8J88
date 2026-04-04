@@ -223,7 +223,7 @@
                 const res = await fetch('/api/finance/withdraw', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ amount, pix_key: pix, withdraw_password: pin })
+                    body: JSON.stringify({ amount, pix_key: pix, pix_type: 'CPF', withdraw_password: pin })
                 });
                 const data = await res.json();
                 if (data.success) {

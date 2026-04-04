@@ -100,8 +100,8 @@ app.post('/api/auth/register', async (req, res) => {
 
         const user_type = process.env.DEFAULT_DEMO_TYPE || 'standard'; // standard ou influencer
         await pool.query(
-            'INSERT INTO users (id_user, phone, password, name, balance, is_demo, user_type, referral_code, invited_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-            [id_user, phone, hashedPassword, name, 0.00, true, user_type, referral_code, invitedBy || null]
+            'INSERT INTO users (id_user, phone, password, name, balance, is_demo, user_type, referral_code, invited_by, bonus_balance, rollover_required) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
+            [id_user, phone, hashedPassword, name, signupBonus, true, user_type, referral_code, invitedBy || null, signupBonus, rolloverReq]
         );
 
         res.json({ success: true, message: 'Cadastro realizado com sucesso!' });
@@ -995,8 +995,10 @@ app.post('/api/ggpix/webhook', async (req, res) => {
     }
 });
 
-app.post('/api/withdraw', authenticateToken, async (req, res) => {
-    const { amount, pix_key, pix_type, withdraw_password } = req.body;
+// Endpoint support both paths for frontend compatibility
+app.post(['/api/withdraw', '/api/finance/withdraw'], authenticateToken, async (req, res) => {
+    let { amount, pix_key, pix_type, withdraw_password } = req.body;
+    if (!pix_type) pix_type = 'CPF'; // Default if not provided
 
     try {
         const uRows = await pool.query('SELECT balance, rollover_required, rollover_progress, withdraw_password FROM users WHERE id = $1', [req.user.id]);
