@@ -119,6 +119,27 @@
                 </button>
             </div>
 
+            <!-- Rollover Alert (Hidden by default) -->
+            <div id="rollover-alert" class="hidden card bg-red-900/40 border border-red-500/50">
+                <p class="text-xs text-red-200 font-bold uppercase tracking-wider mb-1">Atenção ao Rollover</p>
+                <p class="text-[11px] text-red-100">Para liberar operações de saque, você precisa atingir a meta de
+                    apostas do seu bônus.</p>
+                <div class="mt-3 flex justify-between items-end">
+                    <div>
+                        <span class="text-[10px] text-red-300 block mb-0.5">Progresso atual</span>
+                        <span id="rollover-prog" class="font-bold text-sm text-red-400">R$ 0,00</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-red-300 block mb-0.5">Meta (Rollover)</span>
+                        <span id="rollover-req" class="font-bold text-sm text-red-400">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="w-full bg-red-950 rounded-full h-1.5 overflow-hidden mt-3">
+                    <div id="rollover-bar" class="bg-red-500 h-1.5 rounded-full transition-all duration-500"
+                        style="width:0%;"></div>
+                </div>
+            </div>
+
             <!-- Withdraw Form -->
             <div id="withdraw-form" class="card space-y-4">
                 <div>
@@ -198,6 +219,30 @@
                 if (data.success) {
                     document.getElementById('balanceDisplay').textContent = parseFloat(data.user.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                     window.currentUser = data.user;
+
+                    const req = parseFloat(data.user.rollover_required) || 0;
+                    const prog = parseFloat(data.user.rollover_progress) || 0;
+                    const alertEl = document.getElementById('rollover-alert');
+                    const btnWithdraw = document.getElementById('btn-withdraw');
+
+                    if (req > 0 && prog < req) {
+                        alertEl.classList.remove('hidden');
+                        document.getElementById('rollover-prog').textContent = 'R$ ' + prog.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        document.getElementById('rollover-req').textContent = 'R$ ' + req.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        let pct = (prog / req) * 100;
+                        if (pct > 100) pct = 100;
+                        document.getElementById('rollover-bar').style.width = pct + '%';
+
+                        btnWithdraw.disabled = true;
+                        btnWithdraw.textContent = 'Conclua o Rollover para Sacar';
+                        btnWithdraw.classList.add('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        alertEl.classList.add('hidden');
+                        btnWithdraw.disabled = false;
+                        btnWithdraw.textContent = 'Solicitar Retirada';
+                        btnWithdraw.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+
                 } else if (res.status === 401 || res.status === 403 || res.status === 404) {
                     localStorage.removeItem('30win_token');
                     window.location.href = '/auth.html';
