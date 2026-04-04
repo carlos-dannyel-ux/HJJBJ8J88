@@ -836,7 +836,7 @@ app.post('/api/admin/withdrawals/:id/approve', async (req, res) => {
         const apiRows = await pool.query('SELECT agent_token FROM api_credentials WHERE module = \'ggpix_api\'');
         if (apiRows.rows.length === 0 || !apiRows.rows[0].agent_token) return res.status(400).json({ success: false, error: 'GGPIX nao cfg.' });
 
-        const apiKey = apiRows[0].agent_token;
+        const apiKey = apiRows.rows[0].agent_token;
 
         const response = await axios.post('https://ggpixapi.com/api/v1/pix/out', {
             amountCents: Math.round(w.amount * 100),
@@ -910,7 +910,7 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
         const apiRows = await pool.query('SELECT agent_token FROM api_credentials WHERE module = \'ggpix_api\'');
         if (apiRows.rows.length === 0 || !apiRows.rows[0].agent_token) return res.status(400).json({ success: false, error: 'Pix indisp.' });
 
-        const apiKey = apiRows[0].agent_token;
+        const apiKey = apiRows.rows[0].agent_token;
         const externalId = 'dep-' + req.user.id + '-' + Date.now();
         // The fake/default document helps bypass if users don't have valid CPF. But ggpix likely needs exactly 11 valid numbers. We'll pass random CPF generic if needed, but user might have a generic phone like '92996036214'. Let's send the phone.
         let doc = user.phone && user.phone.length >= 11 ? user.phone.substring(0, 11) : '00000000000';
