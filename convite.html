@@ -210,6 +210,37 @@
             }
         }
 
+        /* SVG Animation */
+        @keyframes gift-bounce {
+
+            0%,
+            90%,
+            100% {
+                transform: translateY(0) rotate(0);
+            }
+
+            92% {
+                transform: translateY(-5px) rotate(-8deg);
+            }
+
+            94% {
+                transform: translateY(-5px) rotate(8deg);
+            }
+
+            96% {
+                transform: translateY(-5px) rotate(-8deg);
+            }
+
+            98% {
+                transform: translateY(0) rotate(0);
+            }
+        }
+
+        .animate-gift {
+            animation: gift-bounce 5s infinite ease-in-out;
+            transform-origin: bottom center;
+        }
+
         /* Modal Styles */
         .modal-overlay {
             position: fixed;
@@ -276,16 +307,55 @@
                 <h1 class="font-bold text-lg uppercase tracking-tight text-[var(--skin__primary)]">Bônus de Convite</h1>
             </div>
             <div class="absolute right-4 flex flex-col items-center">
-                <!-- Hot SVG -->
-                <div class="w-10 h-10 -mb-3 z-10">
+                <!-- Full SVG Hot + Gift -->
+                <div class="w-12 h-12 -mb-2 z-10 animate-gift">
                     <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"
-                        class="w-full h-full drop-shadow-[0_0_5px_rgba(245,130,31,0.5)]">
+                        class="w-full h-full drop-shadow-[0_5px_15px_rgba(245,130,31,0.4)]">
+                        <rect width="500" height="500" fill="transparent" />
                         <g id="flame" transform="translate(250, 160)">
                             <path
                                 d="M -70,70 C -110,10 -80,-60 -30,-80 C -15,-86 0,-70 -5,-55 C -10,-40 5,-35 15,-50 C 30,-75 65,-105 100,-95 C 125,-88 110,-55 95,-45 C 130,-45 155,-20 140,15 C 125,50 90,70 65,85 Z"
                                 fill="#F5821F" stroke="#FDBB2E" stroke-width="10" stroke-linejoin="round" />
                             <text x="25" y="15" font-family="'Arial Black', Impact, sans-serif" font-weight="900"
                                 font-size="65" fill="#FFFFFF" text-anchor="middle" transform="rotate(-5)">Hot</text>
+                        </g>
+                        <g id="gift-box">
+                            <polygon points="160,260 250,300 250,420 160,380" fill="#D62828" stroke="#780000"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="340,260 250,300 250,420 340,380" fill="#B21F1F" stroke="#780000"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="190,273 210,282 210,402 190,393" fill="#FFB703" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="290,282 310,273 310,393 290,402" fill="#E59400" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="150,230 250,275 250,315 150,270" fill="#E63946" stroke="#780000"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="350,230 250,275 250,315 350,270" fill="#C92A2A" stroke="#780000"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="250,185 150,230 250,275 350,230" fill="#F04E4E" stroke="#780000"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="190,248 210,257 210,297 190,288" fill="#FFB703" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="290,257 310,248 310,288 290,297" fill="#E59400" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="190,248 210,257 310,212 290,203" fill="#FFC333" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <polygon points="290,257 310,248 190,212 210,203" fill="#FFB703" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <path d="M 235,235 C 190,255 160,270 170,305 L 195,295 C 210,280 230,265 245,245 Z"
+                                fill="#E59400" stroke="#8A4A0B" stroke-width="6" stroke-linejoin="round" />
+                            <path d="M 265,235 C 310,255 340,270 330,305 L 305,295 C 290,280 270,265 255,245 Z"
+                                fill="#E59400" stroke="#8A4A0B" stroke-width="6" stroke-linejoin="round" />
+                            <path d="M 235,225 C 145,170 125,255 240,240 Z" fill="#FFB703" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <path d="M 230,230 C 170,205 160,230 200,242" fill="none" stroke="#8A4A0B" stroke-width="5"
+                                stroke-linecap="round" />
+                            <path d="M 265,225 C 355,170 375,255 260,240 Z" fill="#FFB703" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
+                            <path d="M 270,230 C 330,205 340,230 300,242" fill="none" stroke="#8A4A0B" stroke-width="5"
+                                stroke-linecap="round" />
+                            <rect x="233" y="222" width="34" height="24" rx="6" fill="#FFD166" stroke="#8A4A0B"
+                                stroke-width="6" stroke-linejoin="round" />
                         </g>
                     </svg>
                 </div>
