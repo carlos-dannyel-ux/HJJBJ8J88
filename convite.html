@@ -172,10 +172,12 @@
             background: #1a1a1a;
             border: 1px solid var(--skin__border);
             border-radius: 8px;
-            padding: 12px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            width: 100%;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -198,10 +200,11 @@
         <main class="flex-1 px-4 pt-6 pb-8 space-y-6">
             <!-- Invite Code Card -->
             <div class="card bg-[#1a1a1a] flex items-center justify-between">
-                <div>
+                <div class="flex-1 overflow-hidden">
                     <p class="text-[10px] text-[var(--skin__neutral_1)] font-bold uppercase tracking-wider">Seu Código
                         de Convite</p>
-                    <p class="text-3xl font-black text-[var(--skin__accent_3)] mt-1" id="inviteCode">-------</p>
+                    <p class="text-2xl sm:text-3xl font-black text-[var(--skin__accent_3)] mt-1 break-all"
+                        id="inviteCode">-------</p>
                 </div>
                 <button onclick="copyInviteCode()" class="btn-copy">
                     COPIAR
@@ -220,7 +223,7 @@
                     </div>
                     <div class="flex-1 space-y-3">
                         <div class="referral-link-box">
-                            <span class="text-[11px] text-gray-400 truncate flex-1 font-medium"
+                            <span class="text-[10px] text-gray-400 break-all flex-1 font-medium leading-tight"
                                 id="referralUrlText">Gerando link...</span>
                             <button onclick="copyInviteUrl()" class="text-[var(--skin__accent_3)]">
                                 <span class="material-symbols-outlined text-lg">content_copy</span>

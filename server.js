@@ -96,7 +96,14 @@ app.post('/api/auth/register', async (req, res) => {
         const name = `user${randNum}`;
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        // Generate Unique Referral Code
+        let referral_code;
+        let codeExists = true;
+        while (codeExists) {
+            referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const check = await pool.query('SELECT id FROM users WHERE referral_code = $1', [referral_code]);
+            if (check.rows.length === 0) codeExists = false;
+        }
 
         const user_type = process.env.DEFAULT_DEMO_TYPE || 'standard'; // standard ou influencer
         await pool.query(
@@ -246,12 +253,23 @@ app.post('/api/user/delete-account', authenticateToken, async (req, res) => {
 });
 
 app.get('/api/referral/qr', authenticateToken, async (req, res) => {
-    const inviteUrl = `https://30win-sitegames-cdn.netlify.app/auth.html?ref=${req.user.referral_code}`;
     try {
+        const userQuery = await pool.query('SELECT referral_code FROM users WHERE id = $1', [req.user.id]);
+        let code = userQuery.rows[0]?.referral_code;
+
+        if (!code) {
+            // Se por algum motivo o código sumiu ou é nulo, gera um novo na hora
+            code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            await pool.query('UPDATE users SET referral_code = $1 WHERE id = $2', [code, req.user.id]);
+        }
+
+        const inviteUrl = `https://30win-sitegames-cdn.netlify.app/auth.html?ref=${code}`;
         const qrCodeData = await qrcode.toDataURL(inviteUrl);
-        res.json({ success: true, qr: qrCodeData, url: inviteUrl, code: req.user.referral_code });
+
+        res.json({ success: true, qr: qrCodeData, url: inviteUrl, code: code });
     } catch (err) {
-        res.status(500).json({ success: false, error: 'Erro ao gerar QR Code.' });
+        console.error('QR Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao buscar dados de convite.' });
     }
 });
 
