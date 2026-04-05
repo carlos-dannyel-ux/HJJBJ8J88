@@ -1208,23 +1208,28 @@ app.post('/api/webhook/maxapi', async (req, res) => {
         }
 
         if (method === 'transaction') {
-            let bet = 0;
-            let win = 0;
-
             // Robust extraction: MAX API sends data inside 'slot' object
-            // Some providers may structure it differently (data, slot, root, etc.)
             const gameData = slot || req.body.slot || req.body.data || req.body || {};
 
-            // More comprehensive field extraction for different providers
-            bet = parseFloat(gameData.bet_money) || parseFloat(gameData.bet) || parseFloat(gameData.amount) || parseFloat(req.body.bet_money) || parseFloat(req.body.bet) || 0;
-            win = parseFloat(gameData.win_money) || parseFloat(gameData.win) || parseFloat(req.body.win_money) || parseFloat(req.body.win) || 0;
+            let bet = parseFloat(gameData.bet_money) || parseFloat(gameData.bet) || parseFloat(req.body.bet_money) || parseFloat(req.body.bet) || 0;
+            let win = parseFloat(gameData.win_money) || parseFloat(gameData.win) || parseFloat(req.body.win_money) || parseFloat(req.body.win) || 0;
+            let amount = parseFloat(gameData.amount) || parseFloat(req.body.amount) || 0;
 
             // Handle txn_type correctly
             const txnType = (gameData.txn_type || req.body.txn_type || 'debit_credit').toLowerCase();
+
             if (txnType === 'credit') {
                 bet = 0; // credit-only: no debit
+                if (win === 0 && amount > 0) win = amount;
             } else if (txnType === 'debit') {
                 win = 0; // debit-only: no credit
+                if (bet === 0 && amount > 0) bet = amount;
+            } else {
+                // debit_credit: if no explicit bet/win vars, and amount is provided...
+                // (Usually debit_credit comes with bet_money and win_money specifically)
+                if (bet === 0 && win === 0 && amount > 0) {
+                    bet = amount; // default fallback if strictly unknown format
+                }
             }
 
             // --- IDEMPOTENCY CHECK ---
@@ -1252,20 +1257,11 @@ app.post('/api/webhook/maxapi', async (req, res) => {
 
             console.log(`[Webhook DEBUG] user_type:${user.user_type} win:${win} maxPrize:${maxPrize} phase:${phase}`);
 
-            // 1. PHASE HARD-CAP (Winning Blocker for Arrecadação)
-            if (phase === 'arrecadacao' && user.user_type === 'standard') {
-                const maxWinInArrecadacao = bet * (rtpArrecadacao / 100);
-                if (win > maxWinInArrecadacao) {
-                    console.log(`[Webhook PHASE-CAP] Capping win from ${win} to ${maxWinInArrecadacao.toFixed(2)} (RTP:${rtpArrecadacao}%) for standard user ${user_code}`);
-                    win = maxWinInArrecadacao;
-                }
-            }
+            // 1. PHASE HARD-CAP REVOVOKED
+            // Ocultamos a lógica de Hard Cap para evitar dessincronização do painel do jogo.
+            // O RTP agora é controlado integralmente pela API (agent_update e control_rtp).
 
-            // 2. GLOBAL MAX PRIZE CAP
-            if ((!isDemo || user.user_type === 'standard') && win > maxPrize && maxPrize > 0) {
-                console.log(`[Webhook MAX-CAP] Capping win from ${win} to ${maxPrize} for user ${user_code}`);
-                win = maxPrize;
-            }
+            // 2. GLOBAL MAX PRIZE CAP (Removed safely)
 
             // Update local balance ATOMICALLY to avoid race conditions and force sync
             const result = await pool.query(
