@@ -308,7 +308,7 @@ app.get('/api/referral/stats', authenticateToken, async (req, res) => {
             SELECT 
                 COUNT(*) as total_invites,
                 COUNT(CASE 
-                    WHEN (SELECT COALESCE(SUM(amount), 0) FROM deposits WHERE user_id = u.id AND status = 'approved') >= 30.00 
+                    WHEN (SELECT COALESCE(SUM(amount), 0) FROM deposits WHERE user_id = u.id AND (status = 'approved' OR status = 'completed')) >= 30.00 
                     AND u.rollover_progress >= 100.00 
                     THEN 1 END) as valid_invites
             FROM users u
