@@ -11,34 +11,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet">
     <style>
+        :root {
+            --skin__home_bg: #161616;
+            --skin__primary: #F4F0EC;
+            --skin__accent_3: #FFAA09;
+            --skin__accent_1: #04BE02;
+            --skin__border: #313131;
+            --skin__bg_1: #212121;
+            --skin__neutral_1: #A4A4A4;
+        }
+
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
         body {
-            background-color: #0e0e0e;
-            color: #fff;
+            background-color: var(--skin__home_bg);
+            color: var(--skin__primary);
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
         }
 
         * {
             scrollbar-width: none;
             -ms-overflow-style: none;
+            box-sizing: border-box;
         }
 
         *::-webkit-scrollbar {
             display: none;
         }
 
-        html {
-            font-size: 100%;
+        .lobby-base-header {
+            background: #000;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--skin__border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .card {
-            background: #1a1a1a;
-            border: 1px solid #262626;
-            border-radius: 16px;
+            background: var(--skin__bg_1);
+            border: 1px solid var(--skin__border);
+            border-radius: 12px;
             padding: 20px;
         }
 
@@ -46,23 +67,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
             transition: transform 0.2s;
         }
 
         .share-btn:active {
-            transform: scale(0.9);
+            transform: scale(0.95);
         }
 
         .share-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #262626;
+            background: #2a2a2a;
         }
 
         .reward-grid {
@@ -72,112 +93,157 @@
         }
 
         .reward-card {
-            background: #1a1a1a;
-            border: 1px solid #262626;
+            background: var(--skin__bg_1);
+            border: 1px solid var(--skin__border);
             border-radius: 12px;
-            padding: 8px;
+            padding: 10px 5px;
             text-align: center;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .reward-card img {
-            width: 100%;
-            aspect-ratio: 1;
+            width: 40px;
+            height: 40px;
             object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .btn-copy {
+            background: var(--skin__accent_3);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .referral-link-box {
+            background: #1a1a1a;
+            border: 1px solid var(--skin__border);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
     </style>
 </head>
 
 <body>
-    <div class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0e0e0e] relative flex flex-col">
+    <div class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[var(--skin__home_bg)] relative flex flex-col">
         <!-- Header -->
-        <header class="flex items-center justify-between px-4 h-14 border-b border-[#1a1a1a] shrink-0">
-            <a href="perfil.html" class="p-2 -ml-2" style="text-decoration:none;color:inherit;">
-                <span class="material-symbols-outlined">arrow_back_ios</span>
+        <header class="lobby-base-header">
+            <a href="perfil.html" class="flex items-center justify-center w-10 h-10 -ml-2"
+                style="text-decoration:none;color:inherit;">
+                <span class="material-symbols-outlined text-[var(--skin__neutral_1)]">arrow_back_ios</span>
             </a>
-            <h1 class="font-bold text-base">Bônus de Convite</h1>
-            <a href="#" class="text-[#FFB800] text-xs font-bold no-underline">Histórico</a>
+            <div class="flex-1 text-center pr-8">
+                <h1 class="font-bold text-lg uppercase tracking-tight text-[var(--skin__primary)]">Bônus de Convite</h1>
+            </div>
+            <a href="#"
+                class="text-[var(--skin__accent_3)] text-xs font-bold no-underline absolute right-4">Histórico</a>
         </header>
 
-        <main class="flex-1 px-4 pt-5 pb-8 space-y-5">
-            <!-- Invite Stats -->
-            <div class="card bg-gradient-to-br from-[#FFB800]/10 to-transparent flex items-center gap-4">
-                <div class="flex-1">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Seu Código</p>
-                    <p class="text-2xl font-black text-[#FFB800] mt-1" id="inviteCode">-------</p>
+        <main class="flex-1 px-4 pt-6 pb-8 space-y-6">
+            <!-- Invite Code Card -->
+            <div class="card bg-[#1a1a1a] flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] text-[var(--skin__neutral_1)] font-bold uppercase tracking-wider">Seu Código
+                        de Convite</p>
+                    <p class="text-3xl font-black text-[var(--skin__accent_3)] mt-1" id="inviteCode">-------</p>
                 </div>
-                <button onclick="copyInviteCode()"
-                    class="bg-[#FFB800] text-black h-10 px-4 rounded-xl font-bold text-xs flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">content_copy</span> COPIAR
+                <button onclick="copyInviteCode()" class="btn-copy">
+                    COPIAR
                 </button>
             </div>
 
-            <!-- QR & Link -->
-            <div class="card space-y-4">
-                <div class="flex gap-4 items-center">
+            <!-- QR & Link Section -->
+            <div class="card space-y-5">
+                <div class="flex gap-4 items-start">
                     <div
-                        class="bg-white p-1.5 rounded-xl w-24 h-24 shrink-0 flex items-center justify-center overflow-hidden">
+                        class="bg-white p-2 rounded-xl w-28 h-28 shrink-0 flex items-center justify-center overflow-hidden shadow-lg shadow-black/50">
                         <img id="qrCodeImg" src="" alt="QR" class="w-full h-full hidden">
                         <div id="qrLoading"
-                            class="animate-spin w-6 h-6 border-2 border-[#FFB800] border-t-transparent rounded-full">
+                            class="animate-spin w-6 h-6 border-2 border-[var(--skin__accent_3)] border-t-transparent rounded-full">
                         </div>
                     </div>
-                    <div class="flex-1 space-y-2">
-                        <div class="bg-[#111] border border-[#333] rounded-xl p-3 flex items-center gap-2">
-                            <span class="text-[10px] text-gray-400 truncate flex-1" id="referralUrlText">Gerando
-                                link...</span>
-                            <button onclick="copyInviteUrl()" class="text-[#FFB800]"><span
-                                    class="material-symbols-outlined text-sm">content_copy</span></button>
+                    <div class="flex-1 space-y-3">
+                        <div class="referral-link-box">
+                            <span class="text-[11px] text-gray-400 truncate flex-1 font-medium"
+                                id="referralUrlText">Gerando link...</span>
+                            <button onclick="copyInviteUrl()" class="text-[var(--skin__accent_3)]">
+                                <span class="material-symbols-outlined text-lg">content_copy</span>
+                            </button>
                         </div>
-                        <p class="text-[10px] text-gray-500 leading-tight">Compartilhe seu link e ganhe bônus por cada
-                            indicado válido!</p>
+                        <p class="text-[11px] text-[var(--skin__neutral_1)] leading-snug">
+                            <span class="text-[var(--skin__accent_1)] font-bold">Ganhe bônus!</span> Compartilhe seu
+                            link exclusivo e receba recompensas por cada amigo que começar a jogar.
+                        </p>
                     </div>
                 </div>
 
-                <!-- Social Share -->
-                <div class="flex justify-between px-2 pt-2">
+                <!-- Social Share Divider -->
+                <div class="flex items-center gap-4 py-2">
+                    <div class="h-[1px] flex-1 bg-[var(--skin__border)]"></div>
+                    <span class="text-[10px] text-[var(--skin__neutral_1)] font-bold uppercase">Compartilhar</span>
+                    <div class="h-[1px] flex-1 bg-[var(--skin__border)]"></div>
+                </div>
+
+                <!-- Social Share Icons -->
+                <div class="flex justify-between px-2">
                     <div class="share-btn" onclick="shareLink('whatsapp')">
-                        <div class="share-icon" style="background:rgba(37,211,102,0.15)"><img
+                        <div class="share-icon"><img
                                 src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-6 h-6">
                         </div>
-                        <span class="text-[9px] text-gray-500">WhatsApp</span>
+                        <span class="text-[10px] font-semibold text-[var(--skin__neutral_1)]">WhatsApp</span>
                     </div>
                     <div class="share-btn" onclick="shareLink('facebook')">
-                        <div class="share-icon" style="background:rgba(24,119,242,0.15)"><img
+                        <div class="share-icon"><img
                                 src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png"
                                 class="w-6 h-6"></div>
-                        <span class="text-[9px] text-gray-500">Facebook</span>
+                        <span class="text-[10px] font-semibold text-[var(--skin__neutral_1)]">Facebook</span>
                     </div>
                     <div class="share-btn" onclick="shareLink('telegram')">
-                        <div class="share-icon" style="background:rgba(0,136,204,0.15)"><img
+                        <div class="share-icon"><img
                                 src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg"
                                 class="w-6 h-6"></div>
-                        <span class="text-[9px] text-gray-500">Telegram</span>
+                        <span class="text-[10px] font-semibold text-[var(--skin__neutral_1)]">Telegram</span>
                     </div>
                     <div class="share-btn" onclick="shareLink('native')">
-                        <div class="share-icon"><span class="material-symbols-outlined text-white">share</span></div>
-                        <span class="text-[9px] text-gray-500">Mais</span>
+                        <div class="share-icon"><span class="material-symbols-outlined text-white text-xl">share</span>
+                        </div>
+                        <span class="text-[10px] font-semibold text-[var(--skin__neutral_1)]">Mais</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Guidelines -->
-            <div class="px-1 space-y-2">
-                <h3 class="text-xs font-bold text-[#FFB800] flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">help_outline</span>
-                    Como funciona?
-                </h3>
-                <p class="text-[11px] text-gray-400 leading-relaxed">
-                    Você recebe bônus quando seu indicado realiza um depósito ≥ R$ 20,00 e alcança apostas válidas ≥ R$
-                    300,00.
-                    <button class="text-[#FFB800] font-bold">Ver detalhes</button>
-                </p>
-            </div>
+            <!-- Guidelines and Rewards -->
+            <div class="space-y-4">
+                <div class="px-1 flex items-center justify-between">
+                    <h3 class="text-sm font-black text-[var(--skin__primary)] flex items-center gap-2">
+                        Como funciona?
+                    </h3>
+                    <button class="text-[var(--skin__accent_3)] text-[10px] font-bold uppercase">Ver detalhes</button>
+                </div>
 
-            <!-- Reward Progress (Simplified for UI/UX) -->
-            <div class="grid grid-cols-4 gap-2 pb-6" id="reward-grid">
-                <!-- Populated by JS -->
+                <!-- Reward Progress Grid -->
+                <div class="reward-grid" id="reward-grid">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div class="bg-[var(--skin__accent_1)]/10 border border-[var(--skin__accent_1)]/20 p-4 rounded-xl">
+                    <p class="text-[11px] text-[var(--skin__accent_1)] leading-relaxed text-center">
+                        Receba bônus automáticos quando seus indicados realizarem depósitos e alcançarem o volume de
+                        apostas necessário.
+                    </p>
+                </div>
             </div>
         </main>
     </div>
@@ -193,15 +259,25 @@
             const existing = document.getElementById('toast-container');
             if (existing) existing.remove();
 
-            const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
+            const colors = {
+                success: 'var(--skin__accent_1)',
+                error: '#ff4b2b',
+                info: 'var(--skin__accent_3)',
+                warning: '#ffa500'
+            };
+
+            const icons = { success: 'check_circle', error: 'error', info: 'info', warning: 'warning' };
+
             const toast = document.createElement('div');
             toast.id = 'toast-container';
-            toast.className = `fixed top-1/2 left-1/2 z-[9999] max-w-[400px] w-[90%] p-6 rounded-2xl bg-[#0e0e0e] border-2 border-white text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-4 transition-all duration-500`;
+            toast.className = `fixed top-1/2 left-1/2 z-[9999] max-w-[320px] w-[90%] p-6 rounded-2xl bg-[#1a1a1a] border border-[var(--skin__border)] text-white shadow-2xl flex flex-col items-center text-center gap-4 transition-all duration-500`;
             toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
             toast.style.opacity = '0';
             toast.innerHTML = `
-                <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-3xl shadow-inner animate-pulse">${icons[type] || icons.info}</div>
-                <span class="text-lg font-black tracking-tight uppercase">${msg}</span>
+                <div class="w-12 h-12 rounded-full flex items-center justify-center text-3xl" style="color: ${colors[type] || colors.info}">
+                    <span class="material-symbols-outlined" style="font-size: 40px;">${icons[type] || 'info'}</span>
+                </div>
+                <span class="text-sm font-bold tracking-wide uppercase">${msg}</span>
             `;
             document.body.appendChild(toast);
             requestAnimationFrame(() => {
@@ -212,7 +288,7 @@
                 toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 500);
-            }, 3000);
+            }, 2500);
         }
 
         async function init() {
@@ -228,7 +304,10 @@
                     currentReferralUrl = data.url;
                     currentInviteCode = data.code;
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+                showToast('Falha ao carregar dados', 'error');
+            }
             renderRewards();
         }
 
@@ -241,8 +320,8 @@
             grid.innerHTML = rewards.map(r => `
                 <div class="reward-card">
                     <img src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/common/common/event/tghdhb3_s2.avif" alt="Gift">
-                    <p class="text-[8px] font-bold text-gray-500 mt-1 uppercase">${r.p} Pessoas</p>
-                    <p class="text-[10px] font-black text-[#FFB800] mt-0.5">R$ ${r.a}</p>
+                    <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">${r.p} Amigos</p>
+                    <p class="text-[11px] font-black text-[var(--skin__accent_3)] mt-0.5">R$ ${r.a}</p>
                 </div>
             `).join('');
         }
