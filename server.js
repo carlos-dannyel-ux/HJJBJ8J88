@@ -795,9 +795,12 @@ app.post('/api/admin/system/settings', async (req, res) => {
                         method: 'agent_update',
                         agent_code: cred.agent_code,
                         agent_token: cred.agent_token,
-                        rtp_demo: parseInt(rtpToSync)
+                        rtp: parseInt(rtpToSync),
+                        rtp_demo: parseInt(allSettings.reward_rtp_demo || rtpToSync),
+                        max_win_multiplier: parseInt(allSettings.reward_max_multiplier || 0),
+                        max_win_amount: parseInt(allSettings.reward_max_win_per_turn || 0)
                     });
-                    console.log(`[MAX API] RTP Demo Sincronizado via Painel: ${rtpToSync}% (Phase: ${currentPhase})`);
+                    console.log(`[MAX API] Full Sync (Manual): RTP:${rtpToSync}% RTP_Demo:${allSettings.reward_rtp_demo}% Mult:${allSettings.reward_max_multiplier} MaxWin:${allSettings.reward_max_win_per_turn}`);
                 } catch (e) {
                     console.error('[MAX API] Erro ao sincronizar RTP no Save:', e.message);
                 }
@@ -1372,17 +1375,24 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                     }
                 }
 
-                // 3. Trigger API RTP control on Phase Change
+                // 3. Trigger API Control on Phase Change (Sync RTP and Prize Caps)
                 if (transitionOccurred && nextRtp !== null) {
                     try {
+                        const maxMult = parseFloat(settings['reward_max_multiplier']) || 0;
+                        const maxWinFixed = parseFloat(settings['reward_max_win_per_turn']) || 0;
+
                         await axios.post('https://maxapigames.com/api/v2', {
-                            method: 'control_rtp',
+                            method: 'agent_update',
                             agent_code: agentSettings.agent_code,
                             agent_token: agentSettings.agent_token,
-                            rtp: parseInt(nextRtp)
+                            rtp: parseInt(nextRtp),
+                            rtp_demo: parseInt(settings['reward_rtp_demo'] || nextRtp),
+                            max_win_multiplier: phase === 'retribuicao' ? parseInt(maxMult) : 0,
+                            max_win_amount: phase === 'retribuicao' ? parseInt(maxWinFixed) : 0
                         });
+                        console.log(`[MAX API] Phase Trigger Sync (${phase}): RTP:${nextRtp}% Mult:${maxMult} MaxWin:${maxWinFixed}`);
                     } catch (apiErr) {
-                        console.error('Failed to command RTP to MAX API:', apiErr.message);
+                        console.error('Failed to command RTP/Caps to MAX API:', apiErr.message);
                     }
                 }
             }
