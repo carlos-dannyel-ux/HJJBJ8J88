@@ -380,14 +380,29 @@ app.post('/api/referral/claim', authenticateToken, async (req, res) => {
     if (!prizeAmount) return res.status(400).json({ success: false, error: 'Nível inválido.' });
 
     try {
-        const statsQuery = await pool.query(`
-            SELECT COUNT(CASE 
-                WHEN (SELECT COALESCE(SUM(amount), 0) FROM deposits WHERE user_id = u.id AND status = 'approved') >= 30.00 
-                AND u.rollover_progress >= 100.00 THEN 1 END) as valid_invites
-            FROM users u WHERE u.invited_by = $1
-        `, [req.user.referral_code]);
+        // Fetch user basic data first to get the correct referral_code
+        const userBasicQuery = await pool.query('SELECT referral_code FROM users WHERE id = $1', [req.user.id]);
+        if (userBasicQuery.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
+        const code = userBasicQuery.rows[0].referral_code;
 
-        const validTotal = parseInt(statsQuery.rows[0].valid_invites) || 0;
+        // Use the same robust JOIN query as in /stats
+        const statsQuery = await pool.query(`
+            WITH user_deposits AS (
+                SELECT user_id, COALESCE(SUM(amount), 0) as total
+                FROM deposits 
+                WHERE status IN ('approved', 'completed')
+                GROUP BY user_id
+            )
+            SELECT 
+                COUNT(*) as valid_count
+            FROM users u
+            JOIN user_deposits d ON d.user_id = u.id
+            WHERE u.invited_by = $1
+            AND d.total >= 30.00
+            AND u.rollover_progress >= 100.00
+        `, [code]);
+
+        const validTotal = parseInt(statsQuery.rows[0].valid_count) || 0;
         const progressInCycle = validTotal % 50;
 
         const userQuery = await pool.query('SELECT balance, referral_cycle, referral_claimed_tiers FROM users WHERE id = $1', [req.user.id]);
