@@ -308,7 +308,47 @@
 
                 <!-- Reward Progress Grid -->
                 <div class="reward-grid" id="reward-grid">
-                    <!-- Populated by JS -->
+                    <!-- Staticaly defined for immediate visibility, states updated by JS -->
+                    <div id="tier-1" class="reward-card opacity-50" style="border-color: var(--skin__border)">
+                        <img src="src/freecart.png" alt="Gift Card">
+                        <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">1 Amigo</p>
+                        <p class="text-[11px] font-black text-gray-400 mt-0.5">R$ 30,00</p>
+                    </div>
+                    <div id="tier-2" class="reward-card opacity-50" style="border-color: var(--skin__border)">
+                        <img src="src/freecart.png" alt="Gift Card">
+                        <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">2 Amigos</p>
+                        <p class="text-[11px] font-black text-gray-400 mt-0.5">R$ 75,00</p>
+                    </div>
+                    <div id="tier-3" class="reward-card opacity-50" style="border-color: var(--skin__border)">
+                        <img src="src/freecart.png" alt="Gift Card">
+                        <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">3 Amigos</p>
+                        <p class="text-[11px] font-black text-gray-400 mt-0.5">R$ 95,00</p>
+                    </div>
+                    <div id="tier-5" class="reward-card opacity-50" style="border-color: var(--skin__border)">
+                        <img src="src/freecart.png" alt="Gift Card">
+                        <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">5 Amigos</p>
+                        <p class="text-[11px] font-black text-gray-400 mt-0.5">R$ 150,00</p>
+                    </div>
+                    <div id="tier-10" class="reward-card opacity-50" style="border-color: var(--skin__border)">
+                        <img src="src/freecart.png" alt="Gift Card">
+                        <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">10 Amigos</p>
+                        <p class="text-[11px] font-black text-gray-400 mt-0.5">R$ 300,00</p>
+                    </div>
+                    <div id="tier-20" class="reward-card opacity-50" style="border-color: var(--skin__border)">
+                        <img src="src/freecart.png" alt="Gift Card">
+                        <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">20 Amigos</p>
+                        <p class="text-[11px] font-black text-gray-400 mt-0.5">R$ 500,00</p>
+                    </div>
+                    <div id="tier-30" class="reward-card opacity-50" style="border-color: var(--skin__border)">
+                        <img src="src/freecart.png" alt="Gift Card">
+                        <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">30 Amigos</p>
+                        <p class="text-[11px] font-black text-gray-400 mt-0.5">R$ 800,00</p>
+                    </div>
+                    <div id="tier-50" class="reward-card opacity-50" style="border-color: var(--skin__border)">
+                        <img src="src/freecart.png" alt="Gift Card">
+                        <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">50 Amigos</p>
+                        <p class="text-[11px] font-black text-gray-400 mt-0.5">R$ 1.000,00</p>
+                    </div>
                 </div>
             </div>
         </main>
@@ -422,41 +462,64 @@
         }
 
         function renderRewards() {
-            const grid = document.getElementById('reward-grid');
             const rewards = [
                 { p: 1, a: '30,00' }, { p: 2, a: '75,00' }, { p: 3, a: '95,00' }, { p: 5, a: '150,00' },
                 { p: 10, a: '300,00' }, { p: 20, a: '500,00' }, { p: 30, a: '800,00' }, { p: 50, a: '1.000,00' }
             ];
 
-            grid.innerHTML = rewards.map(r => {
+            rewards.forEach(r => {
+                const el = document.getElementById(`tier-${r.p}`);
+                if (!el) return;
+
                 const reached = validInvitesTotal >= r.p;
-                const claimed = claimedTiers.includes(r.p);
+                const claimed = (claimedTiers || []).includes(r.p);
                 const canClaim = reached && !claimed;
 
-                let imgSrc = 'src/freecart.png';
-                let notification = '';
-                let onClick = '';
-                let stateOpacity = 'opacity-100';
+                const img = el.querySelector('img');
+                const priceTxt = el.querySelector('p:last-child');
 
-                if (reached) {
-                    imgSrc = 'src/goldcart.png';
-                    if (canClaim) {
-                        notification = '<div class="notification-bubble">1</div>';
-                        onClick = `onclick="claimBonus(${r.p})"`;
-                    } else {
-                        // Resgatado
-                        stateOpacity = 'opacity-70 grayscale-[30%]';
+                // Update Image
+                img.src = reached ? 'src/goldcart.png' : 'src/freecart.png';
+
+                // Update Notification Bubble
+                let bubble = el.querySelector('.notification-bubble');
+                if (canClaim) {
+                    if (!bubble) {
+                        bubble = document.createElement('div');
+                        bubble.className = 'notification-bubble';
+                        bubble.textContent = '1';
+                        el.appendChild(bubble);
                     }
+                    el.onclick = () => claimBonus(r.p);
+                    el.style.borderColor = 'var(--skin__accent_3)';
+                    el.classList.remove('opacity-50', 'opacity-70', 'grayscale-[30%]');
+                    el.classList.add('opacity-100');
+                    priceTxt.className = 'text-[11px] font-black text-[var(--skin__accent_3)] mt-0.5';
+                } else if (claimed) {
+                    if (bubble) bubble.remove();
+                    el.onclick = null;
+                    el.style.borderColor = 'var(--skin__border)';
+                    el.classList.add('opacity-70', 'grayscale-[30%]');
+                    el.classList.remove('opacity-50', 'opacity-100');
+                    priceTxt.className = 'text-[11px] font-black text-gray-400 mt-0.5';
+                } else if (reached) {
+                    // Reached but logic handles claim (should not happen if mapped correctly but for safety)
+                    if (bubble) bubble.remove();
+                    el.onclick = null;
+                    el.style.borderColor = 'var(--skin__border)';
+                    el.classList.remove('opacity-50');
+                    el.classList.add('opacity-100');
+                    priceTxt.className = 'text-[11px] font-black text-gray-400 mt-0.5';
+                } else {
+                    // Not reached
+                    if (bubble) bubble.remove();
+                    el.onclick = null;
+                    el.style.borderColor = 'var(--skin__border)';
+                    el.classList.add('opacity-50');
+                    el.classList.remove('opacity-100', 'opacity-70', 'grayscale-[30%]');
+                    priceTxt.className = 'text-[11px] font-black text-gray-400 mt-0.5';
                 }
-
-                return `
-                <div class="reward-card ${stateOpacity}" ${onClick} style="border-color: ${canClaim ? 'var(--skin__accent_3)' : 'var(--skin__border)'}">
-                    ${notification}
-                    <img src="${imgSrc}" alt="Gift Card">
-                    <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">${r.p} Amigos</p>
-                    <p class="text-[11px] font-black ${canClaim ? 'text-[var(--skin__accent_3)]' : 'text-gray-400'} mt-0.5">R$ ${r.a}</p>
-                </div>
-            `}).join('');
+            });
         }
 
         function copyInviteCode() {

@@ -246,7 +246,7 @@ app.post('/api/user/delete-account', authenticateToken, async (req, res) => {
 });
 
 app.get('/api/referral/qr', authenticateToken, async (req, res) => {
-    const inviteUrl = `https://30win-sitegames-cdn.netlify.app/auth?ref=${req.user.referral_code}`;
+    const inviteUrl = `https://30win-sitegames-cdn.netlify.app/auth.html?ref=${req.user.referral_code}`;
     try {
         const qrCodeData = await qrcode.toDataURL(inviteUrl);
         res.json({ success: true, qr: qrCodeData, url: inviteUrl, code: req.user.referral_code });
