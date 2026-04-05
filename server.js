@@ -275,6 +275,32 @@ app.get('/api/referral/qr', authenticateToken, async (req, res) => {
     }
 });
 
+app.get('/api/referral/history', authenticateToken, async (req, res) => {
+    try {
+        const userQuery = await pool.query('SELECT referral_code FROM users WHERE id = $1', [req.user.id]);
+        const code = userQuery.rows[0]?.referral_code;
+
+        if (!code) return res.json({ success: true, history: [] });
+
+        const historyQuery = await pool.query(`
+            SELECT 
+                u.name,
+                u.phone,
+                u.rollover_progress,
+                (SELECT COALESCE(SUM(amount), 0) FROM deposits WHERE user_id = u.id AND (status = 'completed' OR status = 'approved')) as total_deposited,
+                u.created_at
+            FROM users u
+            WHERE u.invited_by = $1
+            ORDER BY u.created_at DESC
+        `, [code]);
+
+        res.json({ success: true, history: historyQuery.rows });
+    } catch (err) {
+        console.error('Referral History Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao buscar histórico de convites.' });
+    }
+});
+
 app.get('/api/referral/stats', authenticateToken, async (req, res) => {
     try {
         // Query to get Total Invites and Valid Invites

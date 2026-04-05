@@ -179,6 +179,88 @@
             width: 100%;
             overflow: hidden;
         }
+
+        /* Claim Animation */
+        .claim-glow {
+            position: relative;
+        }
+
+        .claim-glow::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 12px;
+            box-shadow: 0 0 20px 10px rgba(255, 170, 9, 0);
+            animation: glow-pulse 1.5s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes glow-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 170, 9, 0.8);
+                transform: scale(1);
+            }
+
+            100% {
+                box-shadow: 0 0 30px 15px rgba(255, 170, 9, 0);
+                transform: scale(1.1);
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            border-radius: 16px;
+            border: 1px solid var(--skin__border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--skin__border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 
@@ -193,8 +275,23 @@
             <div class="flex-1 text-center pr-8">
                 <h1 class="font-bold text-lg uppercase tracking-tight text-[var(--skin__primary)]">Bônus de Convite</h1>
             </div>
-            <a href="#"
-                class="text-[var(--skin__accent_3)] text-xs font-bold no-underline absolute right-4">Histórico</a>
+            <div class="absolute right-4 flex flex-col items-center">
+                <!-- Hot SVG -->
+                <div class="w-10 h-10 -mb-3 z-10">
+                    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"
+                        class="w-full h-full drop-shadow-[0_0_5px_rgba(245,130,31,0.5)]">
+                        <g id="flame" transform="translate(250, 160)">
+                            <path
+                                d="M -70,70 C -110,10 -80,-60 -30,-80 C -15,-86 0,-70 -5,-55 C -10,-40 5,-35 15,-50 C 30,-75 65,-105 100,-95 C 125,-88 110,-55 95,-45 C 130,-45 155,-20 140,15 C 125,50 90,70 65,85 Z"
+                                fill="#F5821F" stroke="#FDBB2E" stroke-width="10" stroke-linejoin="round" />
+                            <text x="25" y="15" font-family="'Arial Black', Impact, sans-serif" font-weight="900"
+                                font-size="65" fill="#FFFFFF" text-anchor="middle" transform="rotate(-5)">Hot</text>
+                        </g>
+                    </svg>
+                </div>
+                <button onclick="openHistory()"
+                    class="text-[var(--skin__accent_3)] text-xs font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">Histórico</button>
+            </div>
         </header>
 
         <main class="flex-1 px-4 pt-6 pb-8 space-y-6">
@@ -277,7 +374,9 @@
                     <h3 class="text-sm font-black text-[var(--skin__primary)] flex items-center gap-2">
                         Como funciona?
                     </h3>
-                    <button class="text-[var(--skin__accent_3)] text-[10px] font-bold uppercase">Ver detalhes</button>
+                    <button onclick="openDetails()"
+                        class="text-[var(--skin__accent_3)] text-[10px] font-bold uppercase transition-all active:scale-95">Ver
+                        detalhes</button>
                 </div>
 
                 <div
@@ -357,9 +456,62 @@
         </main>
     </div>
 
+    <!-- Modal Histórico -->
+    <div id="modalHistory" class="modal-overlay" onclick="closeModal('modalHistory')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="font-bold text-[var(--skin__accent_3)] uppercase text-sm">Histórico de Indicados</h3>
+                <button onclick="closeModal('modalHistory')" class="text-gray-400">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="historyList">
+                <!-- Items populated via JS -->
+                <div class="text-center py-4 text-gray-500">Nenhum indicado cadastrado ainda.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes -->
+    <div id="modalDetails" class="modal-overlay" onclick="closeModal('modalDetails')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="font-bold text-[var(--skin__accent_3)] uppercase text-sm">Como funciona?</h3>
+                <button onclick="closeModal('modalDetails')" class="text-gray-400">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body text-[11px] text-gray-400 space-y-4 leading-relaxed">
+                <div class="bg-[#212121] p-4 rounded-xl border border-gray-800">
+                    <h4 class="text-[var(--skin__accent_3)] font-black uppercase mb-2">1. Convite</h4>
+                    <p>Compartilhe seu link exclusivo com seus amigos. Cada amigo que se cadastrar pelo seu link será
+                        vinculado à sua conta.</p>
+                </div>
+                <div class="bg-[#212121] p-4 rounded-xl border border-gray-800">
+                    <h4 class="text-[var(--skin__accent_3)] font-black uppercase mb-2">2. Qualificação</h4>
+                    <p>Para um convite ser considerado "Válido", o seu indicado deve realizar um depósito mínimo de
+                        <span class="text-white font-bold">R$ 30,00</span> e completar um movimento de apostas
+                        (rollover) de <span class="text-white font-bold">R$ 100,00</span>.
+                    </p>
+                </div>
+                <div class="bg-[#212121] p-4 rounded-xl border border-gray-800">
+                    <h4 class="text-[var(--skin__accent_3)] font-black uppercase mb-2">3. Resgate</h4>
+                    <p>Ao atingir as metas (1, 2, 3 amigos, etc.), os cartões de presente ficarão <span
+                            class="text-[var(--skin__accent_1)] font-bold">Dourados</span>. Clique neles para resgatar o
+                        bônus real imediatamente.</p>
+                </div>
+                <div class="bg-[#212121] p-4 rounded-xl border border-gray-800">
+                    <h4 class="text-[var(--skin__accent_3)] font-black uppercase mb-2">4. Ciclos</h4>
+                    <p>O ciclo reinicia a cada 50 amigos válidos. Você pode repetir o processo e ganhar recompensas sem
+                        limites!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const token = localStorage.getItem('30win_token');
-        if (!token) window.location.href = '/auth.html';
+        if (!token) window.location.href = '/auth';
 
         let currentReferralUrl = '';
         let currentInviteCode = '';
@@ -454,7 +606,14 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast(data.message, 'success');
+                    // Start Animation Effect
+                    const el = document.getElementById(`tier-${tierId}`);
+                    if (el) {
+                        el.classList.add('claim-glow');
+                        setTimeout(() => el.classList.remove('claim-glow'), 1500);
+                    }
+
+                    showToast(data.message || 'Bônus resgatado!', 'success');
                     await loadStats(); // Reload to update cards and cycle
                 } else {
                     showToast(data.error, 'error');
@@ -505,14 +664,6 @@
                     el.classList.add('opacity-70', 'grayscale-[30%]');
                     el.classList.remove('opacity-50', 'opacity-100');
                     priceTxt.className = 'text-[11px] font-black text-gray-400 mt-0.5';
-                } else if (reached) {
-                    // Reached but logic handles claim (should not happen if mapped correctly but for safety)
-                    if (bubble) bubble.remove();
-                    el.onclick = null;
-                    el.style.borderColor = 'var(--skin__border)';
-                    el.classList.remove('opacity-50');
-                    el.classList.add('opacity-100');
-                    priceTxt.className = 'text-[11px] font-black text-gray-400 mt-0.5';
                 } else {
                     // Not reached
                     if (bubble) bubble.remove();
@@ -523,6 +674,55 @@
                     priceTxt.className = 'text-[11px] font-black text-gray-400 mt-0.5';
                 }
             });
+        }
+
+        // Modal Functions
+        function openDetails() {
+            document.getElementById('modalDetails').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        async function openHistory() {
+            const modal = document.getElementById('modalHistory');
+            const list = document.getElementById('historyList');
+            list.innerHTML = '<div class="text-center py-8"><div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[var(--skin__accent_3)]"></div></div>';
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch('/api/referral/history', { headers: { 'Authorization': 'Bearer ' + token } });
+                const data = await res.json();
+
+                if (data.success && data.history && data.history.length > 0) {
+                    list.innerHTML = data.history.map(user => `
+                        <div class="history-item">
+                            <div>
+                                <p class="text-[13px] font-bold text-white">${maskPhone(user.phone)}</p>
+                                <p class="text-[10px] text-gray-400">${new Date(user.created_at).toLocaleDateString('pt-BR')} ${new Date(user.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[12px] font-black ${parseFloat(user.total_deposited) >= 30 ? 'text-[var(--skin__accent_1)]' : 'text-orange-500'}">
+                                    R$ ${parseFloat(user.total_deposited).toFixed(2)}
+                                </p>
+                                <p class="text-[9px] text-gray-500 font-medium">Mov: R$ ${parseFloat(user.rollover_progress).toFixed(2)}/100</p>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div class="text-center py-12 flex flex-col items-center gap-4"><span class="material-symbols-outlined text-4xl text-gray-700">group_off</span><p class="text-gray-500 text-xs">Você ainda não tem indicados ativos.</p></div>';
+                }
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = '<div class="text-center py-8 text-red-500 text-xs">Erro ao carregar histórico.</div>';
+            }
+        }
+
+        function maskPhone(phone) {
+            if (!phone) return 'Explorador';
+            if (phone.length < 8) return phone;
+            return phone.slice(0, 4) + '****' + phone.slice(-2);
         }
 
         function copyInviteCode() {
@@ -554,7 +754,6 @@
 
         init();
     </script>
-
 </body>
 
 </html>
