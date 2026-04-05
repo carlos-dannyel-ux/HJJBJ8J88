@@ -1251,17 +1251,38 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             const settings = {};
             sRows.rows.forEach(r => settings[r.key_name] = r.key_value);
 
-            const maxPrize = parseFloat(settings['reward_max_prize']) || 99999.00;
             const phase = settings['reward_system_phase'] || 'arrecadacao';
-            const rtpArrecadacao = parseFloat(settings['reward_rtp_arrecadacao']) || 5;
 
-            console.log(`[Webhook DEBUG] user_type:${user.user_type} win:${win} maxPrize:${maxPrize} phase:${phase}`);
+            // 1.5 Prize Capping Logic (Only in Retribuicao Phase and for Real/Standard users)
+            if (phase === 'retribuicao' && (!isDemo || user.user_type === 'standard')) {
+                const maxMult = parseFloat(settings['reward_max_multiplier']) || 0;
+                const maxWinFixed = parseFloat(settings['reward_max_win_per_turn']) || 0;
 
-            // 1. PHASE HARD-CAP REVOVOKED
+                let effectiveLimit = Infinity;
+
+                // If multiplier is set (e.g. 50), calculate limit based on bet
+                if (maxMult > 0 && bet > 0) {
+                    effectiveLimit = Math.min(effectiveLimit, bet * maxMult);
+                }
+
+                // If fixed max win is set (e.g. 500), apply it
+                if (maxWinFixed > 0) {
+                    effectiveLimit = Math.min(effectiveLimit, maxWinFixed);
+                }
+
+                if (win > effectiveLimit) {
+                    console.log(`[Webhook CAP] user:${user_code} capping win ${win} to ${effectiveLimit} (mult:${maxMult} fixed:${maxWinFixed})`);
+                    win = effectiveLimit;
+                }
+            }
+
+            console.log(`[Webhook DEBUG] user_type:${user.user_type} win:${win} phase:${phase}`);
+
+            // 1. PHASE HARD-CAP REVOKED
             // Ocultamos a lógica de Hard Cap para evitar dessincronização do painel do jogo.
             // O RTP agora é controlado integralmente pela API (agent_update e control_rtp).
 
-            // 2. GLOBAL MAX PRIZE CAP (Removed safely)
+            // 2. GLOBAL MAX PRIZE CAP (Removed/Replaced)
 
             // Update local balance ATOMICALLY to avoid race conditions and force sync
             const result = await pool.query(

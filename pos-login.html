@@ -688,17 +688,30 @@
                         </div>
                     </div>
 
-                    <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-error">3. Limite de Prejuízo (Trava)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-400 mb-2">Prêmio Máximo por Giro
-                                (R$)</label>
-                            <input type="number" id="reward_max_prize"
-                                class="w-full bg-[#110f2d] border border-error/50 rounded p-3 text-white focus:border-error"
-                                placeholder="Ex: 50">
-                            <p class="text-[10px] text-gray-500 mt-2">Ganhos acima desse valor em um único giro serão
-                                bloqueados pelo Webhook. Ex: limite 50$ (O usuário saca 50$ no maximo num grande
-                                premio).</p>
+                    <div class="p-6 bg-secondary/5 border border-secondary/20 rounded-xl mb-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="material-symbols-outlined text-secondary">security</span>
+                            <h4 class="font-bold text-secondary uppercase tracking-widest text-xs">Limite de Ganho por
+                                Jogada (Fase de Retribuição)</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 mb-2">MULTIPLICADOR MÁXIMO</label>
+                                <input type="number" id="reward_max_multiplier"
+                                    class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary"
+                                    placeholder="Ex: 50">
+                                <p class="text-[10px] text-gray-500 mt-2">Jogador aposta R$10, limite 50x = maximo que
+                                    ganha: R$500</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 mb-2">VALOR MÁXIMO QUE VAI PAGAR
+                                    (R$)</label>
+                                <input type="number" id="reward_max_win_per_turn"
+                                    class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary"
+                                    placeholder="Ex: 50.00">
+                                <p class="text-[10px] text-gray-500 mt-2">Ninguém ganha mais que isso em uma única
+                                    jogada.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -1669,7 +1682,8 @@
                     document.getElementById('reward_meta_retribuicao').value = s.reward_meta_retribuicao || '';
                     document.getElementById('reward_rtp_arrecadacao').value = s.reward_rtp_arrecadacao || '';
                     document.getElementById('reward_rtp_retribuicao').value = s.reward_rtp_retribuicao || '';
-                    document.getElementById('reward_max_prize').value = s.reward_max_prize || '';
+                    if (document.getElementById('reward_max_multiplier')) document.getElementById('reward_max_multiplier').value = s.reward_max_multiplier || '';
+                    if (document.getElementById('reward_max_win_per_turn')) document.getElementById('reward_max_win_per_turn').value = s.reward_max_win_per_turn || '';
                     if (document.getElementById('reward_rtp_demo')) document.getElementById('reward_rtp_demo').value = s.reward_rtp_demo || '';
                 }
 
@@ -1740,7 +1754,8 @@
                 reward_meta_retribuicao: document.getElementById('reward_meta_retribuicao').value,
                 reward_rtp_arrecadacao: document.getElementById('reward_rtp_arrecadacao').value,
                 reward_rtp_retribuicao: document.getElementById('reward_rtp_retribuicao').value,
-                reward_max_prize: document.getElementById('reward_max_prize').value,
+                reward_max_multiplier: document.getElementById('reward_max_multiplier').value,
+                reward_max_win_per_turn: document.getElementById('reward_max_win_per_turn').value,
                 reward_rtp_demo: document.getElementById('reward_rtp_demo') ? document.getElementById('reward_rtp_demo').value : ''
             };
 
