@@ -217,9 +217,15 @@
                                 <span class="material-symbols-outlined"
                                     style="font-variation-settings: 'FILL' 1;">payments</span>
                             </div>
-                            <span
-                                class="font-headline text-sm font-bold tracking-widest text-on-surface-variant uppercase">FATURAMENTO
-                                ATUAL</span>
+                            <div class="flex flex-col flex-1">
+                                <div class="flex items-center justify-between">
+                                    <span
+                                        class="font-headline text-sm font-bold tracking-widest text-on-surface-variant uppercase">FATURAMENTO
+                                        ATUAL</span>
+                                    <input type="month" id="stats_month_picker" onchange="changeStatsPeriod()"
+                                        class="bg-[#1a1837] border border-primary/30 rounded-lg px-2 py-1 text-[10px] text-primary font-bold focus:border-primary focus:outline-none">
+                                </div>
+                            </div>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-on-surface-variant text-lg font-bold">R$</span>
@@ -1512,9 +1518,12 @@
 
         loadApiCredentials();
 
-        async function fetchStats() {
+        async function fetchStats(month = null, year = null) {
             try {
-                const response = await fetch('/api/admin/stats');
+                let url = '/api/admin/stats';
+                if (month && year) url += `?month=${month}&year=${year}`;
+
+                const response = await fetch(url);
                 const data = await response.json();
                 if (data.success) {
                     const billing = parseFloat(data.stats.totalBilling || 0);
@@ -1541,14 +1550,31 @@
                         pText.innerText = `0.0% em relação a ontem`;
                     }
 
-                    const cap = data.stats.serverCapacity || 10;
-                    document.getElementById('server_capacity_text').innerText = `${cap}%`;
-                    document.getElementById('server_capacity_bar').style.width = `${cap}%`;
                 }
             } catch (err) {
                 console.error('Erro ao buscar estatísticas:', err);
             }
         }
+
+        function changeStatsPeriod() {
+            const picker = document.getElementById('stats_month_picker');
+            if (picker.value) {
+                const [year, month] = picker.value.split('-');
+                fetchStats(month, year);
+            }
+        }
+
+        // Initialize picker with current month
+        (function initStatsPicker() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const picker = document.getElementById('stats_month_picker');
+            if (picker) {
+                picker.value = `${year}-${month}`;
+            }
+            fetchStats(month, year);
+        })();
 
         async function loadDashboardDeposits() {
             const tbody = document.getElementById('dashboard-deposits-tbody');

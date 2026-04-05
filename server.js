@@ -304,18 +304,29 @@ app.post('/api/admin/login', async (req, res) => {
 
 app.get('/api/admin/stats', async (req, res) => {
     try {
-        // Faturamento mensal: soma de depósitos PIX concluídos no mês atual
-        const billingResult = await pool.query(`
-            SELECT COALESCE(SUM(d.amount), 0) as total
-            FROM deposits d
-            WHERE d.status = 'completed'
-              AND d.method = 'PIX'
-              AND DATE_TRUNC('month', d.created_at) = DATE_TRUNC('month', NOW())
-        `);
+        const { month, year } = req.query;
+        const now = new Date();
+        const currentMonth = month ? parseInt(month) : now.getMonth() + 1;
+        const currentYear = year ? parseInt(year) : now.getFullYear();
 
-        // Faturamento de ontem para a %
+        // Faturamento real: Depósitos concluídos - Saques aprovados no período
+        const billingResult = await pool.query(`
+            SELECT 
+                (SELECT COALESCE(SUM(amount), 0) FROM deposits 
+                 WHERE status = 'completed' 
+                   AND EXTRACT(MONTH FROM created_at) = $1 
+                   AND EXTRACT(YEAR FROM created_at) = $2)
+                -
+                (SELECT COALESCE(SUM(amount), 0) FROM withdrawals 
+                 WHERE status = 'approved' 
+                   AND EXTRACT(MONTH FROM created_at) = $1 
+                   AND EXTRACT(YEAR FROM created_at) = $2)
+            as total
+        `, [currentMonth, currentYear]);
+
+        // Faturamento de ontem para a % (sempre relativo ao mês/ano atual do servidor para simplicidade)
         const yesterdayBilling = await pool.query(`
-            SELECT COALESCE(SUM(d.amount), 0) as total
+            SELECT COALESCE(SUM(amount), 0) as total
             FROM deposits d
             WHERE d.status = 'completed'
               AND d.method = 'PIX'
@@ -324,7 +335,7 @@ app.get('/api/admin/stats', async (req, res) => {
 
         // Faturamento de hoje (para comparar com ontem)
         const todayBilling = await pool.query(`
-            SELECT COALESCE(SUM(d.amount), 0) as total
+            SELECT COALESCE(SUM(amount), 0) as total
             FROM deposits d
             WHERE d.status = 'completed'
               AND d.method = 'PIX'
@@ -337,7 +348,7 @@ app.get('/api/admin/stats', async (req, res) => {
         if (tYesterday > 0) {
             pChange = ((tToday - tYesterday) / tYesterday) * 100;
         } else if (tToday > 0) {
-            pChange = 100; // se ontem foi 0 e hoje > 0, 100% de aumento
+            pChange = 100;
         }
 
         // Jogadores ativos: usuários com last_active nos últimos 5 minutos
