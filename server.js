@@ -313,21 +313,29 @@ app.get('/api/referral/stats', authenticateToken, async (req, res) => {
         // Debugging log for Netlify environment
         console.log(`[ReferralStats] User: ${req.user.id}, Code: ${code}`);
 
-        // Query to get Total Invites and Valid Invites
+        // Query to get Total Invites and Valid Invites (Using JOIN for better reliability)
         const statsQuery = await pool.query(`
+            WITH user_deposits AS (
+                SELECT user_id, COALESCE(SUM(amount), 0) as total
+                FROM deposits 
+                WHERE status IN ('approved', 'completed')
+                GROUP BY user_id
+            )
             SELECT 
-                COUNT(*) as total_invites,
-                COUNT(CASE 
-                    WHEN (SELECT COALESCE(SUM(amount), 0) FROM deposits WHERE user_id = u.id AND (status = 'approved' OR status = 'completed')) >= 30.00 
-                    AND u.rollover_progress >= 100.00 
-                    THEN 1 END) as valid_invites
+                u.id, 
+                u.phone,
+                u.rollover_progress,
+                COALESCE(d.total, 0) as total_deposited,
+                (COALESCE(d.total, 0) >= 30.00 AND u.rollover_progress >= 100.00) as is_valid
             FROM users u
+            LEFT JOIN user_deposits d ON d.user_id = u.id
             WHERE u.invited_by = $1
         `, [code]);
 
+        const referredUsers = statsQuery.rows;
+        const validTotal = referredUsers.filter(u => u.is_valid).length;
+        const totalSubordinates = referredUsers.length;
 
-        const validTotal = parseInt(statsQuery.rows[0].valid_invites) || 0;
-        const totalSubordinates = parseInt(statsQuery.rows[0].total_invites) || 0;
         const cycle = user.referral_cycle || 0;
         let claimedTiers = [];
         try { claimedTiers = JSON.parse(user.referral_claimed_tiers || '[]'); } catch (e) { }
@@ -341,7 +349,8 @@ app.get('/api/referral/stats', authenticateToken, async (req, res) => {
                 validTotal,
                 progressInCycle,
                 cycle,
-                claimedTiers
+                claimedTiers,
+                debug: referredUsers // This helps us see why they are or aren't valid
             }
         });
     } catch (err) {
