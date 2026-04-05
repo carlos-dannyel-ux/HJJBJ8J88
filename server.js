@@ -303,12 +303,15 @@ app.get('/api/referral/history', authenticateToken, async (req, res) => {
 
 app.get('/api/referral/stats', authenticateToken, async (req, res) => {
     try {
-        // Fetch user referral code from DB to be safe (JWT might be old)
-        const userQuery = await pool.query('SELECT referral_code, referral_cycle, referral_claimed_tiers FROM users WHERE id = $1', [req.user.id]);
+        // Fetch user by ID or ID_USER to be extremely resilient with old tokens
+        const userQuery = await pool.query('SELECT referral_code, referral_cycle, referral_claimed_tiers FROM users WHERE id = $1 OR id_user = $1::text', [req.user.id]);
         if (userQuery.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
 
         const user = userQuery.rows[0];
         const code = user.referral_code || '';
+
+        // Debugging log for Netlify environment
+        console.log(`[ReferralStats] User: ${req.user.id}, Code: ${code}`);
 
         // Query to get Total Invites and Valid Invites
         const statsQuery = await pool.query(`
