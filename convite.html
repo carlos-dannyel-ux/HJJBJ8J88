@@ -389,11 +389,11 @@
                 const data = await res.json();
                 if (data.success) {
                     const stats = data.stats;
-                    validInvitesTotal = stats.progressInCycle;
-                    claimedTiers = stats.claimedTiers;
+                    validInvitesTotal = stats.progressInCycle || 0;
+                    claimedTiers = stats.claimedTiers || [];
 
                     document.getElementById('validInvitesCount').textContent = validInvitesTotal;
-                    document.getElementById('totalInvitesCount').textContent = stats.totalSubordinates;
+                    document.getElementById('totalInvitesCount').textContent = stats.totalSubordinates || 0;
 
                     renderRewards();
                 }
@@ -433,13 +433,13 @@
                 const claimed = claimedTiers.includes(r.p);
                 const canClaim = reached && !claimed;
 
-                let imgSrc = '/src/freecart.png';
+                let imgSrc = 'src/freecart.png';
                 let notification = '';
                 let onClick = '';
                 let stateOpacity = 'opacity-100';
 
                 if (reached) {
-                    imgSrc = '/src/goldcart.png';
+                    imgSrc = 'src/goldcart.png';
                     if (canClaim) {
                         notification = '<div class="notification-bubble">1</div>';
                         onClick = `onclick="claimBonus(${r.p})"`;
