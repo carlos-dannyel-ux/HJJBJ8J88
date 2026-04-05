@@ -303,6 +303,13 @@ app.get('/api/referral/history', authenticateToken, async (req, res) => {
 
 app.get('/api/referral/stats', authenticateToken, async (req, res) => {
     try {
+        // Fetch user referral code from DB to be safe (JWT might be old)
+        const userQuery = await pool.query('SELECT referral_code, referral_cycle, referral_claimed_tiers FROM users WHERE id = $1', [req.user.id]);
+        if (userQuery.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
+
+        const user = userQuery.rows[0];
+        const code = user.referral_code || '';
+
         // Query to get Total Invites and Valid Invites
         const statsQuery = await pool.query(`
             SELECT 
@@ -313,15 +320,14 @@ app.get('/api/referral/stats', authenticateToken, async (req, res) => {
                     THEN 1 END) as valid_invites
             FROM users u
             WHERE u.invited_by = $1
-        `, [req.user.referral_code]);
+        `, [code]);
 
-        const userQuery = await pool.query('SELECT referral_cycle, referral_claimed_tiers FROM users WHERE id = $1', [req.user.id]);
 
         const validTotal = parseInt(statsQuery.rows[0].valid_invites) || 0;
         const totalSubordinates = parseInt(statsQuery.rows[0].total_invites) || 0;
-        const cycle = userQuery.rows[0].referral_cycle || 0;
+        const cycle = user.referral_cycle || 0;
         let claimedTiers = [];
-        try { claimedTiers = JSON.parse(userQuery.rows[0].referral_claimed_tiers || '[]'); } catch (e) { }
+        try { claimedTiers = JSON.parse(user.referral_claimed_tiers || '[]'); } catch (e) { }
 
         const progressInCycle = validTotal % 50;
 

@@ -241,6 +241,41 @@
             transform-origin: bottom center;
         }
 
+        /* Fly Animation */
+        .fly-particle {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle, var(--skin__accent_3), var(--skin__accent_1));
+            border-radius: 50%;
+            box-shadow: 0 0 20px 8px var(--skin__accent_3);
+            z-index: 9999;
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 1;
+        }
+
+        @keyframes counter-pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.4);
+                color: white;
+                text-shadow: 0 0 10px white;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse-effect {
+            animation: counter-pulse 0.6s ease-out;
+            display: inline-block;
+        }
+
         /* Modal Styles */
         .modal-overlay {
             position: fixed;
@@ -680,11 +715,13 @@
                     const el = document.getElementById(`tier-${tierId}`);
                     if (el) {
                         el.classList.add('claim-glow');
+                        // Trigger Fly Animation
+                        animateRewardToCounter(`tier-${tierId}`);
                         setTimeout(() => el.classList.remove('claim-glow'), 1500);
                     }
 
                     showToast(data.message || 'Bônus resgatado!', 'success');
-                    await loadStats(); // Reload to update cards and cycle
+                    setTimeout(() => loadStats(), 800); // Reload after animation arrives
                 } else {
                     showToast(data.error, 'error');
                 }
@@ -793,6 +830,35 @@
             if (!phone) return 'Explorador';
             if (phone.length < 8) return phone;
             return phone.slice(0, 4) + '****' + phone.slice(-2);
+        }
+
+        function animateRewardToCounter(cardId) {
+            const card = document.getElementById(cardId);
+            const counter = document.getElementById('validInvitesCount');
+            if (!card || !counter) return;
+
+            const cardRect = card.getBoundingClientRect();
+            const counterRect = counter.getBoundingClientRect();
+
+            const particle = document.createElement('div');
+            particle.className = 'fly-particle';
+            particle.style.left = `${cardRect.left + cardRect.width / 2}px`;
+            particle.style.top = `${cardRect.top + cardRect.height / 2}px`;
+            document.body.appendChild(particle);
+
+            // Force reflow
+            particle.offsetWidth;
+
+            particle.style.left = `${counterRect.left + counterRect.width / 2}px`;
+            particle.style.top = `${counterRect.top + counterRect.height / 2}px`;
+            particle.style.transform = 'scale(0.3)';
+            particle.style.opacity = '0.5';
+
+            setTimeout(() => {
+                particle.remove();
+                counter.classList.add('pulse-effect');
+                setTimeout(() => counter.classList.remove('pulse-effect'), 600);
+            }, 800);
         }
 
         function copyInviteCode() {
