@@ -1322,7 +1322,7 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                         nextRtp = rtpRetribuicao;
                     }
                 } else if (phase === 'retribuicao') {
-                    const diff = (win - bet > 0 ? win - bet : 0);
+                    const diff = win > 0 ? win : 0; // Contabiliza o valor total do prêmio (win)
                     // ATOMIC UPDATE: currentRetribuicao += diff
                     await pool.query(`
                         UPDATE system_settings 
