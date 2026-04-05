@@ -263,7 +263,9 @@ app.get('/api/referral/qr', authenticateToken, async (req, res) => {
             await pool.query('UPDATE users SET referral_code = $1 WHERE id = $2', [code, req.user.id]);
         }
 
-        const inviteUrl = `https://30win-sitegames-cdn.netlify.app/auth?ref=${code}`;
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        const host = req.headers['host'];
+        const inviteUrl = `${protocol}://${host}/auth?ref=${code}`;
         const qrCodeData = await qrcode.toDataURL(inviteUrl);
 
         res.json({ success: true, qr: qrCodeData, url: inviteUrl, code: code });
