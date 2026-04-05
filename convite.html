@@ -692,7 +692,13 @@
                     validInvitesTotal = stats.progressInCycle || 0;
                     claimedTiers = stats.claimedTiers || [];
 
-                    document.getElementById('validInvitesCount').textContent = validInvitesTotal;
+                    // The counter should show the HIGHEST CLAIMED Tier value
+                    let displayCount = 0;
+                    if (claimedTiers.length > 0) {
+                        displayCount = Math.max(...claimedTiers.map(t => parseInt(t)));
+                    }
+
+                    document.getElementById('validInvitesCount').textContent = displayCount;
                     document.getElementById('totalInvitesCount').textContent = stats.totalSubordinates || 0;
 
                     renderRewards();
@@ -856,6 +862,11 @@
 
             setTimeout(() => {
                 particle.remove();
+
+                // Update counter with the new tier value visually
+                const countEl = document.getElementById('validInvitesCount');
+                countEl.textContent = cardId.replace('tier-', '');
+
                 counter.classList.add('pulse-effect');
                 setTimeout(() => counter.classList.remove('pulse-effect'), 600);
             }, 800);
