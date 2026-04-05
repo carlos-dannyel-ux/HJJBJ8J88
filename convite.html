@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet">
     <style>
-        :root {
+        <style> :root {
             --skin__home_bg: #161616;
             --skin__primary: #F4F0EC;
             --skin__accent_3: #FFAA09;
@@ -99,17 +99,60 @@
             padding: 10px 5px;
             text-align: center;
             position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .reward-card:active {
+            transform: scale(0.95);
         }
 
         .reward-card img {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 60px;
             object-fit: contain;
             margin-bottom: 8px;
+        }
+
+        .notification-bubble {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ff4b2b;
+            color: white;
+            font-size: 10px;
+            font-weight: 900;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid var(--skin__bg_1);
+            animation: bounce-pulse 2s infinite;
+        }
+
+        @keyframes bounce-pulse {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            40% {
+                transform: translateY(-3px) scale(1.1);
+                box-shadow: 0 0 8px rgba(255, 75, 43, 0.8);
+            }
+
+            60% {
+                transform: translateY(-1px) scale(1.1);
+            }
         }
 
         .btn-copy {
@@ -184,7 +227,7 @@
                         </div>
                         <p class="text-[11px] text-[var(--skin__neutral_1)] leading-snug">
                             <span class="text-[var(--skin__accent_1)] font-bold">Ganhe bônus!</span> Compartilhe seu
-                            link exclusivo e receba recompensas por cada amigo que começar a jogar.
+                            link exclusivo e receba recompensas.
                         </p>
                     </div>
                 </div>
@@ -233,16 +276,38 @@
                     <button class="text-[var(--skin__accent_3)] text-[10px] font-bold uppercase">Ver detalhes</button>
                 </div>
 
+                <div
+                    class="bg-[var(--skin__bg_1)] border border-[var(--skin__border)] px-4 py-3 rounded-lg flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] text-[var(--skin__neutral_1)] uppercase font-bold">Convites Válidos</p>
+                        <p class="text-xl font-black text-[var(--skin__accent_1)]"><span
+                                id="validInvitesCount">0</span>/50</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-[var(--skin__neutral_1)] uppercase font-bold">Total (Todas
+                            convocações)</p>
+                        <p class="text-[14px] font-bold text-gray-300" id="totalInvitesCount">0</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-[var(--skin__accent_1)]/10 border border-[var(--skin__accent_1)]/20 p-4 rounded-xl space-y-2">
+                    <p class="text-[11px] text-[var(--skin__accent_1)] leading-relaxed font-medium">
+                        O seu bônus de indicação será liberado para resgate automaticamente quando o amigo que você
+                        convidou cumprir estas regras básicas de atividade:
+                    </p>
+                    <ul class="text-[10px] text-[var(--skin__neutral_1)] list-disc pl-4 space-y-1">
+                        <li>Fizer um <span class="text-[var(--skin__primary)] font-bold">primeiro depósito de no mínimo
+                                R$ 30,00</span>.</li>
+                        <li>Possuir uma movimentação na plataforma com <span
+                                class="text-[var(--skin__primary)] font-bold">volume de apostas de no mínimo R$
+                                100,00</span>.</li>
+                    </ul>
+                </div>
+
                 <!-- Reward Progress Grid -->
                 <div class="reward-grid" id="reward-grid">
                     <!-- Populated by JS -->
-                </div>
-
-                <div class="bg-[var(--skin__accent_1)]/10 border border-[var(--skin__accent_1)]/20 p-4 rounded-xl">
-                    <p class="text-[11px] text-[var(--skin__accent_1)] leading-relaxed text-center">
-                        Receba bônus automáticos quando seus indicados realizarem depósitos e alcançarem o volume de
-                        apostas necessário.
-                    </p>
                 </div>
             </div>
         </main>
@@ -254,6 +319,8 @@
 
         let currentReferralUrl = '';
         let currentInviteCode = '';
+        let validInvitesTotal = 0;
+        let claimedTiers = [];
 
         function showToast(msg, type = 'info') {
             const existing = document.getElementById('toast-container');
@@ -293,6 +360,7 @@
 
         async function init() {
             try {
+                // Fetch QR code & Base URL
                 const res = await fetch('/api/referral/qr', { headers: { 'Authorization': 'Bearer ' + token } });
                 const data = await res.json();
                 if (data.success) {
@@ -304,26 +372,90 @@
                     currentReferralUrl = data.url;
                     currentInviteCode = data.code;
                 }
+
+                // Fetch Stats
+                await loadStats();
+
             } catch (e) {
                 console.error(e);
                 showToast('Falha ao carregar dados', 'error');
             }
-            renderRewards();
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/referral/stats', { headers: { 'Authorization': 'Bearer ' + token } });
+                const data = await res.json();
+                if (data.success) {
+                    const stats = data.stats;
+                    validInvitesTotal = stats.progressInCycle;
+                    claimedTiers = stats.claimedTiers;
+
+                    document.getElementById('validInvitesCount').textContent = validInvitesTotal;
+                    document.getElementById('totalInvitesCount').textContent = stats.totalSubordinates;
+
+                    renderRewards();
+                }
+            } catch (e) {
+                console.error('Stats fetch error:', e);
+            }
+        }
+
+        async function claimBonus(tierId) {
+            try {
+                const res = await fetch('/api/referral/claim', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tierId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    await loadStats(); // Reload to update cards and cycle
+                } else {
+                    showToast(data.error, 'error');
+                }
+            } catch (e) {
+                showToast('Erro ao resgatar', 'error');
+            }
         }
 
         function renderRewards() {
             const grid = document.getElementById('reward-grid');
             const rewards = [
-                { p: 1, a: '30' }, { p: 2, a: '30' }, { p: 3, a: '30' }, { p: 5, a: '50' },
-                { p: 10, a: '150' }, { p: 20, a: '300' }, { p: 30, a: '500' }, { p: 50, a: '1.000' }
+                { p: 1, a: '30,00' }, { p: 2, a: '75,00' }, { p: 3, a: '95,00' }, { p: 5, a: '150,00' },
+                { p: 10, a: '300,00' }, { p: 20, a: '500,00' }, { p: 30, a: '800,00' }, { p: 50, a: '1.000,00' }
             ];
-            grid.innerHTML = rewards.map(r => `
-                <div class="reward-card">
-                    <img src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/skin/lobby_asset/common/common/event/tghdhb3_s2.avif" alt="Gift">
+
+            grid.innerHTML = rewards.map(r => {
+                const reached = validInvitesTotal >= r.p;
+                const claimed = claimedTiers.includes(r.p);
+                const canClaim = reached && !claimed;
+
+                let imgSrc = '/src/freecart.png';
+                let notification = '';
+                let onClick = '';
+                let stateOpacity = 'opacity-100';
+
+                if (reached) {
+                    imgSrc = '/src/goldcart.png';
+                    if (canClaim) {
+                        notification = '<div class="notification-bubble">1</div>';
+                        onClick = `onclick="claimBonus(${r.p})"`;
+                    } else {
+                        // Resgatado
+                        stateOpacity = 'opacity-70 grayscale-[30%]';
+                    }
+                }
+
+                return `
+                <div class="reward-card ${stateOpacity}" ${onClick} style="border-color: ${canClaim ? 'var(--skin__accent_3)' : 'var(--skin__border)'}">
+                    ${notification}
+                    <img src="${imgSrc}" alt="Gift Card">
                     <p class="text-[9px] font-bold text-[var(--skin__neutral_1)] uppercase">${r.p} Amigos</p>
-                    <p class="text-[11px] font-black text-[var(--skin__accent_3)] mt-0.5">R$ ${r.a}</p>
+                    <p class="text-[11px] font-black ${canClaim ? 'text-[var(--skin__accent_3)]' : 'text-gray-400'} mt-0.5">R$ ${r.a}</p>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function copyInviteCode() {
@@ -355,6 +487,7 @@
 
         init();
     </script>
+
 </body>
 
 </html>

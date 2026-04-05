@@ -246,10 +246,10 @@ app.post('/api/user/delete-account', authenticateToken, async (req, res) => {
 });
 
 app.get('/api/referral/qr', authenticateToken, async (req, res) => {
-    const inviteUrl = `/AUTH.HTML?ref=${req.user.referral_code}`;
+    const inviteUrl = `https://30win-sitegames-cdn.netlify.app/auth.html?ref=${req.user.referral_code}`;
     try {
         const qrCodeData = await qrcode.toDataURL(inviteUrl);
-        res.json({ success: true, qr: qrCodeData, url: inviteUrl });
+        res.json({ success: true, qr: qrCodeData, url: inviteUrl, code: req.user.referral_code });
     } catch (err) {
         res.status(500).json({ success: false, error: 'Erro ao gerar QR Code.' });
     }
@@ -257,9 +257,38 @@ app.get('/api/referral/qr', authenticateToken, async (req, res) => {
 
 app.get('/api/referral/stats', authenticateToken, async (req, res) => {
     try {
-        const subs = await pool.query('SELECT COUNT(*) as count FROM users WHERE invited_by = $1', [req.user.referral_code]);
-        const user = await pool.query('SELECT rewards_pending FROM users WHERE id = $1', [req.user.id]);
-        res.json({ success: true, stats: { totalSubordinates: parseInt(subs.rows[0].count), rewardsPending: user.rows[0].rewards_pending } });
+        // Query to get Total Invites and Valid Invites
+        const statsQuery = await pool.query(`
+            SELECT 
+                COUNT(*) as total_invites,
+                COUNT(CASE 
+                    WHEN (SELECT COALESCE(SUM(amount), 0) FROM deposits WHERE user_id = u.id AND status = 'approved') >= 30.00 
+                    AND u.rollover_progress >= 100.00 
+                    THEN 1 END) as valid_invites
+            FROM users u
+            WHERE u.invited_by = $1
+        `, [req.user.referral_code]);
+
+        const userQuery = await pool.query('SELECT referral_cycle, referral_claimed_tiers FROM users WHERE id = $1', [req.user.id]);
+
+        const validTotal = parseInt(statsQuery.rows[0].valid_invites) || 0;
+        const totalSubordinates = parseInt(statsQuery.rows[0].total_invites) || 0;
+        const cycle = userQuery.rows[0].referral_cycle || 0;
+        let claimedTiers = [];
+        try { claimedTiers = JSON.parse(userQuery.rows[0].referral_claimed_tiers || '[]'); } catch (e) { }
+
+        const progressInCycle = validTotal % 50;
+
+        res.json({
+            success: true,
+            stats: {
+                totalSubordinates,
+                validTotal,
+                progressInCycle,
+                cycle,
+                claimedTiers
+            }
+        });
     } catch (err) {
         console.error('Referral Stats Error:', err);
         res.status(500).json({ success: false, error: 'Erro ao buscar convites.' });
@@ -267,16 +296,72 @@ app.get('/api/referral/stats', authenticateToken, async (req, res) => {
 });
 
 app.post('/api/referral/claim', authenticateToken, async (req, res) => {
-    try {
-        const user = await pool.query('SELECT rewards_pending FROM users WHERE id = $1', [req.user.id]);
-        const amount = parseFloat(user.rows[0].rewards_pending);
-        if (amount <= 0) return res.status(400).json({ success: false, error: 'Nenhum prêmio para resgatar.' });
+    const { tierId } = req.body;
+    if (!tierId) return res.status(400).json({ success: false, error: 'Nível não informado.' });
 
-        await pool.query('UPDATE users SET balance = balance + $1, rewards_pending = 0 WHERE id = $2', [amount, req.user.id]);
-        res.json({ success: true, message: `R$ ${amount.toFixed(2)} resgatados com sucesso!` });
+    // Tabela de valores (p: pessoas, a: amount)
+    const rewardsMap = {
+        1: 30.00,
+        2: 75.00,
+        3: 95.00,
+        5: 150.00,
+        10: 300.00, // Preços padrão do template
+        20: 500.00,
+        30: 800.00,
+        50: 1000.00
+    };
+
+    const prizeAmount = rewardsMap[tierId];
+    if (!prizeAmount) return res.status(400).json({ success: false, error: 'Nível inválido.' });
+
+    try {
+        const statsQuery = await pool.query(`
+            SELECT COUNT(CASE 
+                WHEN (SELECT COALESCE(SUM(amount), 0) FROM deposits WHERE user_id = u.id AND status = 'approved') >= 30.00 
+                AND u.rollover_progress >= 100.00 THEN 1 END) as valid_invites
+            FROM users u WHERE u.invited_by = $1
+        `, [req.user.referral_code]);
+
+        const validTotal = parseInt(statsQuery.rows[0].valid_invites) || 0;
+        const progressInCycle = validTotal % 50;
+
+        const userQuery = await pool.query('SELECT balance, referral_cycle, referral_claimed_tiers FROM users WHERE id = $1', [req.user.id]);
+
+        let claimedTiers = [];
+        try { claimedTiers = JSON.parse(userQuery.rows[0].referral_claimed_tiers || '[]'); } catch (e) { }
+
+        // Se o número de amigos convidados no ciclo atual é menor que o tier
+        if (progressInCycle < tierId && !(validTotal >= 50 && tierId === 50)) {
+            return res.status(400).json({ success: false, error: 'Meta não alcançada.' });
+        }
+
+        // Se já resgatou
+        if (claimedTiers.includes(tierId)) {
+            return res.status(400).json({ success: false, error: 'Prêmio já resgatado.' });
+        }
+
+        // Adiciona à conta (conta como real/bônus balance)
+        // E registra o tier claimed
+        claimedTiers.push(tierId);
+
+        let newCycle = userQuery.rows[0].referral_cycle;
+        let newClaimedTiersStr = JSON.stringify(claimedTiers);
+
+        // Se resgatou o 50, incrementa o ciclo e reseta o claimed
+        if (tierId === 50) {
+            newCycle += 1;
+            newClaimedTiersStr = '[]';
+        }
+
+        await pool.query(
+            'UPDATE users SET balance = balance + $1, bonus_balance = bonus_balance + $1, referral_cycle = $2, referral_claimed_tiers = $3 WHERE id = $4',
+            [prizeAmount, newCycle, newClaimedTiersStr, req.user.id]
+        );
+
+        res.json({ success: true, message: `Bônus de R$ ${prizeAmount.toFixed(2)} resgatado com sucesso!` });
     } catch (err) {
         console.error('Claim Error:', err);
-        res.status(500).json({ success: false, error: 'Erro ao resgatar.' });
+        res.status(500).json({ success: false, error: 'Erro ao resgatar bônus.' });
     }
 });
 
