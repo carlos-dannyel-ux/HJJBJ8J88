@@ -1,6 +1,10 @@
 [build]
   command = "npm install"
   publish = "."
+  [build.processing]
+    skip_processing = false
+    [build.processing.html]
+      pretty_urls = true
   [build.environment]
     SECRETS_SCAN_ENABLED = "false"
 
@@ -11,6 +15,42 @@
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Explicit Page Redirects
+[[redirects]]
+  from = "/auth"
+  to = "/auth.html"
+  status = 200
+
+[[redirects]]
+  from = "/convite"
+  to = "/convite.html"
+  status = 200
+
+[[redirects]]
+  from = "/perfil"
+  to = "/perfil.html"
+  status = 200
+
+[[redirects]]
+  from = "/deposito"
+  to = "/deposito.html"
+  status = 200
+
+[[redirects]]
+  from = "/saques"
+  to = "/saques.html"
+  status = 200
+
+[[redirects]]
+  from = "/bonus"
+  to = "/bonus.html"
+  status = 200
+
+[[redirects]]
+  from = "/registros"
+  to = "/registros.html"
   status = 200
 
 [[redirects]]
