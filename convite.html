@@ -341,11 +341,11 @@
             <div class="flex-1 text-center">
                 <h1 class="font-bold text-lg uppercase tracking-tight text-[var(--skin__primary)]">Bônus de Convite</h1>
             </div>
-            <div class="flex flex-col items-center gap-0" style="margin-left: auto;">
-                <!-- Full SVG Hot + Gift -->
-                <div class="w-8 h-8 z-10 animate-gift">
+            <button onclick="openHistory()"
+                class="flex items-center gap-1 ml-auto hover:brightness-110 active:scale-95 transition-all">
+                <div class="w-7 h-7 animate-gift">
                     <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"
-                        class="w-full h-full drop-shadow-[0_5px_15px_rgba(245,130,31,0.4)]">
+                        class="w-full h-full drop-shadow-[0_3px_8px_rgba(245,130,31,0.4)]">
                         <rect width="500" height="500" fill="transparent" />
                         <g id="flame" transform="translate(250, 160)">
                             <path
@@ -394,9 +394,9 @@
                         </g>
                     </svg>
                 </div>
-                <button onclick="openHistory()"
-                    class="text-[var(--skin__accent_3)] text-[9px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all leading-none">Histórico</button>
-            </div>
+                <span
+                    class="text-[var(--skin__accent_3)] text-[10px] font-black uppercase tracking-wider">Histórico</span>
+            </button>
         </header>
 
         <main class="flex-1 px-4 pt-6 pb-8 space-y-6">
