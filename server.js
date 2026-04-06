@@ -54,6 +54,27 @@ if (process.env.NODE_ENV === 'production') {
         .catch(err => console.error('Database connection failed on startup:', err.message));
 }
 
+// Auto-migrate schema updates
+pool.query('ALTER TABLE users ADD COLUMN pwa_claimed BOOLEAN DEFAULT false').catch(() => { });
+pool.query(`
+    CREATE TABLE IF NOT EXISTS floating_popups (
+        id SERIAL PRIMARY KEY,
+        image_url TEXT NOT NULL,
+        position VARCHAR(50) DEFAULT 'left',
+        link_url TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+`).catch(console.error);
+
+pool.query(`
+    CREATE TABLE IF NOT EXISTS entry_popups (
+        id SERIAL PRIMARY KEY,
+        image_url TEXT NOT NULL,
+        link_url TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+`).catch(console.error);
+
 // --- Middleware: Verify JWT ---
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -73,6 +94,9 @@ const authenticateToken = (req, res, next) => {
 app.post('/api/auth/register', async (req, res) => {
     const { phone, password, invitedBy } = req.body;
     if (!phone || !password) return res.status(400).json({ success: false, error: 'Telefone e senha obrigatórios.' });
+
+    const phoneStr = String(phone).replace(/\\D/g, '');
+    if (phoneStr.length !== 11) return res.status(400).json({ success: false, error: 'O número de telefone deve ter exatamente 11 dígitos numéricos.' });
 
     try {
         // Check phone uniqueness
@@ -121,6 +145,10 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
     const { phone, password } = req.body;
+    if (!phone || !password) return res.status(400).json({ success: false, error: 'Telefone e senha obrigatórios.' });
+
+    const phoneStr = String(phone).replace(/\\D/g, '');
+    if (phoneStr.length !== 11) return res.status(400).json({ success: false, error: 'O número de telefone deve ter exatamente 11 dígitos numéricos.' });
     try {
         const rows = await pool.query('SELECT * FROM users WHERE phone = $1', [phone]);
         if (rows.rows.length === 0) return res.status(400).json({ success: false, error: 'Usuário não encontrado.' });
@@ -183,6 +211,25 @@ app.get('/api/user/withdrawals', authenticateToken, async (req, res) => {
     } catch (err) {
         console.error('Fetch Withdrawals Error:', err);
         res.status(500).json({ success: false, error: 'Erro ao buscar saques.' });
+    }
+});
+
+app.post('/api/user/claim-pwa', authenticateToken, async (req, res) => {
+    try {
+        const userQuery = await pool.query('SELECT pwa_claimed FROM users WHERE id = $1', [req.user.id]);
+        if (userQuery.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
+        if (userQuery.rows[0].pwa_claimed) return res.status(400).json({ success: false, error: 'Bônus já resgatado.' });
+
+        const bonusAmount = 15.00;
+        await pool.query(
+            'UPDATE users SET balance = balance + $1, bonus_balance = bonus_balance + $1, pwa_claimed = true WHERE id = $2',
+            [bonusAmount, req.user.id]
+        );
+
+        res.json({ success: true, message: 'Bônus de Instalação (R$ 15) resgatado!' });
+    } catch (err) {
+        console.error('Claim PWA Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao resgatar bônus.' });
     }
 });
 
@@ -573,6 +620,66 @@ app.get('/api/admin/dashboard-deposits', async (req, res) => {
     } catch (err) {
         console.error('Dashboard Deposits Error:', err);
         res.status(500).json({ success: false, error: 'Erro ao buscar histórico de depósitos.' });
+    }
+});
+
+// --- POPUPS ENDPOINTS ---
+app.get('/api/popups/floating', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM floating_popups ORDER BY id DESC LIMIT 3');
+        res.json({ success: true, popups: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Erro ao buscar floating popups.' });
+    }
+});
+
+app.post('/api/admin/popups/floating', async (req, res) => {
+    const { image_url, position, link_url } = req.body;
+    if (!image_url) return res.status(400).json({ success: false, error: 'URL da imagem é obrigatória.' });
+    try {
+        // Enforce max 3 logic here or let admin replace? Let's just allow insert, frontend limits to 3 or admin can delete
+        await pool.query('INSERT INTO floating_popups (image_url, position, link_url) VALUES ($1, $2, $3)', [image_url, position || 'left', link_url || '']);
+        res.json({ success: true, message: 'Popup flutuante criado com sucesso.' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Erro ao criar popup.' });
+    }
+});
+
+app.delete('/api/admin/popups/floating/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM floating_popups WHERE id = $1', [req.params.id]);
+        res.json({ success: true, message: 'Popup removido.' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Erro ao remover popup.' });
+    }
+});
+
+app.get('/api/popups/entry', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM entry_popups ORDER BY id DESC');
+        res.json({ success: true, popups: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Erro ao buscar entry popups.' });
+    }
+});
+
+app.post('/api/admin/popups/entry', async (req, res) => {
+    const { image_url, link_url } = req.body;
+    if (!image_url) return res.status(400).json({ success: false, error: 'URL da imagem é obrigatória.' });
+    try {
+        await pool.query('INSERT INTO entry_popups (image_url, link_url) VALUES ($1, $2)', [image_url, link_url || '']);
+        res.json({ success: true, message: 'Popup de entrada criado com sucesso.' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Erro ao criar popup.' });
+    }
+});
+
+app.delete('/api/admin/popups/entry/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM entry_popups WHERE id = $1', [req.params.id]);
+        res.json({ success: true, message: 'Popup removido.' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Erro ao remover popup.' });
     }
 });
 

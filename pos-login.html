@@ -163,6 +163,11 @@
                         <span class="material-symbols-outlined">account_balance_wallet</span>
                         <span class="font-headline uppercase tracking-wide text-sm">Retribuição e RTP</span>
                     </div>
+                    <div id="tab-popups" onclick="switchTab('popups')"
+                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all">
+                        <span class="material-symbols-outlined">ad_units</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">Popups Banner</span>
+                    </div>
                     <div class="mt-40 flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:text-error transition-all"
                         onclick="localStorage.removeItem('30win_token'); window.location.href='/admin.html'">
                         <span class="material-symbols-outlined">logout</span>
@@ -740,6 +745,109 @@
                 </div>
             </div>
 
+            <!-- POPUPS View -->
+            <div id="view-popups" class="hidden flex flex-col gap-6">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-headline font-bold text-2xl text-[#00e3fd]">Gerenciador de Popups</h3>
+                </div>
+
+                <!-- Floating Popups (Ads) -->
+                <div class="glass-card rounded-xl p-8 border-l-4 border-primary">
+                    <h3 class="font-headline font-bold text-xl mb-2 text-[#df8eff]">Popups Flutuantes (Anúncios
+                        Laterais)</h3>
+                    <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-widest font-bold">Máximo recomendado: 3
+                        ativos.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-end">
+                        <div class="md:col-span-5">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">URL da Imagem</label>
+                            <input type="text" id="floating_img_url"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                                placeholder="https://exemplo.com/banner.png">
+                        </div>
+                        <div class="md:col-span-4">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">URL de Redirecionamento
+                                (Opcional)</label>
+                            <input type="text" id="floating_link_url"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
+                                placeholder="https://seu-link-afiliado.com">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Posição</label>
+                            <select id="floating_position"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary">
+                                <option value="left">Esquerda</option>
+                                <option value="right">Direita</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-1">
+                            <button onclick="addFloatingPopup()"
+                                class="w-full bg-primary hover:bg-primary-dim text-white font-bold p-3 rounded shadow-lg transition-all flex items-center justify-center">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left text-sm mb-4">
+                            <thead>
+                                <tr
+                                    class="bg-surface-container-low text-[10px] font-black uppercase text-on-surface-variant">
+                                    <th class="px-4 py-2">Preview</th>
+                                    <th class="px-4 py-2">Posição</th>
+                                    <th class="px-4 py-2">Link</th>
+                                    <th class="px-4 py-2 text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="floating_popups_list" class="divide-y divide-outline-variant/5"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Entry Popups (Center Load) -->
+                <div class="glass-card rounded-xl p-8 border-l-4 border-secondary mt-6">
+                    <h3 class="font-headline font-bold text-xl mb-2 text-[#00e3fd]">Popups de Entrada (Centro)</h3>
+                    <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-widest font-bold">Aparece uma vez ao
+                        abrir o site. Imagem deve ser quadrada (400x400).</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-end">
+                        <div class="md:col-span-6">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">URL da Imagem (400x400)</label>
+                            <input type="text" id="entry_img_url"
+                                class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-3 text-white focus:border-secondary"
+                                placeholder="https://exemplo.com/promo.png">
+                        </div>
+                        <div class="md:col-span-5">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">URL de Redirecionamento
+                                (Opcional)</label>
+                            <input type="text" id="entry_link_url"
+                                class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-3 text-white focus:border-secondary"
+                                placeholder="/deposito.html">
+                        </div>
+                        <div class="md:col-span-1">
+                            <button onclick="addEntryPopup()"
+                                class="w-full bg-secondary hover:bg-secondary-dim text-black font-bold p-3 rounded shadow-lg transition-all flex items-center justify-center">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left text-sm mb-4">
+                            <thead>
+                                <tr
+                                    class="bg-surface-container-low text-[10px] font-black uppercase text-on-surface-variant">
+                                    <th class="px-4 py-2">Preview</th>
+                                    <th class="px-4 py-2">Link</th>
+                                    <th class="px-4 py-2 text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="entry_popups_list" class="divide-y divide-outline-variant/5"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
     </div>
 
     <!-- Modal Criar Conta Demo -->
@@ -945,6 +1053,7 @@
             const financeView = document.getElementById('view-finance');
             const settingsView = document.getElementById('view-settings');
             const rewardView = document.getElementById('view-reward');
+            const popupsView = document.getElementById('view-popups');
 
             const tabDashboard = document.getElementById('tab-dashboard');
             const tabApi = document.getElementById('tab-api');
@@ -952,12 +1061,13 @@
             const tabFinance = document.getElementById('tab-finance');
             const tabSettings = document.getElementById('tab-settings');
             const tabReward = document.getElementById('tab-reward');
+            const tabPopups = document.getElementById('tab-popups');
 
             const inactiveClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all";
             const activeClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#df8eff] bg-[#232148] font-bold border-r-4 border-[#df8eff]";
 
-            [dashboardView, apiView, usersView, financeView, settingsView, rewardView].forEach(v => { if (v) v.classList.add('hidden'); });
-            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings, tabReward].forEach(t => { if (t) t.className = inactiveClass; });
+            [dashboardView, apiView, usersView, financeView, settingsView, rewardView, popupsView].forEach(v => { if (v) v.classList.add('hidden'); });
+            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings, tabReward, tabPopups].forEach(t => { if (t) t.className = inactiveClass; });
 
             if (tab === 'dashboard') { dashboardView.classList.remove('hidden'); tabDashboard.className = activeClass; }
             else if (tab === 'api') { apiView.classList.remove('hidden'); tabApi.className = activeClass; loadAdminGames(); }
@@ -965,6 +1075,7 @@
             else if (tab === 'finance') { financeView.classList.remove('hidden'); tabFinance.className = activeClass; loadFinance(); }
             else if (tab === 'settings') { settingsView.classList.remove('hidden'); tabSettings.className = activeClass; loadSystemSettings(); }
             else if (tab === 'reward') { rewardView.classList.remove('hidden'); tabReward.className = activeClass; loadRewardSettings(); }
+            else if (tab === 'popups') { popupsView.classList.remove('hidden'); tabPopups.className = activeClass; loadPopups(); }
         }
 
         async function loadAdminGames() {
@@ -1801,6 +1912,120 @@
             } catch (err) {
                 alert('Erro na conexão!');
             }
+        }
+    </script>
+    <script>
+        // --- POPUPS JS ---
+        async function loadPopups() {
+            try {
+                // Floating
+                const resF = await fetch('/api/popups/floating');
+                const dataF = await resF.json();
+                if (dataF.success) renderFloatingPopups(dataF.popups);
+
+                // Entry
+                const resE = await fetch('/api/popups/entry');
+                const dataE = await resE.json();
+                if (dataE.success) renderEntryPopups(dataE.popups);
+            } catch (err) {
+                console.error('Erro ao carregar popups:', err);
+            }
+        }
+
+        function renderFloatingPopups(popups) {
+            const tbody = document.getElementById('floating_popups_list');
+            tbody.innerHTML = '';
+            if (!popups || popups.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500 text-xs">Nenhum popup flutuante cadastrado.</td></tr>';
+                return;
+            }
+            popups.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-4 py-2"><img src="${p.image_url}" class="h-10 w-auto rounded border border-outline-variant/30 object-contain bg-surface-container"></td>
+                    <td class="px-4 py-2 text-primary font-bold uppercase text-[10px]">${p.position}</td>
+                    <td class="px-4 py-2 text-[10px] text-gray-400 max-w-[150px] truncate">${p.link_url || '-'}</td>
+                    <td class="px-4 py-2 text-right">
+                        <button onclick="deletePopup('floating', ${p.id})" class="text-error hover:text-white p-1 transition-colors"><span class="material-symbols-outlined text-sm">delete</span></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderEntryPopups(popups) {
+            const tbody = document.getElementById('entry_popups_list');
+            tbody.innerHTML = '';
+            if (!popups || popups.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-6 text-center text-gray-500 text-xs">Nenhum popup central cadastrado.</td></tr>';
+                return;
+            }
+            popups.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-4 py-2"><img src="${p.image_url}" class="h-10 w-10 object-cover rounded border border-outline-variant/30 bg-surface-container"></td>
+                    <td class="px-4 py-2 text-[10px] text-gray-400 max-w-[150px] truncate">${p.link_url || '-'}</td>
+                    <td class="px-4 py-2 text-right">
+                        <button onclick="deletePopup('entry', ${p.id})" class="text-error hover:text-white p-1 transition-colors"><span class="material-symbols-outlined text-sm">delete</span></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function addFloatingPopup() {
+            const img = document.getElementById('floating_img_url').value;
+            const link = document.getElementById('floating_link_url').value;
+            const pos = document.getElementById('floating_position').value;
+            if (!img) return alert("URL da imagem é obrigatória.");
+
+            try {
+                const res = await fetch('/api/admin/popups/floating', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_url: img, link_url: link, position: pos })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('floating_img_url').value = '';
+                    document.getElementById('floating_link_url').value = '';
+                    loadPopups();
+                } else {
+                    alert(data.error);
+                }
+            } catch (err) { alert('Erro ao adicionar'); }
+        }
+
+        async function addEntryPopup() {
+            const img = document.getElementById('entry_img_url').value;
+            const link = document.getElementById('entry_link_url').value;
+            if (!img) return alert("URL da imagem é obrigatória.");
+
+            try {
+                const res = await fetch('/api/admin/popups/entry', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_url: img, link_url: link })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('entry_img_url').value = '';
+                    document.getElementById('entry_link_url').value = '';
+                    loadPopups();
+                } else {
+                    alert(data.error);
+                }
+            } catch (err) { alert('Erro ao adicionar'); }
+        }
+
+        async function deletePopup(type, id) {
+            if (!confirm("Tem certeza que deseja remover este popup?")) return;
+            try {
+                const res = await fetch(`/api/admin/popups/${type}/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) loadPopups();
+                else alert(data.error);
+            } catch (err) { alert('Erro ao deletar'); }
         }
     </script>
 </body>

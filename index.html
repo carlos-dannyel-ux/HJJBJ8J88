@@ -233,7 +233,7 @@
                 </div>
             </div>
             <button class="bg-brand-yellow text-black font-bold px-3 py-1 rounded-full text-[9px] uppercase"
-                onclick="window.open('/public/30win.apk', '_blank')">Baixar
+                onclick="openPWAModal()">Baixar
                 Agora</button>
         </header>
         <!-- END: Top Banner -->
@@ -535,7 +535,7 @@
             let balanceAnimFrame = null;
 
             function animateBalance() {
-                if (Math.abs(currentDisplayBalance - targetBalance) < 0.01) {
+                if (Math.abs(currentDisplayBalance - targetBalance) < 0.05) {
                     currentDisplayBalance = targetBalance;
                     const els = document.querySelectorAll('.userBalanceDisplay');
                     els.forEach(el => {
@@ -545,6 +545,7 @@
                             el.innerText = 'R$ ' + currentDisplayBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         }
                     });
+                    balanceAnimFrame = null;
                     return;
                 }
                 currentDisplayBalance += (targetBalance - currentDisplayBalance) * 0.1;
@@ -580,7 +581,7 @@
                 } catch (err) { console.error('Sync error:', err); }
             }
 
-            setInterval(syncUserData, 5000);
+            let syncInterval = setInterval(syncUserData, 15000); // Polling reduzido para 15s para evitar lag
             syncUserData();
 
             let rotation = 0;
@@ -738,6 +739,12 @@
                         overlay.classList.remove('hidden');
                         overlay.classList.add('block');
 
+                        // Pause polling during gameplay to prevent lag
+                        if (syncInterval) {
+                            clearInterval(syncInterval);
+                            syncInterval = null;
+                        }
+
                         // Mover o botão para o final do overlay para garantir que fique por cima no DOM
                         const btn = overlay.querySelector('button');
                         if (btn) overlay.appendChild(btn);
@@ -768,9 +775,44 @@
                 document.getElementById('bottom-nav').style.display = 'flex';
                 document.getElementById('main-content').style.display = 'block';
                 syncUserData(); // Atualiza saldo apos fechar o jogo
+                if (!syncInterval) {
+                    syncInterval = setInterval(syncUserData, 15000);
+                }
             }
 
-            document.addEventListener('DOMContentLoaded', loadApiGames);
+            document.addEventListener('DOMContentLoaded', () => {
+                loadApiGames();
+
+                // --- PWA Bonus Logic ---
+                if (window.location.search.includes('pwa=true')) {
+                    localStorage.setItem('pwa_bonus_pending', 'true');
+                }
+
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+                const token = localStorage.getItem('30win_token');
+
+                if (isStandalone && token && localStorage.getItem('pwa_bonus_pending') === 'true') {
+                    fetch('/api/user/claim-pwa', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast('Bônus de Instalação PWA (R$ 15) resgatado!', 'success');
+                                localStorage.removeItem('pwa_bonus_pending');
+                                syncUserData();
+                            } else {
+                                if (data.error === 'Bônus já resgatado.') {
+                                    localStorage.removeItem('pwa_bonus_pending');
+                                }
+                            }
+                        }).catch(console.error);
+                }
+            });
         </script>
 
         <!-- Jogo Overlay Fullscreen -->
@@ -794,7 +836,256 @@
             }
 
             function closeDepositModal() { document.getElementById('modal-deposit').classList.add('hidden'); }
+
+            // --- PWA Modal Logic ---
+            function openPWAModal() {
+                document.getElementById('pwa-modal').classList.remove('hidden');
+            }
+
+            function closePWAModal() {
+                document.getElementById('pwa-modal').classList.add('hidden');
+                document.getElementById('pwa-options').classList.remove('hidden');
+                document.getElementById('pwa-android').classList.add('hidden');
+                document.getElementById('pwa-ios').classList.add('hidden');
+            }
+
+            function selectOS(os) {
+                document.getElementById('pwa-options').classList.add('hidden');
+                if (os === 'android') {
+                    document.getElementById('pwa-android').classList.remove('hidden');
+                } else {
+                    document.getElementById('pwa-ios').classList.remove('hidden');
+                }
+            }
+
+            function copyPWALink() {
+                const link = window.location.origin + window.location.pathname + "?pwa=true";
+                navigator.clipboard.writeText(link).then(() => {
+                    showToast('Link copiado! Cole no seu navegador.', 'success');
+                }).catch(err => {
+                    showToast('Erro ao copiar link.', 'error');
+                });
+            }
         </script>
+
+        <!-- PWA Modal -->
+        <div id="pwa-modal" class="fixed inset-0 bg-black/80 z-[99999] hidden flex items-center justify-center p-4">
+            <div class="bg-[#1a1a1a] border border-[#333] rounded-2xl w-full max-w-[400px] p-6 relative">
+                <button onclick="closePWAModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+
+                <div class="text-center mb-6">
+                    <img src="https://dppb8rbqlsefl.cloudfront.net/siteadmin/upload/img/1880941958243016705.avif"
+                        alt="30win logo" class="h-8 mx-auto mb-2">
+                    <h2 class="text-white text-xl font-bold">Instalar Aplicativo</h2>
+                    <p class="text-gray-400 text-sm">Ganhe R$ 15 de bônus na sua primeira entrada pelo App!</p>
+                </div>
+
+                <div id="pwa-options" class="flex justify-center gap-6">
+                    <button onclick="selectOS('android')"
+                        class="flex flex-col items-center gap-2 active:scale-95 transition-transform">
+                        <img src="https://images.icon-icons.com/70/PNG/512/android_14191.png" alt="Android"
+                            class="w-16 h-16 object-contain bg-white/5 rounded-2xl p-2 border border-white/10">
+                        <span class="text-white font-medium">Android</span>
+                    </button>
+                    <button onclick="selectOS('ios')"
+                        class="flex flex-col items-center gap-2 active:scale-95 transition-transform">
+                        <img src="https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/os-systems/apple-ios-2-e235xdc451cyh8o5s169p.png/apple-ios-2-wjop6bm2opnk0jicnkscg.png?_a=DATAiZAAZAA0"
+                            alt="iOS"
+                            class="w-16 h-16 object-contain bg-white/5 rounded-2xl p-2 border border-white/10 filter invert">
+                        <span class="text-white font-medium">iOS</span>
+                    </button>
+                </div>
+
+                <div id="pwa-android" class="hidden text-center space-y-4">
+                    <div class="bg-[#222] border border-[#333] rounded-xl p-4 text-left space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="bg-brand-yellow text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0">1</span>
+                            <p class="text-sm text-gray-300">Toque em <strong>Copiar Link</strong> ou acesse pelo
+                                navegador (Chrome).</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="bg-brand-yellow text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0">2</span>
+                            <p class="text-sm text-gray-300">Procure o aviso de <strong>Adicionar à Tela
+                                    Principal</strong> no final da tela ou menu.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="bg-brand-yellow text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0">3</span>
+                            <p class="text-sm text-gray-300">Abra o App instalado e garanta seu bônus!</p>
+                        </div>
+                    </div>
+                    <button onclick="copyPWALink()"
+                        class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        Copiar Link do Jogo
+                    </button>
+                    <button onclick="selectOS('')"
+                        class="text-gray-400 text-sm mt-4 underline decoration-gray-600 underline-offset-4">Voltar</button>
+                </div>
+
+                <div id="pwa-ios" class="hidden text-center space-y-4">
+                    <div class="bg-[#222] border border-[#333] rounded-xl p-4 text-left space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="bg-white text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0">1</span>
+                            <p class="text-sm text-gray-300">Acesse o link apenas pelo <strong>Safari</strong>.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="bg-white text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0">2</span>
+                            <p class="text-sm text-gray-300">Toque no ícone de <strong>Compartilhar</strong> (quadrado
+                                com seta para cima).</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="bg-white text-black w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0">3</span>
+                            <p class="text-sm text-gray-300">Selecione <strong>Adicionar à Tela de Início</strong>.</p>
+                        </div>
+                    </div>
+                    <button onclick="copyPWALink()"
+                        class="w-full bg-white text-black font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        Copiar Link do Jogo
+                    </button>
+                    <button onclick="selectOS('')"
+                        class="text-gray-400 text-sm mt-4 underline decoration-gray-600 underline-offset-4">Voltar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUPS PLACEMENT CONTAINERS -->
+    <div id="popups-left" class="fixed top-1/2 left-4 -translate-y-1/2 z-[60] flex flex-col gap-4 pointer-events-none">
+    </div>
+    <div id="popups-right"
+        class="fixed top-1/2 right-4 -translate-y-1/2 z-[60] flex flex-col gap-4 pointer-events-none"></div>
+
+    <!-- ENTRY POPUP MODAL -->
+    <div id="entry-popup"
+        class="hidden fixed inset-0 z-[70] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-surface-container relative rounded-2xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] transform scale-95 transition-transform"
+            id="entry-popup-content" style="max-width: 400px; max-height: 400px;">
+            <button onclick="closeEntryPopup()"
+                class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-error text-white font-bold flex items-center justify-center shadow-lg active:scale-95 transition-transform z-10">✕</button>
+            <a href="#" id="entry-popup-link" class="block w-full h-full">
+                <img id="entry-popup-img" src="" alt="Promo" class="w-full h-full object-cover rounded-2xl"
+                    style="width: 400px; height: 400px; max-width: 100vw; max-height: 100vw;">
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // --- POPUPS FRONTEND LOGIC ---
+        let entryPopupsQueue = [];
+
+        async function loadFrontendPopups() {
+            try {
+                // Floating Popups
+                const resF = await fetch('/api/popups/floating');
+                const dataF = await resF.json();
+                if (dataF.success) renderFloating(dataF.popups);
+
+                // Entry Popups (Only if not seen this session)
+                if (!sessionStorage.getItem('entryPopupsSeen')) {
+                    const resE = await fetch('/api/popups/entry');
+                    const dataE = await resE.json();
+                    if (dataE.success && dataE.popups.length > 0) {
+                        entryPopupsQueue = dataE.popups;
+                        showNextEntryPopup();
+                    } else {
+                        sessionStorage.setItem('entryPopupsSeen', 'true');
+                    }
+                }
+            } catch (err) {
+                console.error('Popups error:', err);
+            }
+        }
+
+        function renderFloating(popups) {
+            const containerLeft = document.getElementById('popups-left');
+            const containerRight = document.getElementById('popups-right');
+
+            popups.forEach(p => {
+                const el = document.createElement('div');
+                // pointer-events-auto restores clickability within the pointer-events-none container
+                el.className = 'relative w-24 md:w-32 lg:w-40 pointer-events-auto rounded-xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer animate-fade-in transition-transform hover:scale-105';
+
+                let linkHtml = p.link_url ? `href="${p.link_url}" target="_blank"` : `href="javascript:void(0)"`;
+
+                el.innerHTML = `
+                        <button onclick="this.parentElement.remove()" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] z-10 hover:bg-error transition-colors">✕</button>
+                        <a ${linkHtml} class="block w-full h-full">
+                            <img src="${p.image_url}" class="w-full h-auto object-contain">
+                        </a>
+                    `;
+
+                if (p.position === 'left') containerLeft.appendChild(el);
+                else containerRight.appendChild(el);
+            });
+        }
+
+        function showNextEntryPopup() {
+            if (entryPopupsQueue.length === 0) {
+                sessionStorage.setItem('entryPopupsSeen', 'true');
+                document.getElementById('entry-popup').classList.add('hidden');
+                return;
+            }
+
+            const popup = entryPopupsQueue.shift(); // take first one
+            const modal = document.getElementById('entry-popup');
+            const modalContent = document.getElementById('entry-popup-content');
+            const img = document.getElementById('entry-popup-img');
+            const link = document.getElementById('entry-popup-link');
+
+            img.src = popup.image_url;
+            if (popup.link_url) {
+                link.href = popup.link_url;
+                link.target = "_blank";
+            } else {
+                link.href = "javascript:void(0)";
+                link.removeAttribute("target");
+            }
+
+            modal.classList.remove('hidden');
+            // Allow browser reflow to trigger opacity transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeEntryPopup() {
+            const modal = document.getElementById('entry-popup');
+            const modalContent = document.getElementById('entry-popup-content');
+
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                showNextEntryPopup();
+            }, 300); // Wait for transition
+        }
+
+        // Init popups on load
+        window.addEventListener('DOMContentLoaded', loadFrontendPopups);
+    </script>
 </body>
 
 </html>

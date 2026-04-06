@@ -66,7 +66,8 @@
                     <div class="flex items-center input-bg rounded-lg p-3">
                         <img src="/public/assets/Brazil.png" class="w-6 h-4 mr-2">
                         <span class="mr-2">+55</span>
-                        <input type="text" id="regPhone" placeholder="Digite o Número do Celular"
+                        <input type="tel" id="regPhone" maxlength="11"
+                            oninput="this.value = this.value.replace(/\\D/g, '')" placeholder="Ex: 11999999999"
                             class="bg-transparent outline-none w-full text-white">
                     </div>
                 </div>
@@ -105,7 +106,8 @@
                     <label class="text-sm text-gray-400">Número do Celular</label>
                     <div class="flex items-center input-bg rounded-lg p-3">
                         <i class="fas fa-phone text-gray-500 mr-3"></i>
-                        <input type="text" id="loginPhone" placeholder="Seu número"
+                        <input type="tel" id="loginPhone" maxlength="11"
+                            oninput="this.value = this.value.replace(/\\D/g, '')" placeholder="Ex: 11999999999"
                             class="bg-transparent outline-none w-full text-white">
                     </div>
                 </div>
@@ -157,8 +159,7 @@
                         class="absolute top-0 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#1a1a1a]"></span>
                     <span class="text-[9px] font-medium text-gray-600 group-hover:text-white">Ofertas</span>
                 </a>
-                <a href="suporte" class="flex flex-col items-center gap-1 group py-1"
-                    style="text-decoration:none;">
+                <a href="suporte" class="flex flex-col items-center gap-1 group py-1" style="text-decoration:none;">
                     <div class="text-gray-600 group-hover:text-white transition-colors">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
@@ -254,6 +255,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const invitedBy = urlParams.get('ref');
 
+            if (!phone || phone.length !== 11) return showToast('O número de telefone deve ter exatamente 11 dígitos.', 'warning');
+            if (!password) return showToast('Preencha a senha.', 'warning');
             if (password !== confirm) return showToast('Senhas não coincidem!', 'error');
 
             try {
@@ -273,6 +276,9 @@
         async function handleLogin() {
             const phone = document.getElementById('loginPhone').value;
             const password = document.getElementById('loginPassword').value;
+
+            if (!phone || phone.length !== 11) return showToast('O número de telefone deve ter exatamente 11 dígitos.', 'warning');
+            if (!password) return showToast('Preencha a senha.', 'warning');
 
             try {
                 const res = await fetch(`${API_URL}/auth/login`, {
