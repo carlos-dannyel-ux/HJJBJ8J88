@@ -760,7 +760,13 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-end">
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">Upload de Imagem (PC)</label>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-xs font-bold text-gray-400">Upload de Imagem (PC)</label>
+                                <button onclick="openServerFilePicker('floating_img_url')"
+                                    class="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white flex items-center gap-1 transition-colors">
+                                    <span class="material-symbols-outlined text-[10px]">folder_open</span> Servidor
+                                </button>
+                            </div>
                             <input type="file" id="floating_img_file" accept="image/*"
                                 class="w-full bg-[#110f2d] border border-gray-700 rounded p-2 text-white focus:border-primary text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30">
                         </div>
@@ -817,7 +823,13 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-end">
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">Upload de Imagem (PC)</label>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-xs font-bold text-gray-400">Upload de Imagem (PC)</label>
+                                <button onclick="openServerFilePicker('entry_img_url')"
+                                    class="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white flex items-center gap-1 transition-colors">
+                                    <span class="material-symbols-outlined text-[10px]">folder_open</span> Servidor
+                                </button>
+                            </div>
                             <input type="file" id="entry_img_file" accept="image/*"
                                 class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-2 text-white focus:border-secondary text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary/20 file:text-secondary hover:file:bg-secondary/30">
                         </div>
@@ -1985,7 +1997,50 @@
             });
         }
 
-        function uploadImageFetch(fileInput) {
+        // --- SERVER FILE PICKER ---
+        let currentTargetInputId = '';
+        async function openServerFilePicker(targetId) {
+            currentTargetInputId = targetId;
+            const res = await fetch('/api/admin/popups/list-files', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+            });
+            const data = await res.json();
+            if (data.success) {
+                const container = document.getElementById('server-files-container');
+                container.innerHTML = '';
+                if (data.files.length === 0) {
+                    container.innerHTML = '<p class="col-span-full text-center text-gray-500 py-10">Nenhum arquivo encontrado em /public/uploads/popups</p>';
+                } else {
+                    data.files.forEach(file => {
+                        const div = document.createElement('div');
+                        div.className = 'group relative aspect-square rounded-lg border border-white/10 overflow-hidden cursor-pointer hover:border-primary transition-colors';
+                        div.onclick = () => selectServerFile(file);
+                        div.innerHTML = `
+                            <img src="/public/uploads/popups/${file}" class="w-full h-full object-cover transition-transform group-hover:scale-110">
+                            <div class="absolute inset-x-0 bottom-0 bg-black/80 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <p class="text-[10px] text-white truncate">${file}</p>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+                document.getElementById('server-file-modal').classList.remove('hidden');
+            } else {
+                alert(data.error);
+            }
+        }
+
+        function closeServerFilePicker() {
+            document.getElementById('server-file-modal').classList.add('hidden');
+        }
+
+        function selectServerFile(filename) {
+            const path = `/public/uploads/popups/${filename}`;
+            document.getElementById(currentTargetInputId).value = path;
+            closeServerFilePicker();
+        }
+
+        async function uploadImageFetch(fileInput) {
             return new Promise((resolve, reject) => {
                 if (!fileInput.files || fileInput.files.length === 0) {
                     return resolve(null);
@@ -2066,6 +2121,32 @@
             } catch (err) { alert('Erro ao deletar'); }
         }
     </script>
+
+    <!-- SERVER FILE PICKER MODAL -->
+    <div id="server-file-modal"
+        class="hidden fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-6 backdrop-blur-md">
+        <div
+            class="bg-surface-container w-full max-w-4xl max-h-[80vh] rounded-2xl border border-white/10 flex flex-col shadow-2xl overflow-hidden">
+            <div
+                class="px-6 py-4 border-bottom border-white/10 flex items-center justify-between bg-surface-container-high">
+                <div class="flex items-center gap-2 text-primary font-bold">
+                    <span class="material-symbols-outlined">folder_open</span>
+                    <span>Arquivos no Servidor (/public/uploads/popups)</span>
+                </div>
+                <button onclick="closeServerFilePicker()" class="text-gray-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+                id="server-files-container">
+                <!-- Files populated by JS -->
+            </div>
+            <div class="px-6 py-4 border-top border-white/10 bg-surface-container-low text-right">
+                <button onclick="closeServerFilePicker()"
+                    class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-lg transition-all">Fechar</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

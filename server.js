@@ -630,6 +630,22 @@ app.get('/api/admin/dashboard-deposits', async (req, res) => {
 });
 
 // --- POPUPS ENDPOINTS ---
+app.get('/api/admin/popups/list-files', authenticateToken, async (req, res) => {
+    try {
+        const uploadsDir = path.join(__dirname, 'public', 'uploads', 'popups');
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const files = fs.readdirSync(uploadsDir);
+        // Filter for image-like extensions
+        const images = files.filter(f => /\.(png|jpg|jpeg|gif|webp|avif)$/i.test(f));
+        res.json({ success: true, files: images });
+    } catch (err) {
+        console.error('Error listing popup files:', err);
+        res.status(500).json({ success: false, error: 'Erro ao listar arquivos do servidor.' });
+    }
+});
+
 app.get('/api/popups/floating', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM floating_popups ORDER BY id DESC LIMIT 3');
