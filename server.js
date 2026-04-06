@@ -9,6 +9,7 @@ const qrcode = require('qrcode');
 const axios = require('axios');
 const fs = require('fs');
 const serverless = require('serverless-http');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,19 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// Configure Multer for popup uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, 'public', 'uploads', 'popups'));
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    }
+});
+const upload = multer({ storage: storage });
 
 app.get('/favicon.ico', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
@@ -624,6 +638,15 @@ app.get('/api/admin/dashboard-deposits', async (req, res) => {
 });
 
 // --- POPUPS ENDPOINTS ---
+app.post('/api/admin/popups/upload', upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ success: false, error: 'Nenhuma imagem foi enviada.' });
+    }
+    // Return the public URL for the uploaded image
+    const imageUrl = `/public/uploads/popups/${req.file.filename}`;
+    res.json({ success: true, image_url: imageUrl });
+});
+
 app.get('/api/popups/floating', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM floating_popups ORDER BY id DESC LIMIT 3');

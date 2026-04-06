@@ -759,13 +759,18 @@
                         ativos.</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-end">
-                        <div class="md:col-span-5">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">URL da Imagem</label>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Upload de Imagem (PC)</label>
+                            <input type="file" id="floating_img_file" accept="image/*"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-2 text-white focus:border-primary text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">OU URL da Imagem</label>
                             <input type="text" id="floating_img_url"
                                 class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
                                 placeholder="https://exemplo.com/banner.png">
                         </div>
-                        <div class="md:col-span-4">
+                        <div class="md:col-span-3">
                             <label class="block text-xs font-bold text-gray-400 mb-2">URL de Redirecionamento
                                 (Opcional)</label>
                             <input type="text" id="floating_link_url"
@@ -811,13 +816,18 @@
                         abrir o site. Imagem deve ser quadrada (400x400).</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-end">
-                        <div class="md:col-span-6">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">URL da Imagem (400x400)</label>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Upload de Imagem (PC)</label>
+                            <input type="file" id="entry_img_file" accept="image/*"
+                                class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-2 text-white focus:border-secondary text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary/20 file:text-secondary hover:file:bg-secondary/30">
+                        </div>
+                        <div class="md:col-span-4">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">OU URL da Imagem (400x400)</label>
                             <input type="text" id="entry_img_url"
                                 class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-3 text-white focus:border-secondary"
                                 placeholder="https://exemplo.com/promo.png">
                         </div>
-                        <div class="md:col-span-5">
+                        <div class="md:col-span-4">
                             <label class="block text-xs font-bold text-gray-400 mb-2">URL de Redirecionamento
                                 (Opcional)</label>
                             <input type="text" id="entry_link_url"
@@ -1975,16 +1985,37 @@
             });
         }
 
+        async function uploadImageFetch(fileInput) {
+            if (!fileInput.files || fileInput.files.length === 0) return null;
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            const res = await fetch('/api/admin/popups/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                fileInput.value = ''; // clear input
+                return data.image_url;
+            }
+            throw new Error(data.error || 'Erro no upload da imagem');
+        }
+
         async function addFloatingPopup() {
-            const img = document.getElementById('floating_img_url').value;
+            let imgUrl = document.getElementById('floating_img_url').value;
+            const fileInput = document.getElementById('floating_img_file');
             const link = document.getElementById('floating_link_url').value;
             const pos = document.getElementById('floating_position').value;
-            if (!img) return alert("URL da imagem é obrigatória.");
 
             try {
+                const uploadedUrl = await uploadImageFetch(fileInput);
+                if (uploadedUrl) imgUrl = uploadedUrl;
+
+                if (!imgUrl) return alert("Forneça a URL da imagem ou faça o upload de um arquivo.");
+
                 const res = await fetch('/api/admin/popups/floating', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image_url: img, link_url: link, position: pos })
+                    body: JSON.stringify({ image_url: imgUrl, link_url: link, position: pos })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -1994,18 +2025,23 @@
                 } else {
                     alert(data.error);
                 }
-            } catch (err) { alert('Erro ao adicionar'); }
+            } catch (err) { alert(err.message || 'Erro ao adicionar'); }
         }
 
         async function addEntryPopup() {
-            const img = document.getElementById('entry_img_url').value;
+            let imgUrl = document.getElementById('entry_img_url').value;
+            const fileInput = document.getElementById('entry_img_file');
             const link = document.getElementById('entry_link_url').value;
-            if (!img) return alert("URL da imagem é obrigatória.");
 
             try {
+                const uploadedUrl = await uploadImageFetch(fileInput);
+                if (uploadedUrl) imgUrl = uploadedUrl;
+
+                if (!imgUrl) return alert("Forneça a URL da imagem ou faça o upload de um arquivo.");
+
                 const res = await fetch('/api/admin/popups/entry', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image_url: img, link_url: link })
+                    body: JSON.stringify({ image_url: imgUrl, link_url: link })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -2015,7 +2051,7 @@
                 } else {
                     alert(data.error);
                 }
-            } catch (err) { alert('Erro ao adicionar'); }
+            } catch (err) { alert(err.message || 'Erro ao adicionar'); }
         }
 
         async function deletePopup(type, id) {
