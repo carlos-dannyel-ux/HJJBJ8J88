@@ -977,11 +977,9 @@
             </div>
         </div>
         <!-- POPUPS PLACEMENT CONTAINERS -->
-        <div id="popups-left"
-            class="absolute top-1/2 left-4 -translate-y-1/2 z-[60] flex flex-col gap-4 pointer-events-none">
+        <div id="popups-left" class="absolute bottom-24 left-4 z-[60] flex flex-col gap-4 pointer-events-auto">
         </div>
-        <div id="popups-right"
-            class="absolute top-1/2 right-4 -translate-y-1/2 z-[60] flex flex-col gap-4 pointer-events-none"></div>
+        <div id="popups-right" class="absolute bottom-24 right-4 z-[60] flex flex-col gap-4 pointer-events-none"></div>
     </div>
 
     <!-- ENTRY POPUP MODAL -->
@@ -1032,7 +1030,7 @@
             popups.forEach(p => {
                 const el = document.createElement('div');
                 // pointer-events-auto restores clickability within the pointer-events-none container
-                el.className = 'relative w-24 md:w-32 lg:w-40 pointer-events-auto rounded-xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer animate-fade-in transition-transform hover:scale-105';
+                el.className = 'relative w-20 md:w-28 lg:w-32 pointer-events-auto rounded-xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer animate-fade-in transition-transform hover:scale-105';
 
                 let linkHtml = p.link_url ? `href="${p.link_url}" target="_blank"` : `href="javascript:void(0)"`;
 
