@@ -979,9 +979,9 @@
         <!-- POPUPS PLACEMENT CONTAINERS -->
         <div class="fixed inset-0 pointer-events-none z-[60] flex justify-center">
             <div
-                class="w-full max-w-[450px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1440px] relative pointer-events-none">
-                <div id="popups-left" class="absolute bottom-24 left-2 flex flex-col gap-2 pointer-events-none"></div>
-                <div id="popups-right" class="absolute bottom-24 right-2 flex flex-col gap-2 pointer-events-none"></div>
+                class="w-full max-w-[450px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1440px] h-full relative pointer-events-none">
+                <div id="popups-left" class="absolute bottom-4 left-2 flex flex-col gap-2 pointer-events-none"></div>
+                <div id="popups-right" class="absolute bottom-4 right-2 flex flex-col gap-2 pointer-events-none"></div>
             </div>
         </div>
 
@@ -1034,7 +1034,7 @@
                 popups.forEach(p => {
                     const el = document.createElement('div');
                     // pointer-events-auto restores clickability within the pointer-events-none container
-                    el.className = 'relative w-16 md:w-20 lg:w-24 pointer-events-auto rounded-xl overflow-hidden shadow-2xl border border-white/5 group cursor-pointer animate-fade-in transition-all hover:scale-110';
+                    el.className = 'relative w-14 md:w-16 lg:w-20 pointer-events-auto rounded-lg overflow-hidden transition-all hover:scale-110';
 
                     let linkHtml = p.link_url ? `href="${p.link_url}" target="_blank"` : `href="javascript:void(0)"`;
 
