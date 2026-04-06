@@ -8,7 +8,6 @@ const bcrypt = require('bcryptjs');
 const qrcode = require('qrcode');
 const axios = require('axios');
 const fs = require('fs');
-const fetch = require('node-fetch'); // In case it was needed earlier, just node native
 const serverless = require('serverless-http');
 
 const app = express();
