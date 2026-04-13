@@ -728,10 +728,9 @@
                         const btn = overlay.querySelector('button');
                         if (btn) overlay.appendChild(btn);
                         // Hide Navbars and Main Content with style for extra safety
-                        document.getElementById('top-banner').style.display = 'none';
-                        document.getElementById('main-nav').style.display = 'none';
-                        document.getElementById('bottom-nav').style.display = 'none';
                         document.getElementById('main-content').style.display = 'none';
+                        const popupWrapper = document.getElementById('global-popups-wrapper');
+                        if (popupWrapper) popupWrapper.style.display = 'none';
                     } else {
                         showToast('Erro ao iniciar: ' + (data.error || 'Tente novamente'), 'error');
                     }
@@ -747,12 +746,10 @@
                 document.getElementById('game-overlay').classList.add('hidden');
                 document.getElementById('game-overlay').classList.remove('block');
                 if (document.getElementById('main-container')) {
-                    document.getElementById('main-container').style.display = 'flex';
-                }
-                document.getElementById('top-banner').style.display = 'flex';
-                document.getElementById('main-nav').style.display = 'flex';
-                document.getElementById('bottom-nav').style.display = 'flex';
+                    document.getElementById('bottom-nav').style.display = 'flex';
                 document.getElementById('main-content').style.display = 'block';
+                const popupWrapper = document.getElementById('global-popups-wrapper');
+                if (popupWrapper) popupWrapper.style.display = 'flex';
                 syncUserData(); // Atualiza saldo apos fechar o jogo
                 if (!syncInterval) {
                     syncInterval = setInterval(syncUserData, 15000);
@@ -948,7 +945,7 @@
             </div>
         </div>
         <!-- FLOATING POPUP - RIGHT SIDE -->
-        <div class="fixed inset-0 pointer-events-none z-[60] flex justify-center">
+        <div id="global-popups-wrapper" class="fixed inset-0 pointer-events-none z-[60] flex justify-center">
             <div class="w-full max-w-[450px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1440px] h-full relative pointer-events-none">
                 <div id="floating-popup-right" class="absolute pointer-events-auto" style="bottom: 110px; right: 12px;">
                     <div class="relative w-14 md:w-16 lg:w-20 rounded-lg overflow-hidden transition-all hover:scale-110 shadow-lg shadow-black/50 border border-white/10">
