@@ -628,81 +628,8 @@ app.get('/api/admin/dashboard-deposits', async (req, res) => {
     }
 });
 
-// --- POPUPS ENDPOINTS ---
-app.get('/api/admin/popups/list-files', authenticateToken, async (req, res) => {
-    try {
-        const uploadsDir = path.join(__dirname, 'public', 'uploads', 'popups');
-        if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-        }
-        const files = fs.readdirSync(uploadsDir);
-        // Filter for image-like extensions
-        const images = files.filter(f => /\.(png|jpg|jpeg|gif|webp|avif)$/i.test(f));
-        res.json({ success: true, files: images });
-    } catch (err) {
-        console.error('Error listing popup files:', err);
-        res.status(500).json({ success: false, error: 'Erro ao listar arquivos do servidor.' });
-    }
-});
 
-app.get('/api/popups/floating', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM floating_popups ORDER BY id DESC LIMIT 3');
-        res.json({ success: true, popups: result.rows });
-    } catch (err) {
-        res.status(500).json({ success: false, error: 'Erro ao buscar floating popups.' });
-    }
-});
 
-app.post('/api/admin/popups/floating', async (req, res) => {
-    const { image_url, position, link_url } = req.body;
-    if (!image_url) return res.status(400).json({ success: false, error: 'URL da imagem é obrigatória.' });
-    try {
-        // Enforce max 3 logic here or let admin replace? Let's just allow insert, frontend limits to 3 or admin can delete
-        await pool.query('INSERT INTO floating_popups (image_url, position, link_url) VALUES ($1, $2, $3)', [image_url, position || 'left', link_url || '']);
-        res.json({ success: true, message: 'Popup flutuante criado com sucesso.' });
-    } catch (err) {
-        res.status(500).json({ success: false, error: 'Erro ao criar popup.' });
-    }
-});
-
-app.delete('/api/admin/popups/floating/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM floating_popups WHERE id = $1', [req.params.id]);
-        res.json({ success: true, message: 'Popup removido.' });
-    } catch (err) {
-        res.status(500).json({ success: false, error: 'Erro ao remover popup.' });
-    }
-});
-
-app.get('/api/popups/entry', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM entry_popups ORDER BY id DESC');
-        res.json({ success: true, popups: result.rows });
-    } catch (err) {
-        res.status(500).json({ success: false, error: 'Erro ao buscar entry popups.' });
-    }
-});
-
-app.post('/api/admin/popups/entry', async (req, res) => {
-    const { image_url, link_url } = req.body;
-    if (!image_url) return res.status(400).json({ success: false, error: 'URL da imagem é obrigatória.' });
-    try {
-        await pool.query('INSERT INTO entry_popups (image_url, link_url) VALUES ($1, $2)', [image_url, link_url || '']);
-        res.json({ success: true, message: 'Popup de entrada criado com sucesso.' });
-    } catch (err) {
-        res.status(500).json({ success: false, error: 'Erro ao criar popup.' });
-    }
-});
-
-app.delete('/api/admin/popups/entry/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM entry_popups WHERE id = $1', [req.params.id]);
-        res.json({ success: true, message: 'Popup removido.' });
-    } catch (err) {
-        res.status(500).json({ success: false, error: 'Erro ao remover popup.' });
-    }
-});
 
 // --- MAX API GAMES INTEGRATION ---
 

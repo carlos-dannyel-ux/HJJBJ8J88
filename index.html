@@ -977,126 +977,22 @@
 
             </div>
         </div>
-        <!-- POPUPS PLACEMENT CONTAINERS -->
+        <!-- FLOATING POPUP - RIGHT SIDE -->
         <div class="fixed inset-0 pointer-events-none z-[60] flex justify-center">
             <div
                 class="w-full max-w-[450px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1280px] 2xl:max-w-[1440px] h-full relative pointer-events-none">
-                <div id="popups-left" class="absolute bottom-20 left-2 flex flex-col gap-2 pointer-events-none"></div>
-                <div id="popups-right" class="absolute bottom-24 right-3 flex flex-col gap-2 pointer-events-none"></div>
-            </div>
-        </div>
-
-        <!-- ENTRY POPUP MODAL -->
-        <div id="entry-popup"
-            class="hidden fixed inset-0 z-[70] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity opacity-0">
-            <div class="bg-surface-container relative rounded-2xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] transform scale-95 transition-transform"
-                id="entry-popup-content" style="max-width: 400px; max-height: 400px;">
-                <button onclick="closeEntryPopup()"
-                    class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-error text-white font-bold flex items-center justify-center shadow-lg active:scale-95 transition-transform z-10">✕</button>
-                <a href="#" id="entry-popup-link" class="block w-full h-full">
-                    <img id="entry-popup-img" src="" alt="Promo"
-                        class="w-full h-auto object-contain rounded-2xl mx-auto shadow-2xl"
-                        style="max-width: 320px; max-height: 80vh;">
-                </a>
-            </div>
-        </div>
-
-        <script>
-            // --- POPUPS FRONTEND LOGIC ---
-            let entryPopupsQueue = [];
-
-            async function loadFrontendPopups() {
-                try {
-                    // Floating Popups
-                    const resF = await fetch('/api/popups/floating');
-                    const dataF = await resF.json();
-                    if (dataF.success) renderFloating(dataF.popups);
-
-                    // Entry Popups (Only if not seen this session)
-                    if (!sessionStorage.getItem('entryPopupsSeen')) {
-                        const resE = await fetch('/api/popups/entry');
-                        const dataE = await resE.json();
-                        if (dataE.success && dataE.popups.length > 0) {
-                            entryPopupsQueue = dataE.popups;
-                            showNextEntryPopup();
-                        } else {
-                            sessionStorage.setItem('entryPopupsSeen', 'true');
-                        }
-                    }
-                } catch (err) {
-                    console.error('Popups error:', err);
-                }
-            }
-
-            function renderFloating(popups) {
-                const containerLeft = document.getElementById('popups-left');
-                const containerRight = document.getElementById('popups-right');
-
-                popups.forEach(p => {
-                    const el = document.createElement('div');
-                    // pointer-events-auto restores clickability within the pointer-events-none container
-                    el.className = 'relative w-14 md:w-16 lg:w-20 pointer-events-auto rounded-lg overflow-hidden transition-all hover:scale-110';
-
-                    let linkHtml = p.link_url ? `href="${p.link_url}" target="_blank"` : `href="javascript:void(0)"`;
-
-                    el.innerHTML = `
-                        <button onclick="this.parentElement.remove()" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] z-10 hover:bg-error transition-colors">✕</button>
-                        <a ${linkHtml} class="block w-full h-full">
-                            <img src="${p.image_url}" class="w-full h-auto object-contain">
+                <div id="floating-popup-right" class="absolute bottom-24 right-3 flex flex-col gap-2 pointer-events-auto">
+                    <div class="relative w-14 md:w-16 lg:w-20 rounded-lg overflow-hidden transition-all hover:scale-110 shadow-lg shadow-black/50">
+                        <button onclick="this.parentElement.style.display='none'" class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/70 text-white flex items-center justify-center text-[8px] z-10 hover:bg-red-500 transition-colors">✕</button>
+                        <a href="/deposito.html" class="block w-full h-full">
+                            <img src="/PUBLIC/eusoa.avif" alt="Promo" class="w-full h-auto object-contain rounded-lg">
                         </a>
-                    `;
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    if (p.position === 'left') containerLeft.appendChild(el);
-                    else containerRight.appendChild(el);
-                });
-            }
 
-            function showNextEntryPopup() {
-                if (entryPopupsQueue.length === 0) {
-                    sessionStorage.setItem('entryPopupsSeen', 'true');
-                    document.getElementById('entry-popup').classList.add('hidden');
-                    return;
-                }
-
-                const popup = entryPopupsQueue.shift(); // take first one
-                const modal = document.getElementById('entry-popup');
-                const modalContent = document.getElementById('entry-popup-content');
-                const img = document.getElementById('entry-popup-img');
-                const link = document.getElementById('entry-popup-link');
-
-                img.src = popup.image_url;
-                if (popup.link_url) {
-                    link.href = popup.link_url;
-                    link.target = "_blank";
-                } else {
-                    link.href = "javascript:void(0)";
-                    link.removeAttribute("target");
-                }
-
-                modal.classList.remove('hidden');
-                // Allow browser reflow to trigger opacity transition
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    modalContent.classList.remove('scale-95');
-                }, 10);
-            }
-
-            function closeEntryPopup() {
-                const modal = document.getElementById('entry-popup');
-                const modalContent = document.getElementById('entry-popup-content');
-
-                modal.classList.add('opacity-0');
-                modalContent.classList.add('scale-95');
-
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    showNextEntryPopup();
-                }, 300); // Wait for transition
-            }
-
-            // Init popups on load
-            window.addEventListener('DOMContentLoaded', loadFrontendPopups);
-        </script>
 </body>
 
 </html>

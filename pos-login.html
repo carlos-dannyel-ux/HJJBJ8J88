@@ -163,11 +163,7 @@
                         <span class="material-symbols-outlined">account_balance_wallet</span>
                         <span class="font-headline uppercase tracking-wide text-sm">Retribuição e RTP</span>
                     </div>
-                    <div id="tab-popups" onclick="switchTab('popups')"
-                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all">
-                        <span class="material-symbols-outlined">ad_units</span>
-                        <span class="font-headline uppercase tracking-wide text-sm">Popups Banner</span>
-                    </div>
+
                     <div class="mt-40 flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:text-error transition-all"
                         onclick="localStorage.removeItem('30win_token'); window.location.href='/admin.html'">
                         <span class="material-symbols-outlined">logout</span>
@@ -745,130 +741,7 @@
                 </div>
             </div>
 
-            <!-- POPUPS View -->
-            <div id="view-popups" class="hidden flex flex-col gap-6">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-headline font-bold text-2xl text-[#00e3fd]">Gerenciador de Popups</h3>
-                </div>
 
-                <!-- Floating Popups (Ads) -->
-                <div class="glass-card rounded-xl p-8 border-l-4 border-primary">
-                    <h3 class="font-headline font-bold text-xl mb-2 text-[#df8eff]">Popups Flutuantes (Anúncios
-                        Laterais)</h3>
-                    <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-widest font-bold">Máximo recomendado: 3
-                        ativos.</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-end">
-                        <div class="md:col-span-3">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-bold text-gray-400">Upload de Imagem (PC)</label>
-                                <button onclick="openServerFilePicker('floating_img_url')"
-                                    class="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white flex items-center gap-1 transition-colors">
-                                    <span class="material-symbols-outlined text-[10px]">folder_open</span> Servidor
-                                </button>
-                            </div>
-                            <input type="file" id="floating_img_file" accept="image/*"
-                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-2 text-white focus:border-primary text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30">
-                        </div>
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">OU URL da Imagem</label>
-                            <input type="text" id="floating_img_url"
-                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
-                                placeholder="https://exemplo.com/banner.png">
-                        </div>
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">URL de Redirecionamento
-                                (Opcional)</label>
-                            <input type="text" id="floating_link_url"
-                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary"
-                                placeholder="https://seu-link-afiliado.com">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">Posição</label>
-                            <select id="floating_position"
-                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-primary">
-                                <option value="left">Esquerda</option>
-                                <option value="right">Direita</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-1">
-                            <button onclick="addFloatingPopup()"
-                                class="w-full bg-primary hover:bg-primary-dim text-white font-bold p-3 rounded shadow-lg transition-all flex items-center justify-center">
-                                <span class="material-symbols-outlined">add</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto w-full">
-                        <table class="w-full text-left text-sm mb-4">
-                            <thead>
-                                <tr
-                                    class="bg-surface-container-low text-[10px] font-black uppercase text-on-surface-variant">
-                                    <th class="px-4 py-2">Preview</th>
-                                    <th class="px-4 py-2">Posição</th>
-                                    <th class="px-4 py-2">Link</th>
-                                    <th class="px-4 py-2 text-right">Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody id="floating_popups_list" class="divide-y divide-outline-variant/5"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Entry Popups (Center Load) -->
-                <div class="glass-card rounded-xl p-8 border-l-4 border-secondary mt-6">
-                    <h3 class="font-headline font-bold text-xl mb-2 text-[#00e3fd]">Popups de Entrada (Centro)</h3>
-                    <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-widest font-bold">Aparece uma vez ao
-                        abrir o site. Imagem deve ser quadrada (400x400).</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-end">
-                        <div class="md:col-span-3">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-bold text-gray-400">Upload de Imagem (PC)</label>
-                                <button onclick="openServerFilePicker('entry_img_url')"
-                                    class="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white flex items-center gap-1 transition-colors">
-                                    <span class="material-symbols-outlined text-[10px]">folder_open</span> Servidor
-                                </button>
-                            </div>
-                            <input type="file" id="entry_img_file" accept="image/*"
-                                class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-2 text-white focus:border-secondary text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary/20 file:text-secondary hover:file:bg-secondary/30">
-                        </div>
-                        <div class="md:col-span-4">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">OU URL da Imagem (400x400)</label>
-                            <input type="text" id="entry_img_url"
-                                class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-3 text-white focus:border-secondary"
-                                placeholder="https://exemplo.com/promo.png">
-                        </div>
-                        <div class="md:col-span-4">
-                            <label class="block text-xs font-bold text-gray-400 mb-2">URL de Redirecionamento
-                                (Opcional)</label>
-                            <input type="text" id="entry_link_url"
-                                class="w-full bg-[#110f2d] border border-[#00e3fd]/50 rounded p-3 text-white focus:border-secondary"
-                                placeholder="/deposito.html">
-                        </div>
-                        <div class="md:col-span-1">
-                            <button onclick="addEntryPopup()"
-                                class="w-full bg-secondary hover:bg-secondary-dim text-black font-bold p-3 rounded shadow-lg transition-all flex items-center justify-center">
-                                <span class="material-symbols-outlined">add</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto w-full">
-                        <table class="w-full text-left text-sm mb-4">
-                            <thead>
-                                <tr
-                                    class="bg-surface-container-low text-[10px] font-black uppercase text-on-surface-variant">
-                                    <th class="px-4 py-2">Preview</th>
-                                    <th class="px-4 py-2">Link</th>
-                                    <th class="px-4 py-2 text-right">Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody id="entry_popups_list" class="divide-y divide-outline-variant/5"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
 
     </div>
 
@@ -1075,7 +948,7 @@
             const financeView = document.getElementById('view-finance');
             const settingsView = document.getElementById('view-settings');
             const rewardView = document.getElementById('view-reward');
-            const popupsView = document.getElementById('view-popups');
+
 
             const tabDashboard = document.getElementById('tab-dashboard');
             const tabApi = document.getElementById('tab-api');
@@ -1083,13 +956,13 @@
             const tabFinance = document.getElementById('tab-finance');
             const tabSettings = document.getElementById('tab-settings');
             const tabReward = document.getElementById('tab-reward');
-            const tabPopups = document.getElementById('tab-popups');
+
 
             const inactiveClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all";
             const activeClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#df8eff] bg-[#232148] font-bold border-r-4 border-[#df8eff]";
 
-            [dashboardView, apiView, usersView, financeView, settingsView, rewardView, popupsView].forEach(v => { if (v) v.classList.add('hidden'); });
-            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings, tabReward, tabPopups].forEach(t => { if (t) t.className = inactiveClass; });
+            [dashboardView, apiView, usersView, financeView, settingsView, rewardView].forEach(v => { if (v) v.classList.add('hidden'); });
+            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings, tabReward].forEach(t => { if (t) t.className = inactiveClass; });
 
             if (tab === 'dashboard') { dashboardView.classList.remove('hidden'); tabDashboard.className = activeClass; }
             else if (tab === 'api') { apiView.classList.remove('hidden'); tabApi.className = activeClass; loadAdminGames(); }
@@ -1097,7 +970,7 @@
             else if (tab === 'finance') { financeView.classList.remove('hidden'); tabFinance.className = activeClass; loadFinance(); }
             else if (tab === 'settings') { settingsView.classList.remove('hidden'); tabSettings.className = activeClass; loadSystemSettings(); }
             else if (tab === 'reward') { rewardView.classList.remove('hidden'); tabReward.className = activeClass; loadRewardSettings(); }
-            else if (tab === 'popups') { popupsView.classList.remove('hidden'); tabPopups.className = activeClass; loadPopups(); }
+
         }
 
         async function loadAdminGames() {
@@ -1936,217 +1809,7 @@
             }
         }
     </script>
-    <script>
-        // --- POPUPS JS ---
-        async function loadPopups() {
-            try {
-                // Floating
-                const resF = await fetch('/api/popups/floating');
-                const dataF = await resF.json();
-                if (dataF.success) renderFloatingPopups(dataF.popups);
 
-                // Entry
-                const resE = await fetch('/api/popups/entry');
-                const dataE = await resE.json();
-                if (dataE.success) renderEntryPopups(dataE.popups);
-            } catch (err) {
-                console.error('Erro ao carregar popups:', err);
-            }
-        }
-
-        function renderFloatingPopups(popups) {
-            const tbody = document.getElementById('floating_popups_list');
-            tbody.innerHTML = '';
-            if (!popups || popups.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500 text-xs">Nenhum popup flutuante cadastrado.</td></tr>';
-                return;
-            }
-            popups.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-white/5 transition-colors';
-                tr.innerHTML = `
-                    <td class="px-4 py-2"><img src="${p.image_url}" class="h-10 w-auto rounded border border-outline-variant/30 object-contain bg-surface-container"></td>
-                    <td class="px-4 py-2 text-primary font-bold uppercase text-[10px]">${p.position}</td>
-                    <td class="px-4 py-2 text-[10px] text-gray-400 max-w-[150px] truncate">${p.link_url || '-'}</td>
-                    <td class="px-4 py-2 text-right">
-                        <button onclick="deletePopup('floating', ${p.id})" class="text-error hover:text-white p-1 transition-colors"><span class="material-symbols-outlined text-sm">delete</span></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderEntryPopups(popups) {
-            const tbody = document.getElementById('entry_popups_list');
-            tbody.innerHTML = '';
-            if (!popups || popups.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-6 text-center text-gray-500 text-xs">Nenhum popup central cadastrado.</td></tr>';
-                return;
-            }
-            popups.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-white/5 transition-colors';
-                tr.innerHTML = `
-                    <td class="px-4 py-2"><img src="${p.image_url}" class="h-10 w-10 object-cover rounded border border-outline-variant/30 bg-surface-container"></td>
-                    <td class="px-4 py-2 text-[10px] text-gray-400 max-w-[150px] truncate">${p.link_url || '-'}</td>
-                    <td class="px-4 py-2 text-right">
-                        <button onclick="deletePopup('entry', ${p.id})" class="text-error hover:text-white p-1 transition-colors"><span class="material-symbols-outlined text-sm">delete</span></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // --- SERVER FILE PICKER ---
-        let currentTargetInputId = '';
-        async function openServerFilePicker(targetId) {
-            currentTargetInputId = targetId;
-            const res = await fetch('/api/admin/popups/list-files', {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
-            });
-            const data = await res.json();
-            if (data.success) {
-                const container = document.getElementById('server-files-container');
-                container.innerHTML = '';
-                if (data.files.length === 0) {
-                    container.innerHTML = '<p class="col-span-full text-center text-gray-500 py-10">Nenhum arquivo encontrado em /public/uploads/popups</p>';
-                } else {
-                    data.files.forEach(file => {
-                        const div = document.createElement('div');
-                        div.className = 'group relative aspect-square rounded-lg border border-white/10 overflow-hidden cursor-pointer hover:border-primary transition-colors';
-                        div.onclick = () => selectServerFile(file);
-                        div.innerHTML = `
-                            <img src="/public/uploads/popups/${file}" class="w-full h-full object-cover transition-transform group-hover:scale-110">
-                            <div class="absolute inset-x-0 bottom-0 bg-black/80 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <p class="text-[10px] text-white truncate">${file}</p>
-                            </div>
-                        `;
-                        container.appendChild(div);
-                    });
-                }
-                document.getElementById('server-file-modal').classList.remove('hidden');
-            } else {
-                alert(data.error);
-            }
-        }
-
-        function closeServerFilePicker() {
-            document.getElementById('server-file-modal').classList.add('hidden');
-        }
-
-        function selectServerFile(filename) {
-            const path = `/public/uploads/popups/${filename}`;
-            document.getElementById(currentTargetInputId).value = path;
-            closeServerFilePicker();
-        }
-
-        async function uploadImageFetch(fileInput) {
-            return new Promise((resolve, reject) => {
-                if (!fileInput.files || fileInput.files.length === 0) {
-                    return resolve(null);
-                }
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    fileInput.value = ''; // clear input
-                    resolve(reader.result); // base64 string
-                };
-                reader.onerror = () => {
-                    reject(new Error('Falha ao processar arquivo de imagem no navegador.'));
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function addFloatingPopup() {
-            let imgUrl = document.getElementById('floating_img_url').value;
-            const fileInput = document.getElementById('floating_img_file');
-            const link = document.getElementById('floating_link_url').value;
-            const pos = document.getElementById('floating_position').value;
-
-            try {
-                const uploadedUrl = await uploadImageFetch(fileInput);
-                if (uploadedUrl) imgUrl = uploadedUrl;
-
-                if (!imgUrl) return alert("Forneça a URL da imagem ou faça o upload de um arquivo.");
-
-                const res = await fetch('/api/admin/popups/floating', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image_url: imgUrl, link_url: link, position: pos })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('floating_img_url').value = '';
-                    document.getElementById('floating_link_url').value = '';
-                    loadPopups();
-                } else {
-                    alert(data.error);
-                }
-            } catch (err) { alert(err.message || 'Erro ao adicionar'); }
-        }
-
-        async function addEntryPopup() {
-            let imgUrl = document.getElementById('entry_img_url').value;
-            const fileInput = document.getElementById('entry_img_file');
-            const link = document.getElementById('entry_link_url').value;
-
-            try {
-                const uploadedUrl = await uploadImageFetch(fileInput);
-                if (uploadedUrl) imgUrl = uploadedUrl;
-
-                if (!imgUrl) return alert("Forneça a URL da imagem ou faça o upload de um arquivo.");
-
-                const res = await fetch('/api/admin/popups/entry', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image_url: imgUrl, link_url: link })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('entry_img_url').value = '';
-                    document.getElementById('entry_link_url').value = '';
-                    loadPopups();
-                } else {
-                    alert(data.error);
-                }
-            } catch (err) { alert(err.message || 'Erro ao adicionar'); }
-        }
-
-        async function deletePopup(type, id) {
-            if (!confirm("Tem certeza que deseja remover este popup?")) return;
-            try {
-                const res = await fetch(`/api/admin/popups/${type}/${id}`, { method: 'DELETE' });
-                const data = await res.json();
-                if (data.success) loadPopups();
-                else alert(data.error);
-            } catch (err) { alert('Erro ao deletar'); }
-        }
-    </script>
-
-    <!-- SERVER FILE PICKER MODAL -->
-    <div id="server-file-modal"
-        class="hidden fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-6 backdrop-blur-md">
-        <div
-            class="bg-surface-container w-full max-w-4xl max-h-[80vh] rounded-2xl border border-white/10 flex flex-col shadow-2xl overflow-hidden">
-            <div
-                class="px-6 py-4 border-bottom border-white/10 flex items-center justify-between bg-surface-container-high">
-                <div class="flex items-center gap-2 text-primary font-bold">
-                    <span class="material-symbols-outlined">folder_open</span>
-                    <span>Arquivos no Servidor (/public/uploads/popups)</span>
-                </div>
-                <button onclick="closeServerFilePicker()" class="text-gray-400 hover:text-white transition-colors">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-            <div class="p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
-                id="server-files-container">
-                <!-- Files populated by JS -->
-            </div>
-            <div class="px-6 py-4 border-top border-white/10 bg-surface-container-low text-right">
-                <button onclick="closeServerFilePicker()"
-                    class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-lg transition-all">Fechar</button>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>
