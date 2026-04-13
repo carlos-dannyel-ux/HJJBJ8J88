@@ -151,21 +151,6 @@
             letter-spacing: 0.02em;
         }
 
-        .game-card .card-badge {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            background: linear-gradient(135deg, #ff7a00, #ff5500);
-            color: #fff;
-            font-size: 8px;
-            font-weight: 900;
-            padding: 2px 5px;
-            border-radius: 5px;
-            z-index: 2;
-            letter-spacing: 0.05em;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
-
         /* --- END Premium Game Card --- */
     </style>
 
@@ -404,13 +389,11 @@
                     <div class="game-card" onclick="launchGame('fortune-rabbit')">
                         <img alt="Fortune Rabbit"
                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2OhOxFeaY-LcJdWKILJKiAQ0rHw-TWu_uPt8JVrr9Gb3ezvi9FRhIEDxyWXiFhlzMH6rrvMkDAVGoad1hDDbFJOXoePBAXrzbNgjW8Ex7pXdAYN6CkuboaWB5uF4_VCdJzPXXhOLgp0TMHUEaCop0uJ7gcrKs91lM0ISwXzd37aa5KyxX2dNm1T-GqNc_KD2_WDdkzd6e7fZltSIYXAS4pIFfbyMGeFXjUxXrkGKY3deYl-ogHa_f1--hBXeRy0BLmg5L0b-DBQ">
-                        <span class="card-badge">PG</span>
                     </div>
                     <!-- Game Card 2 -->
                     <div class="game-card" onclick="launchGame('fortune-tiger')">
                         <img alt="Fortune Tiger"
                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA_G2oW86NlHcN86wVQR2hvL7pxKgTfUFWogLAs8WarYiLsXA6vifbTioYsVjiH6gBhGL4cs-Pxj7L-5QI84NKfEkRQMjpqjkX0nn8DeZtIL-CDiGJwf0UjVPojNd5AHpJH9Nj153VG3P9zPQzQlVZH47XSHf3P8kdbosQcoky4Wyq5fNDUCSBqnRh1jIeYAOqE-DJROI-joPezTYJZE90txKw3lekg8D5oItogXy5ZYqVHk40Sol3vTNSciDi-RcPxh3yZeT7Mg">
-                        <span class="card-badge">PG</span>
                     </div>
                 </div>
             </section>
@@ -619,7 +602,6 @@
                             popHtml += `
                             <div class="game-card" onclick="launchGame('${game.game_code}')">
                                 <img src="${bannerSrc}" loading="lazy">
-                                <span class="card-badge">${game.provider || 'HOT'}</span>
                             </div>`;
                         });
                         popularContainer.innerHTML = popHtml;
@@ -639,7 +621,6 @@
                             gamesHtml += `
                             <div class="game-card" onclick="launchGame('${game.game_code}')">
                                 <img alt="${game.game_name}" src="${bannerSrc}" loading="lazy">
-                                <span class="card-badge">${provider.split(' ')[0]}</span>
                             </div>
                             `;
                         });
