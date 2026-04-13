@@ -698,7 +698,9 @@
                         let errorJson = {};
                         try { errorJson = JSON.parse(errorText); } catch (i) { }
                         console.error('Erro de servidor:', res.status, errorText);
-                        showToast('Erro no servidor (' + res.status + '): ' + (errorJson.error || 'Falha ao iniciar'), 'error');
+                        const errorMsg = errorJson.error || 'Falha ao iniciar';
+                        const debugUrl = errorJson.debug_info ? `<br><small class="opacity-70">Callback: ${errorJson.debug_info.callback_url}</small>` : '';
+                        showToast(`Erro (${res.status}): ${errorMsg}${debugUrl}`, 'error');
                         return;
                     }
 
