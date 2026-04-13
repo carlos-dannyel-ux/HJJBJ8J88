@@ -1408,7 +1408,8 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
 
         const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
         const host = req.headers['x-forwarded-host'] || req.get('host');
-        const callbackUrl = process.env.PUBLIC_URL || `${protocol}://${host}/api/webhook/maxapi`;
+        const baseUrl = process.env.PUBLIC_URL || `${protocol}://${host}`;
+        const callbackUrl = baseUrl.includes('/api/webhook/maxapi') ? baseUrl : `${baseUrl.replace(/\/$/, '')}/api/webhook/maxapi`;
 
         const launchPayload = {
             method: 'game_launch',
