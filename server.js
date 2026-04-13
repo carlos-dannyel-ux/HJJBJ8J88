@@ -1406,14 +1406,20 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
             }
         }
 
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+        const host = req.get('host');
+        const callbackUrl = process.env.PUBLIC_URL || `${protocol}://${host}/api/webhook/maxapi`;
+
         const launchPayload = {
             method: 'game_launch',
             agent_code,
             agent_token,
             user_code: userCode,
             game_code: gameCode,
-            callback_url: `${process.env.PUBLIC_URL || `https://${req.get('host')}`}/api/webhook/maxapi`
+            callback_url: callbackUrl
         };
+        
+        console.log(`[MAX API] Launching ${gameCode} for ${userCode}. Callback: ${callbackUrl}`);
 
         const response = await axios.post('https://maxapigames.com/api/v2', launchPayload);
         const data = response.data;
@@ -1439,11 +1445,19 @@ app.post('/api/webhook/maxapi', async (req, res) => {
 
     try {
         const creds = await pool.query('SELECT * FROM api_credentials WHERE module = $1', ['max_api']);
-        if (creds.rows.length === 0) return res.status(401).json({ status: 0, msg: 'INVALID_AGENT' });
+        if (creds.rows.length === 0) {
+            console.error('[Webhook Error] No credentials found for max_api');
+            return res.status(401).json({ status: 0, msg: 'INVALID_AGENT' });
+        }
 
         // Verifica Agent Secret
         const agentSettings = creds.rows[0];
-        if (agentSettings.agent_code !== agent_code || agentSettings.agent_secret !== agent_secret) {
+        if (agentSettings.agent_code !== agent_code || (agentSettings.agent_secret && agentSettings.agent_secret !== agent_secret)) {
+            console.error('[Webhook Error] Agent Code or Secret mismatch', { 
+                expected_code: agentSettings.agent_code, 
+                received_code: agent_code,
+                secret_match: agentSettings.agent_secret === agent_secret
+            });
             return res.status(401).json({ status: 0, msg: 'INVALID_AGENT' });
         }
 
