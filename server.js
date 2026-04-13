@@ -794,6 +794,20 @@ app.get('/api/admin/users', async (req, res) => {
     }
 });
 
+app.get('/api/admin/users/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT id, id_user, phone, name, is_demo, user_type, plain_password, balance, bonus_balance, rollover_required, rollover_progress, created_at FROM users WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
+        }
+        res.json({ success: true, user: result.rows[0] });
+    } catch (err) {
+        console.error('Get User Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao buscar usuário.' });
+    }
+});
+
 app.post('/api/admin/users/demo', async (req, res) => {
     const { phone, password, name, user_type } = req.body;
     if (!phone || !password) return res.status(400).json({ success: false, error: 'Telefone e senha são obrigatórios.' });
@@ -883,9 +897,15 @@ app.put('/api/admin/users/:id', async (req, res) => {
 app.delete('/api/admin/users/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        // Limpar transações relacionadas primeiro para evitar erros de FK (opcional, dependendo do design, mas seguro)
+        // Limpar transações e histórico relacionados primeiro para evitar erros de FK
         await pool.query('DELETE FROM deposits WHERE user_id = $1', [id]);
         await pool.query('DELETE FROM withdrawals WHERE user_id = $1', [id]);
+        await pool.query('DELETE FROM game_history WHERE user_id = $1', [id]);
+        
+        // Também limpar referenciados se o usuário for um padrinho (referrals)
+        // Isso usa uma subquery para encontrar o referral_code do usuário
+        await pool.query('DELETE FROM referrals WHERE referrer_code IN (SELECT referral_code FROM users WHERE id = $1)', [id]);
+
         await pool.query('DELETE FROM users WHERE id = $1', [id]);
         res.json({ success: true, message: 'Usuário excluído com sucesso!' });
     } catch (err) {
@@ -1211,6 +1231,7 @@ app.post('/api/ggpix/webhook', async (req, res) => {
             }
 
             if (dep.rows.length > 0) {
+                const amount = parseFloat(dep.rows[0].amount);
                 const bonus = getBonusForAmount(amount);
                 const totalBalanceCredit = amount + bonus;
 
