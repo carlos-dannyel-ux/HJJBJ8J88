@@ -1407,7 +1407,7 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         }
 
         const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-        const host = req.get('host');
+        const host = req.headers['x-forwarded-host'] || req.get('host');
         const callbackUrl = process.env.PUBLIC_URL || `${protocol}://${host}/api/webhook/maxapi`;
 
         const launchPayload = {
@@ -1427,7 +1427,14 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         if (data.status === 1) {
             res.json({ launch_url: data.launch_url });
         } else {
-            res.status(400).json({ error: data.msg || 'Erro na API MAX' });
+            console.error(`[MAX API] Provider Error: ${data.msg}`, { callback_url: callbackUrl });
+            res.status(400).json({ 
+                error: data.msg || 'Erro na API MAX', 
+                debug_info: { 
+                    callback_url: callbackUrl,
+                    status: data.status
+                }
+            });
         }
     } catch (err) {
         console.error('Launch Error Details:', {
