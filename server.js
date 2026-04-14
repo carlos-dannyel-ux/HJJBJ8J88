@@ -167,7 +167,7 @@ app.post('/api/auth/login', async (req, res) => {
         // Update last_active for real-time active players tracking
         await pool.query('UPDATE users SET last_active = NOW() WHERE id = $1', [user.id]).catch(() => { });
 
-        const token = jwt.sign({ id: user.id, phone: user.phone, referral_code: user.referral_code }, SECRET_KEY, { expiresIn: '24h' });
+        const token = jwt.sign({ id: user.id, phone: user.phone, referral_code: user.referral_code }, SECRET_KEY, { expiresIn: '365d' });
         res.json({ success: true, token, user: { phone: user.phone, balance: user.balance, id_user: user.id_user, user_type: user.user_type } });
     } catch (err) {
         console.error('Login Error:', err);
