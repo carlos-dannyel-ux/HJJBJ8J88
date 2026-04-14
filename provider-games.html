@@ -370,13 +370,22 @@
                 const res = await fetch('/api/games');
                 const data = await res.json();
 
-                if (!data.success || !data.providers || !data.providers[provider]) {
-                    showToast('Provedor não encontrado', 'error');
-                    setTimeout(() => window.location.href = '/', 2000);
-                    return;
+                if (provider.toLowerCase() === 'popular') {
+                    if (!data.success || !data.popular) {
+                        showToast('Jogos populares não encontrados', 'error');
+                        setTimeout(() => window.location.href = '/', 2000);
+                        return;
+                    }
+                    allGames = data.popular;
+                } else {
+                    if (!data.success || !data.providers || !data.providers[provider]) {
+                        showToast('Provedor não encontrado', 'error');
+                        setTimeout(() => window.location.href = '/', 2000);
+                        return;
+                    }
+                    allGames = data.providers[provider];
                 }
 
-                allGames = data.providers[provider];
                 document.getElementById('game-count').textContent = `${allGames.length} jogos`;
                 renderGames(allGames);
             } catch (err) {
