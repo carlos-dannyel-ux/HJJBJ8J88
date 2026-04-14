@@ -181,6 +181,9 @@ app.get('/api/user/info', authenticateToken, async (req, res) => {
         if (rows.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
 
         const user = rows.rows[0];
+        const depCheck = await pool.query("SELECT COUNT(*) FROM deposits WHERE user_id = $1 AND status = 'completed'", [req.user.id]);
+        const isFirstDeposit = parseInt(depCheck.rows[0].count) === 0;
+
         const userData = {
             id_user: user.id_user,
             phone: user.phone,
@@ -189,7 +192,8 @@ app.get('/api/user/info', authenticateToken, async (req, res) => {
             rewards_pending: user.rewards_pending,
             rollover_required: user.rollover_required,
             rollover_progress: user.rollover_progress,
-            has_withdraw_password: !!user.withdraw_password
+            has_withdraw_password: !!user.withdraw_password,
+            is_first_deposit: isFirstDeposit
         };
 
         res.json({ success: true, user: userData });

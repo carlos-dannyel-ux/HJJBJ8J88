@@ -310,15 +310,26 @@
         ];
 
         let selectedAmount = null;
+        let isFirstDeposit = false;
 
         function renderPresets() {
             const grid = document.getElementById('amounts-grid');
-            grid.innerHTML = presets.map((p, i) => `
-                <div class="amount-card" id="preset-${i}" onclick="selectPreset(${i}, ${p.value})">
-                    <div class="value">${p.value.toLocaleString('pt-BR')}</div>
-                    <div class="bonus">${p.bonus}</div>
-                </div>
-            `).join('');
+            grid.innerHTML = presets.map((p, i) => {
+                let displayBonus = p.bonus;
+                
+                // If it's the first deposit and "PIX (Empresacnpj)" is selected, calculate 4.9x multiplier bonus visual
+                if (isFirstDeposit && currentMethod === 'pix2') {
+                    const multiplierValue = (p.value * 4.9) - p.value;
+                    displayBonus = `+${multiplierValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                }
+
+                return `
+                    <div class="amount-card" id="preset-${i}" onclick="selectPreset(${i}, ${p.value})">
+                        <div class="value">${p.value.toLocaleString('pt-BR')}</div>
+                        <div class="bonus">${displayBonus}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function selectPreset(index, value) {
@@ -334,6 +345,7 @@
             currentMethod = method;
             document.getElementById('method-pix').classList.toggle('active', method === 'pix');
             document.getElementById('method-pix2').classList.toggle('active', method === 'pix2');
+            renderPresets();
         }
 
         let currentBalance = 0;
@@ -367,6 +379,8 @@
                     animateValue(document.getElementById('balanceDisplay'), currentBalance, newBalance, 1000);
                     currentBalance = newBalance;
                     window.currentUser = data.user;
+                    isFirstDeposit = data.user.is_first_deposit;
+                    renderPresets();
                 } else if (res.status === 401 || res.status === 403 || res.status === 404) {
                     localStorage.removeItem('30win_token');
                     window.location.href = '/auth.html';
