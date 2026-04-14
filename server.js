@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const qrcode = require('qrcode');
 const axios = require('axios');
 const fs = require('fs');
@@ -61,6 +62,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Auto-migrate schema updates
 pool.query('ALTER TABLE users ADD COLUMN pwa_claimed BOOLEAN DEFAULT false').catch(() => { });
+pool.query('ALTER TABLE deposits ADD COLUMN fb_tracking JSONB DEFAULT \'{}\'::jsonb').catch(() => { });
 pool.query(`
     CREATE TABLE IF NOT EXISTS floating_popups (
         id SERIAL PRIMARY KEY,
@@ -166,7 +168,7 @@ app.post('/api/auth/login', async (req, res) => {
         await pool.query('UPDATE users SET last_active = NOW() WHERE id = $1', [user.id]).catch(() => { });
 
         const token = jwt.sign({ id: user.id, phone: user.phone, referral_code: user.referral_code }, SECRET_KEY, { expiresIn: '24h' });
-        res.json({ success: true, token, user: { phone: user.phone, balance: user.balance, id_user: user.id_user } });
+        res.json({ success: true, token, user: { phone: user.phone, balance: user.balance, id_user: user.id_user, user_type: user.user_type } });
     } catch (err) {
         console.error('Login Error:', err);
         res.status(500).json({ success: false, error: 'Erro no servidor.' });
@@ -177,7 +179,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/user/info', authenticateToken, async (req, res) => {
     try {
-        const rows = await pool.query('SELECT id_user, phone, balance, referral_code, rewards_pending, withdraw_password, rollover_required, rollover_progress FROM users WHERE id = $1', [req.user.id]);
+        const rows = await pool.query('SELECT id_user, phone, balance, referral_code, rewards_pending, withdraw_password, rollover_required, rollover_progress, user_type FROM users WHERE id = $1', [req.user.id]);
         if (rows.rows.length === 0) return res.status(404).json({ success: false, error: 'Usuário não encontrado.' });
 
         const user = rows.rows[0];
@@ -193,7 +195,8 @@ app.get('/api/user/info', authenticateToken, async (req, res) => {
             rollover_required: user.rollover_required,
             rollover_progress: user.rollover_progress,
             has_withdraw_password: !!user.withdraw_password,
-            is_first_deposit: isFirstDeposit
+            is_first_deposit: isFirstDeposit,
+            user_type: user.user_type
         };
 
         res.json({ success: true, user: userData });
@@ -1188,11 +1191,54 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
     // Mark deposit as completed
     await pool.query('UPDATE deposits SET status = \'completed\' WHERE id = $1', [dep.id]);
     
+    // FACEBOOK CONVERSIONS API (CAPI) TRIGGER
+    try {
+        const userQ = await pool.query('SELECT phone, user_type FROM users WHERE id = $1', [user_id]);
+        if (userQ.rows.length === 1) {
+            const u = userQ.rows[0];
+            if (u.user_type !== 'influencer') {
+                const fbTracking = dep.fb_tracking || {};
+                const hashData = (data) => data ? crypto.createHash('sha256').update(data.trim().toLowerCase()).digest('hex') : undefined;
+                
+                const phHash = hashData('55' + (u.phone || ''));
+                
+                const payload = {
+                    data: [{
+                        event_name: 'Purchase',
+                        event_time: Math.floor(Date.now() / 1000),
+                        action_source: 'website',
+                        original_event_id: 'dep_' + dep.id,
+                        user_data: {
+                            client_ip_address: fbTracking.client_ip || '',
+                            client_user_agent: fbTracking.client_user_agent || '',
+                            ...(phHash ? { ph: [phHash] } : {}),
+                            ...(fbTracking.fbc ? { fbc: fbTracking.fbc } : {}),
+                            ...(fbTracking.fbp ? { fbp: fbTracking.fbp } : {})
+                        },
+                        custom_data: {
+                            currency: 'BRL',
+                            value: baseAmount
+                        }
+                    }]
+                };
+
+                const PIXEL_ID = '1518053683231214';
+                const CAPI_TOKEN = 'EAAPaMZBjMbTEBRO9GlqteUZApL8HZCoLaujfUElGrHSjJqEkAst8fDuVPiI6AHWSpSreOdl653GJtbin6GOd8ix2NOSxvavqHEbcnRAyBZAqExusTJ7fZBjBSnhrUos82y8q2rwuQfncZA3kDmk1xp6KA1ZAZB0A2AvUZAIBdMDZA0iUhZBVJlVB7MKFQT8EEWluNKoGQZDZD';
+
+                axios.post(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${CAPI_TOKEN}`, payload)
+                    .then(res => console.log(`[CAPI] Purchase sent for dep_${dep.id}:`, res.data))
+                    .catch(e => console.error(`[CAPI] Error for dep_${dep.id}:`, e.response?.data || e.message));
+            }
+        }
+    } catch (e) {
+        console.error('[CAPI] Trigger logic error:', e.message);
+    }
+    
     return { success: true, credited: totalCredit };
 }
 
 app.post('/api/deposit', authenticateToken, async (req, res) => {
-    const { amount } = req.body;
+    const { amount, fbp, fbc } = req.body;
     if (!amount || amount < 1) return res.status(400).json({ success: false, error: 'Mínimo de R$ 1,00.' });
 
     try {
@@ -1224,8 +1270,12 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
             const data = response.data;
             const finalMethod = req.body.method === 'pix2' ? 'PIX_CNPJ' : 'PIX';
             
-            const insertRes = await pool.query('INSERT INTO deposits (user_id, amount, method, status, external_id) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-                [req.user.id, amount, finalMethod, 'pending', data.id || externalId]);
+            const client_ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            const client_user_agent = req.headers['user-agent'] || '';
+            const fb_tracking = { fbp, fbc, client_ip, client_user_agent };
+            
+            const insertRes = await pool.query('INSERT INTO deposits (user_id, amount, method, status, external_id, fb_tracking) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+                [req.user.id, amount, finalMethod, 'pending', data.id || externalId, JSON.stringify(fb_tracking)]);
             
             res.json({ 
                 success: true, 
