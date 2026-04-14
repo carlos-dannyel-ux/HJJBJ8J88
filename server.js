@@ -1201,15 +1201,8 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
 
         const user = uRow.rows[0];
 
-        if (user.is_demo && user.user_type === 'influencer') {
-            return res.json({
-                success: true,
-                is_demo: true,
-                pixCopyPaste: '00020101021226820014br.gov.bcb.pixFICTICIO_DEMO',
-                pixCode: '00020101021226820014br.gov.bcb.pixFICTICIO_DEMO',
-                message: 'QR Code Fictício Gerado (Aguarde 8s...)'
-            });
-        }
+        // Influencers now also generate real PIX requests to see the QR Code like a normal user,
+        // but the frontend will still trigger the auto-approval after 8 seconds.
 
         const apiRows = await pool.query('SELECT agent_token FROM api_credentials WHERE module = \'ggpix_api\'');
         if (apiRows.rows.length === 0 || !apiRows.rows[0].agent_token) return res.status(400).json({ success: false, error: 'Pix indisp.' });

@@ -453,10 +453,10 @@
             const toast = document.createElement('div');
             toast.id = 'influencer-countdown';
             toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-2xl shadow-xl font-bold z-50 flex items-center gap-3 animate-bounce';
-            toast.innerHTML = `<span class="material-symbols-outlined">timer</span> Aguardando 7s para aprovação automática...`;
+            toast.innerHTML = `<span class="material-symbols-outlined">timer</span> Aguardando 8s para aprovação automática...`;
             document.body.appendChild(toast);
 
-            let seconds = 7;
+            let seconds = 8;
             influencerTimer = setInterval(async () => {
                 seconds--;
                 if (seconds <= 0) {
