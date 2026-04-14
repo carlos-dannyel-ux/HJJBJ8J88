@@ -1620,8 +1620,8 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                 [userId, gameData.game_code || req.body.game_code || 'unknown', bet, win, txnId || `auto-${Date.now()}-${Math.random().toString(36).substring(7)}`, txnType, gameData.provider_code || req.body.provider_code || 'unknown', isDemo]
             );
 
-            // 1.6 Update Rollover Progress (Real money and Standard Demo)
-            if ((!isDemo || user.user_type === 'standard') && bet > 0) {
+            // 1.6 Update Rollover Progress (For all accounts that have a bet)
+            if (bet > 0) {
                 await pool.query('UPDATE users SET rollover_progress = rollover_progress + $1 WHERE id = $2', [bet, userId]);
             }
 
