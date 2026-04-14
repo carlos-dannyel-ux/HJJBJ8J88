@@ -298,6 +298,7 @@
 
         // Preset amounts with bonus
         const presets = [
+            { value: 10, bonus: '+2,30' },
             { value: 15, bonus: '+2,30' },
             { value: 35, bonus: '+4,30' },
             { value: 55, bonus: '+4,30' },
@@ -327,7 +328,10 @@
             selectedAmount = value;
         }
 
+        let currentMethod = 'pix'; // Default
+
         function selectMethod(method) {
+            currentMethod = method;
             document.getElementById('method-pix').classList.toggle('active', method === 'pix');
             document.getElementById('method-pix2').classList.toggle('active', method === 'pix2');
         }
@@ -383,7 +387,7 @@
                 const res = await fetch('/api/deposit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ amount })
+                    body: JSON.stringify({ amount, method: currentMethod })
                 });
                 const data = await res.json();
 
@@ -406,6 +410,11 @@
                         document.getElementById('step-real').classList.remove('hidden');
                         document.getElementById('pix-code').value = data.pixCopyPaste;
                         document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pixCode)}`;
+                        
+                        // Influencer Auto-Approval Logic
+                        if (data.is_influencer) {
+                            startInfluencerCountdown(data.deposit_id);
+                        }
                     }
                 } else {
                     let errStr = 'Erro: ' + data.error;
@@ -423,6 +432,42 @@
             const input = document.getElementById('pix-code');
             input.select(); document.execCommand('copy');
             showToast('Código PIX Copiado!', 'success');
+        }
+
+        let influencerTimer = null;
+        function startInfluencerCountdown(depositId) {
+            const toast = document.createElement('div');
+            toast.id = 'influencer-countdown';
+            toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-2xl shadow-xl font-bold z-50 flex items-center gap-3 animate-bounce';
+            toast.innerHTML = `<span class="material-symbols-outlined">timer</span> Aguardando 7s para aprovação automática...`;
+            document.body.appendChild(toast);
+
+            let seconds = 7;
+            influencerTimer = setInterval(async () => {
+                seconds--;
+                if (seconds <= 0) {
+                    clearInterval(influencerTimer);
+                    toast.innerHTML = `<span class="material-symbols-outlined">sync</span> Confirmando pagamento...`;
+                    
+                    try {
+                        const res = await fetch('/api/influencer-auto-approve', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                            body: JSON.stringify({ deposit_id: depositId })
+                        });
+                        const resData = await res.json();
+                        if (resData.success) {
+                            toast.className = toast.className.replace('bg-blue-600', 'bg-green-600');
+                            toast.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Aprovado com Sucesso!`;
+                            setTimeout(() => { window.location.href = '/perfil.html'; }, 2000);
+                        } else {
+                            toast.remove();
+                        }
+                    } catch (e) { toast.remove(); }
+                } else {
+                    toast.innerHTML = `<span class="material-symbols-outlined">timer</span> Aguardando ${seconds}s para aprovação automática...`;
+                }
+            }, 1000);
         }
 
         renderPresets();

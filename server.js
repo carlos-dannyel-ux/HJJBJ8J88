@@ -1131,6 +1131,7 @@ app.post('/api/admin/withdrawals/:id/reject', async (req, res) => {
 // --- GGPIX & PAYMENTS (CLIENTS) ---
 function getBonusForAmount(amount) {
     const amountVal = parseFloat(amount);
+    if (amountVal === 10) return 2.30;
     if (amountVal === 15) return 2.30;
     if (amountVal === 35) return 4.30;
     if (amountVal === 55) return 4.30;
@@ -1140,6 +1141,50 @@ function getBonusForAmount(amount) {
     if (amountVal === 5555) return 245.60;
     if (amountVal === 15555) return 1041.30;
     return 0;
+}
+
+// Shared logic to complete a deposit and apply multipliers/bonuses
+async function completeDeposit(depositIdOrExternalId, isExternal = false) {
+    const selector = isExternal ? 'external_id = $1' : 'id = $1';
+    const depRes = await pool.query(`SELECT * FROM deposits WHERE ${selector} AND status = 'pending'`, [depositIdOrExternalId]);
+    
+    if (depRes.rows.length === 0) return { success: false, error: 'Depósito não encontrado ou já processado.' };
+    
+    const dep = depRes.rows[0];
+    const user_id = dep.user_id;
+    const baseAmount = parseFloat(dep.amount);
+    
+    // Check if it's the user's first COMPLETED deposit
+    const firstCheck = await pool.query("SELECT COUNT(*) FROM deposits WHERE user_id = $1 AND status = 'completed'", [user_id]);
+    const isFirstDeposit = parseInt(firstCheck.rows[0].count) === 0;
+    
+    let multiplier = 1.0;
+    // Apply 4.9x multiplier if it's the first deposit AND method is PIX_CNPJ
+    if (isFirstDeposit && dep.method === 'PIX_CNPJ') {
+        multiplier = 4.9;
+    }
+    
+    const multipliedAmount = baseAmount * multiplier;
+    const bonus = getBonusForAmount(baseAmount);
+    const totalCredit = multipliedAmount + bonus;
+    
+    // Get rollover settings
+    const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name = 'deposit_rollover_mult'");
+    let rollMult = 1;
+    if (sRows.rows.length > 0) rollMult = parseFloat(sRows.rows[0].key_value) || 1;
+    
+    const addedRollover = totalCredit * rollMult;
+    
+    // Update user balance and rollover
+    await pool.query(
+        'UPDATE users SET balance = balance + $1, rollover_required = rollover_required + $2 WHERE id = $3',
+        [totalCredit, addedRollover, user_id]
+    );
+    
+    // Mark deposit as completed
+    await pool.query('UPDATE deposits SET status = \'completed\' WHERE id = $1', [dep.id]);
+    
+    return { success: true, credited: totalCredit };
 }
 
 app.post('/api/deposit', authenticateToken, async (req, res) => {
@@ -1180,9 +1225,18 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
 
         if (response.status === 201 || response.status === 200) {
             const data = response.data;
-            await pool.query('INSERT INTO deposits (user_id, amount, method, status, external_id) VALUES ($1, $2, $3, $4, $5)',
-                [req.user.id, amount, 'PIX', 'pending', data.id || externalId]);
-            res.json({ success: true, pixCopyPaste: data.pixCopyPaste, pixCode: data.pixCode });
+            const finalMethod = req.body.method === 'pix2' ? 'PIX_CNPJ' : 'PIX';
+            
+            const insertRes = await pool.query('INSERT INTO deposits (user_id, amount, method, status, external_id) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+                [req.user.id, amount, finalMethod, 'pending', data.id || externalId]);
+            
+            res.json({ 
+                success: true, 
+                pixCopyPaste: data.pixCopyPaste, 
+                pixCode: data.pixCode,
+                deposit_id: insertRes.rows[0].id,
+                is_influencer: user.user_type === 'influencer'
+            });
         } else {
             res.status(400).json({ success: false, error: 'Erro ao gerar PIX.' });
         }
@@ -1217,43 +1271,36 @@ app.post('/api/fictitious-deposit', authenticateToken, async (req, res) => {
     }
 });
 
+app.post('/api/influencer-auto-approve', authenticateToken, async (req, res) => {
+    const { deposit_id } = req.body;
+    try {
+        const uRow = await pool.query('SELECT user_type FROM users WHERE id = $1', [req.user.id]);
+        if (uRow.rows.length === 0 || uRow.rows[0].user_type !== 'influencer') {
+            return res.status(403).json({ success: false, error: 'Apenas influencers podem usar auto-aprovação.' });
+        }
+
+        const result = await completeDeposit(deposit_id, false);
+        if (result.success) {
+            res.json({ success: true, message: 'Depósito aprovado com sucesso!' });
+        } else {
+            res.status(400).json(result);
+        }
+    } catch (err) {
+        console.error('Influencer Auto-Approve Error:', err);
+        res.status(500).json({ success: false, error: 'Erro interno.' });
+    }
+});
+
 app.post('/api/ggpix/webhook', async (req, res) => {
     try {
         const payload = req.body;
         if (payload.status === 'COMPLETE' && payload.type === 'PIX_IN') {
             const external_id = payload.transactionId || payload.externalId;
-            let stmt = 'SELECT * FROM deposits WHERE external_id = $1 AND status = \'pending\'';
-            let dep = await pool.query(stmt, [payload.transactionId]);
-
-            if (dep.rows.length === 0 && payload.externalId) {
-                const dep2 = await pool.query(stmt, [payload.externalId]);
-                dep = dep2;
-            }
-
-            if (dep.rows.length > 0) {
-                const amount = parseFloat(dep.rows[0].amount);
-                const bonus = getBonusForAmount(amount);
-                const totalBalanceCredit = amount + bonus;
-
-                // Get system settings for deposit bonus (Legacy settings kept for compatibility)
-                const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('deposit_rollover_mult')");
-                let rollMult = 1;
-                sRows.rows.forEach(r => {
-                    if (r.key_name === 'deposit_rollover_mult') rollMult = parseFloat(r.key_value) || 1;
-                });
-
-                let addedRollover = (amount + bonus) * rollMult;
-
-                await pool.query(
-                    'UPDATE users SET balance = balance + $1, rollover_required = rollover_required + $2 WHERE id = $3',
-                    [totalBalanceCredit, addedRollover, dep.rows[0].user_id]
-                );
-                await pool.query('UPDATE deposits SET status = \'completed\' WHERE id = $1', [dep.rows[0].id]);
-            }
+            await completeDeposit(external_id, true);
         }
         res.json({ received: true });
     } catch (err) {
-        console.error(err);
+        console.error('Webhook Error:', err);
         res.status(400).json({ error: 'Erro no webhook' });
     }
 });
