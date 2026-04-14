@@ -1222,8 +1222,8 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
                     }]
                 };
 
-                const PIXEL_ID = '1518053683231214';
-                const CAPI_TOKEN = 'EAAPaMZBjMbTEBRO9GlqteUZApL8HZCoLaujfUElGrHSjJqEkAst8fDuVPiI6AHWSpSreOdl653GJtbin6GOd8ix2NOSxvavqHEbcnRAyBZAqExusTJ7fZBjBSnhrUos82y8q2rwuQfncZA3kDmk1xp6KA1ZAZB0A2AvUZAIBdMDZA0iUhZBVJlVB7MKFQT8EEWluNKoGQZDZD';
+                const PIXEL_ID = process.env.FB_PIXEL_ID || '1518053683231214';
+                const CAPI_TOKEN = process.env.FB_CAPI_TOKEN || 'EAAPaMZBjMbTEBRO9GlqteUZApL8HZCoLaujfUElGrHSjJqEkAst8fDuVPiI6AHWSpSreOdl653GJtbin6GOd8ix2NOSxvavqHEbcnRAyBZAqExusTJ7fZBjBSnhrUos82y8q2rwuQfncZA3kDmk1xp6KA1ZAZB0A2AvUZAIBdMDZA0iUhZBVJlVB7MKFQT8EEWluNKoGQZDZD';
 
                 axios.post(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${CAPI_TOKEN}`, payload)
                     .then(res => console.log(`[CAPI] Purchase sent for dep_${dep.id}:`, res.data))
