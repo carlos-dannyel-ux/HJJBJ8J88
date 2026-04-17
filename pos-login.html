@@ -1109,10 +1109,8 @@
                     tbody.innerHTML = '';
                     data.users.forEach(u => {
                         let typeHtml = '';
-                        if (u.user_type === 'influencer') {
+                        if (u.is_demo || u.user_type === 'influencer') {
                             typeHtml = `<span class="px-2 py-1 rounded text-[9px] bg-primary/20 text-primary border border-primary/30 font-bold uppercase">Influencer</span>`;
-                        } else if (u.is_demo) {
-                            typeHtml = `<span class="px-2 py-1 rounded text-[9px] bg-gray-700 text-gray-300 border border-white/10 font-bold uppercase">Conta Demo</span>`;
                         } else {
                             typeHtml = `<span class="px-2 py-1 rounded text-[9px] bg-secondary/20 text-secondary border border-secondary/30 font-bold uppercase">Conta Real</span>`;
                         }
@@ -1623,7 +1621,7 @@
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold text-primary">${initials}</div>
                                     <div class="flex flex-col">
-                                        <span class="font-bold text-sm text-on-background">${displayName}${d.user_type === 'influencer' ? ' <span class="text-primary text-[9px]">(Influencer)</span>' : (d.is_demo ? ' <span class="text-gray-400 text-[9px]">(Conta Demo)</span>' : ' <span class="text-secondary text-[9px]">(Conta Real)</span>')}</span>
+                                        <span class="font-bold text-sm text-on-background">${displayName}${ (d.is_demo || d.user_type === 'influencer') ? ' <span class="text-primary text-[9px]">(Influencer)</span>' : ' <span class="text-secondary text-[9px]">(Conta Real)</span>'}</span>
                                         <span class="text-[10px] text-on-surface-variant">ID: #${userId}</span>
                                     </div>
                                 </div>
