@@ -1341,13 +1341,24 @@ app.post('/api/influencer-auto-approve', authenticateToken, async (req, res) => 
 app.post('/api/ggpix/webhook', async (req, res) => {
     try {
         const payload = req.body;
-        if (payload.status === 'COMPLETE' && payload.type === 'PIX_IN') {
-            const external_id = payload.transactionId || payload.externalId;
-            await completeDeposit(external_id, true);
+        console.log('[GGPIX Webhook] Raw Payload:', JSON.stringify(payload));
+
+        const acceptableStatuses = ['COMPLETE', 'PAID', 'SUCCESS', 'APPROVED'];
+        const isPaidStatus = acceptableStatuses.includes(String(payload.status).toUpperCase());
+        
+        if (isPaidStatus && payload.type === 'PIX_IN') {
+            // GGPIX typically sends its internal ID as 'id' or 'transactionId'
+            // and our reference as 'externalId'
+            const gatewayId = payload.id || payload.transactionId || payload.externalId;
+            console.log(`[GGPIX Webhook] Processing payment for Gateway ID: ${gatewayId}`);
+            
+            await completeDeposit(gatewayId, true);
+        } else {
+            console.log(`[GGPIX Webhook] Ignored payload - Status: ${payload.status}, Type: ${payload.type}`);
         }
         res.json({ received: true });
     } catch (err) {
-        console.error('Webhook Error:', err);
+        console.error('[GGPIX Webhook] Error:', err.message);
         res.status(400).json({ error: 'Erro no webhook' });
     }
 });
