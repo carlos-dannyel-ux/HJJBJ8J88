@@ -673,16 +673,20 @@
                 }
             }
 
+            let isLaunching = false;
             async function launchGame(code) {
+                if (isLaunching) return;
                 const token = localStorage.getItem('30win_token');
                 if (!token) return window.location.href = '/auth.html';
 
+                isLaunching = true;
                 // Verificação de saldo antes do lançamento
                 if (!window.currentUser || parseFloat(window.currentUser.balance) <= 0) {
                     showToast('Saldo insuficiente. Realize um depósito para jogar!', 'warning');
                     setTimeout(() => {
                         window.location.href = '/deposito.html';
                     }, 2000);
+                    isLaunching = false;
                     return;
                 }
 
@@ -702,6 +706,7 @@
                         const errorMsg = errorJson.error || 'Falha ao iniciar';
                         const debugUrl = errorJson.debug_info ? `<br><small class="opacity-70">Callback: ${errorJson.debug_info.callback_url}</small>` : '';
                         showToast(`Erro (${res.status}): ${errorMsg}${debugUrl}`, 'error');
+                        isLaunching = false;
                         return;
                     }
 
@@ -712,9 +717,6 @@
                             iframe = document.createElement('iframe');
                             iframe.id = 'game-iframe';
                             iframe.className = 'absolute inset-0 w-full h-full border-none';
-                            iframe.setAttribute('allowfullscreen', 'true');
-                            iframe.setAttribute('webkitallowfullscreen', 'true');
-                            iframe.setAttribute('mozallowfullscreen', 'true');
                             iframe.setAttribute('scrolling', 'no');
                             iframe.setAttribute('allow', 'autoplay; fullscreen; display-capture; camera; microphone');
                             iframe.style.cssText = 'transform: translateZ(0); -webkit-transform: translateZ(0); pointer-events: auto !important;';
@@ -754,6 +756,8 @@
                 } catch (e) {
                     console.error('Fetch Catch Error:', e);
                     showToast('Erro de conexão ou timeout. Verifique sua rede.', 'error');
+                } finally {
+                    setTimeout(() => { isLaunching = false; }, 1000);
                 }
             }
 
