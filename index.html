@@ -717,10 +717,17 @@
                             iframe.setAttribute('mozallowfullscreen', 'true');
                             iframe.setAttribute('scrolling', 'no');
                             iframe.setAttribute('allow', 'autoplay; fullscreen; display-capture; camera; microphone');
-                            iframe.style.cssText = 'transform: translateZ(0); -webkit-transform: translateZ(0); overscroll-behavior: none;';
+                            iframe.style.cssText = 'transform: translateZ(0); -webkit-transform: translateZ(0); pointer-events: auto !important;';
                             document.getElementById('game-overlay').appendChild(iframe);
                         }
                         iframe.src = data.launch_url;
+                        iframe.onload = () => {
+                            setTimeout(() => {
+                                iframe.focus();
+                                console.log('Iframe focused after load');
+                            }, 100);
+                        };
+                        iframe.focus();
                         const overlay = document.getElementById('game-overlay');
                         overlay.classList.remove('hidden');
                         overlay.classList.add('block');
@@ -755,6 +762,7 @@
                 if (iframe) iframe.remove();
                 document.getElementById('game-overlay').classList.add('hidden');
                 document.getElementById('game-overlay').classList.remove('block');
+                document.body.style.overflow = 'auto';
                 
                 if (document.getElementById('main-container')) {
                     document.getElementById('main-container').style.display = 'flex';
@@ -810,7 +818,7 @@
         </script>
 
         <!-- Jogo Overlay Fullscreen -->
-        <div id="game-overlay" class="fixed inset-0 bg-black z-[10000] hidden overflow-hidden" style="touch-action: none; overscroll-behavior: none; transform: translateZ(0);">
+        <div id="game-overlay" class="fixed inset-0 bg-black z-[10000] hidden overflow-hidden" style="pointer-events: auto; transform: translateZ(0);">
             <!-- Fullscreen Iframe will be appended before the button -->
             <button onclick="closeGameOverlay()" style="z-index: 999999999 !important;"
                 class="fixed left-0 top-1/2 -translate-y-1/2 w-10 h-20 bg-white/10 backdrop-blur-lg border border-white/20 rounded-r-2xl flex items-center justify-center active:scale-95 transition-all shadow-[10px_0_30px_rgba(0,0,0,0.5)] group">
