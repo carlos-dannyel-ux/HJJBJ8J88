@@ -1306,11 +1306,15 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
                         ...(TEST_CODE ? { test_event_code: TEST_CODE } : {})
                     };
 
-                    console.log(`[CAPI] Sending Purchase payload:`, JSON.stringify(payload));
+                    console.log(`[CAPI] Sending Purchase payload for dep_${dep.id}...`);
 
-                    axios.post(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${CAPI_TOKEN}`, payload)
-                        .then(res => console.log(`[CAPI] Purchase sent for dep_${dep.id} (Status: ${res.data.events_received})`))
-                        .catch(e => console.error(`[CAPI] Error for dep_${dep.id}:`, e.response?.data || e.message));
+                    try {
+                        const fbRes = await axios.post(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${CAPI_TOKEN}`, payload);
+                        console.log(`[CAPI] Purchase sent for dep_${dep.id} (Facebook Response: ${JSON.stringify(fbRes.data)})`);
+                    } catch (fbErr) {
+                        const errorDetail = fbErr.response?.data || fbErr.message;
+                        console.error(`[CAPI] Facebook rejected dep_${dep.id}:`, JSON.stringify(errorDetail));
+                    }
                 } else {
                     console.warn(`[CAPI] Skipped dep_${dep.id}: PIXEL_ID or TOKEN missing in settings.`);
                 }
