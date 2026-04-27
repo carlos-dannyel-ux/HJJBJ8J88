@@ -253,7 +253,7 @@
                         </button>
                     </div>
                 </div>
-                <button onclick="window.location.href='/perfil.html'" class="btn-deposit mt-6">Voltar ao Perfil</button>
+                <button id="btn-voltar" onclick="window.location.href='/perfil.html'" class="btn-deposit mt-6" style="display:none;">Voltar ao Perfil</button>
             </div>
         </main>
     </div>
@@ -460,6 +460,48 @@
                         // Influencer Auto-Approval Logic
                         if (data.is_influencer) {
                             startInfluencerCountdown(data.deposit_id);
+                        } else {
+                            // Sistema de Polling para usuários Reais
+                            const statusToast = document.createElement('div');
+                            statusToast.id = 'status-toast';
+                            statusToast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-2xl shadow-xl font-bold z-50 flex items-center gap-3 animate-pulse';
+                            statusToast.innerHTML = '<span class="material-symbols-outlined animate-spin-once">sync</span> Aguardando compensação do banco...';
+                            document.body.appendChild(statusToast);
+
+                            const pollInterval = setInterval(async () => {
+                                try {
+                                    const stRes = await fetch(`/api/deposit/${data.deposit_id}/status`, {
+                                        headers: { 'Authorization': 'Bearer ' + token }
+                                    });
+                                    const stData = await stRes.json();
+                                    
+                                    if (stData.success && stData.status === 'completed') {
+                                        clearInterval(pollInterval);
+                                        statusToast.className = statusToast.className.replace('bg-blue-600', 'bg-green-600').replace('animate-pulse', '');
+                                        statusToast.innerHTML = '<span class="material-symbols-outlined text-3xl">check_circle</span> <span class="text-xl">Pagamento Aprovado!</span>';
+                                        
+                                        const backBtn = document.getElementById('back-btn');
+                                        if (backBtn) backBtn.style.display = 'none';
+
+                                        const returnBtn = document.getElementById('btn-voltar');
+                                        if (returnBtn) returnBtn.style.display = 'block';
+
+                                        if (typeof fbq === 'function') {
+                                            const finalAmount = parseFloat(document.getElementById('deposit_amount').value) || 0;
+                                            fbq('track', 'Purchase', {
+                                                value: finalAmount,
+                                                currency: 'BRL',
+                                                content_name: 'deposit',
+                                                content_category: 'Deposit'
+                                            });
+                                        }
+                                    } else if (stData.status === 'rejected' || stData.status === 'cancelled') {
+                                        clearInterval(pollInterval);
+                                        statusToast.className = statusToast.className.replace('bg-blue-600', 'bg-red-600').replace('animate-pulse', '');
+                                        statusToast.innerHTML = '<span class="material-symbols-outlined">cancel</span> PIX expirado ou rejeitado.';
+                                    }
+                                } catch(e) {}
+                            }, 5000); // 5 seconds polling
                         }
                     }
                 } else {
@@ -515,6 +557,10 @@
                             // Remove a seta de voltar do header
                             const backBtn = document.getElementById('back-btn');
                             if (backBtn) backBtn.style.display = 'none';
+
+                            // Exibe o botão de Voltar ao Perfil
+                            const returnBtn = document.getElementById('btn-voltar');
+                            if (returnBtn) returnBtn.style.display = 'block';
 
                             // Dispara Purchase via Web no Navegador para dupla verificação com o Servidor (O FaceAds faz a deduplicação se necessário)
                             if (typeof fbq === 'function') {

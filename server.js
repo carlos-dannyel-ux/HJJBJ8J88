@@ -1432,6 +1432,16 @@ app.post('/api/influencer-auto-approve', authenticateToken, async (req, res) => 
     }
 });
 
+app.get('/api/deposit/:id/status', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const depRow = await pool.query('SELECT status, amount FROM deposits WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+        if(depRow.rows.length === 0) return res.status(404).json({ error: 'Depósito não encontrado' });
+        res.json({ success: true, status: depRow.rows[0].status });
+    } catch(err) {
+        res.status(500).json({ error: 'Erro ao checar status.' });
+    }
+});
 app.post('/api/ggpix/webhook', async (req, res) => {
     try {
         const payload = req.body;
