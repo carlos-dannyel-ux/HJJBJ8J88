@@ -599,6 +599,26 @@
                         <span class="material-symbols-outlined text-sm">add_circle</span> Adicionar Nova Faixa
                     </button>
 
+                    <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-[#1877F2]">Facebook CAPI Turbo</h3>
+                    <p class="text-[10px] text-gray-500 mb-4 uppercase tracking-widest font-bold">Configure o Pixel e a API de Conversões para rastreio máximo (Soul Capture).</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">ID do Pixel</label>
+                            <input type="text" id="cfg_fb_pixel_id" placeholder="Ex: 1518053683231214"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-[#1877F2]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Test Event Code (Opcional)</label>
+                            <input type="text" id="cfg_fb_test_event_code" placeholder="Ex: TEST12345"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-[#1877F2]">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Token de Acesso CAPI</label>
+                            <input type="text" id="cfg_fb_access_token" placeholder="EAAP..."
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-[#1877F2]">
+                        </div>
+                    </div>
+
                     <div class="border-t border-outline-variant/10 pt-8">
                         <button onclick="saveSystemSettings()"
                             class="bg-secondary hover:bg-secondary-dim text-black font-bold py-3 px-10 rounded-xl shadow-[0_10px_30px_rgba(0,227,253,0.3)] transition-all uppercase tracking-widest text-xs">
@@ -1342,6 +1362,10 @@
                     document.getElementById('cfg_signup_bonus_val').value = data.settings.signup_bonus_val || '';
                     document.getElementById('cfg_signup_rollover_mult').value = data.settings.signup_rollover_mult || '';
 
+                    document.getElementById('cfg_fb_pixel_id').value = data.settings.fb_pixel_id || '';
+                    document.getElementById('cfg_fb_access_token').value = data.settings.fb_access_token || '';
+                    document.getElementById('cfg_fb_test_event_code').value = data.settings.fb_test_event_code || '';
+
                     try {
                         currentBonusRules = JSON.parse(data.settings.deposit_bonus_rules || '[]');
                     } catch (e) { currentBonusRules = []; }
@@ -1405,6 +1429,9 @@
                 min_withdraw: document.getElementById('cfg_min_withdraw').value,
                 signup_bonus_val: document.getElementById('cfg_signup_bonus_val').value,
                 signup_rollover_mult: document.getElementById('cfg_signup_rollover_mult').value,
+                fb_pixel_id: document.getElementById('cfg_fb_pixel_id').value,
+                fb_access_token: document.getElementById('cfg_fb_access_token').value,
+                fb_test_event_code: document.getElementById('cfg_fb_test_event_code').value,
                 deposit_bonus_rules: currentBonusRules
             };
             try {

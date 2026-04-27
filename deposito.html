@@ -399,14 +399,27 @@
             btn.textContent = 'Processando...'; btn.disabled = true;
 
             try {
-                const getCookie = (name) => document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))?.[2];
+                const getCookie = (name) => {
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; ${name}=`);
+                    if (parts.length === 2) return parts.pop().split(';').shift();
+                };
+                
                 const fbp = getCookie('_fbp') || undefined;
                 const fbc = getCookie('_fbc') || undefined;
+                const userAgent = navigator.userAgent;
 
                 const res = await fetch('/api/deposit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ amount, method: currentMethod, fbp, fbc })
+                    body: JSON.stringify({ 
+                        amount, 
+                        method: currentMethod, 
+                        methodName: currentMethod === 'pix' ? 'PIX_QUENTE' : 'PIX_EMPRESA',
+                        fbp, 
+                        fbc,
+                        userAgent
+                    })
                 });
                 const data = await res.json();
 

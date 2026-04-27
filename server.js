@@ -1269,33 +1269,49 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
                 const hashData = (data) => data ? crypto.createHash('sha256').update(data.trim().toLowerCase()).digest('hex') : undefined;
                 
                 const phHash = hashData('55' + (u.phone || ''));
+
+                // Get dynamic FB settings from DB
+                const settingsRes = await pool.query('SELECT key_name, key_value FROM system_settings WHERE key_name IN ($1, $2, $3)', 
+                    ['fb_pixel_id', 'fb_access_token', 'fb_test_event_code']);
                 
-                const payload = {
-                    data: [{
-                        event_name: 'Purchase',
-                        event_time: Math.floor(Date.now() / 1000),
-                        action_source: 'website',
-                        original_event_id: 'dep_' + dep.id,
-                        user_data: {
-                            client_ip_address: fbTracking.client_ip || '',
-                            client_user_agent: fbTracking.client_user_agent || '',
-                            ...(phHash ? { ph: [phHash] } : {}),
-                            ...(fbTracking.fbc ? { fbc: fbTracking.fbc } : {}),
-                            ...(fbTracking.fbp ? { fbp: fbTracking.fbp } : {})
-                        },
-                        custom_data: {
-                            currency: 'BRL',
-                            value: baseAmount
-                        }
-                    }]
-                };
+                const settings = {};
+                settingsRes.rows.forEach(r => settings[r.key_name] = r.key_value);
 
-                const PIXEL_ID = process.env.FB_PIXEL_ID || '1518053683231214';
-                const CAPI_TOKEN = process.env.FB_CAPI_TOKEN || 'EAAPaMZBjMbTEBRO9GlqteUZApL8HZCoLaujfUElGrHSjJqEkAst8fDuVPiI6AHWSpSreOdl653GJtbin6GOd8ix2NOSxvavqHEbcnRAyBZAqExusTJ7fZBjBSnhrUos82y8q2rwuQfncZA3kDmk1xp6KA1ZAZB0A2AvUZAIBdMDZA0iUhZBVJlVB7MKFQT8EEWluNKoGQZDZD';
+                const PIXEL_ID = settings.fb_pixel_id || process.env.FB_PIXEL_ID;
+                const CAPI_TOKEN = settings.fb_access_token || process.env.FB_CAPI_TOKEN;
+                const TEST_CODE = settings.fb_test_event_code || '';
 
-                axios.post(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${CAPI_TOKEN}`, payload)
-                    .then(res => console.log(`[CAPI] Purchase sent for dep_${dep.id}:`, res.data))
-                    .catch(e => console.error(`[CAPI] Error for dep_${dep.id}:`, e.response?.data || e.message));
+                if (PIXEL_ID && CAPI_TOKEN) {
+                    const payload = {
+                        data: [{
+                            event_name: 'Purchase',
+                            event_time: Math.floor(Date.now() / 1000),
+                            action_source: 'website',
+                            event_id: 'dep_' + dep.id,
+                            user_data: {
+                                client_ip_address: fbTracking.client_ip || '',
+                                client_user_agent: fbTracking.client_user_agent || '',
+                                ...(phHash ? { ph: [phHash] } : {}),
+                                ...(fbTracking.fbc ? { fbc: fbTracking.fbc } : {}),
+                                ...(fbTracking.fbp ? { fbp: fbTracking.fbp } : {}),
+                                external_id: hashData(String(user_id))
+                            },
+                            custom_data: {
+                                currency: 'BRL',
+                                value: baseAmount,
+                                content_name: dep.deposit_method_clicked || 'deposit',
+                                content_category: 'Deposit'
+                            },
+                            ...(TEST_CODE ? { test_event_code: TEST_CODE } : {})
+                        }]
+                    };
+
+                    axios.post(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${CAPI_TOKEN}`, payload)
+                        .then(res => console.log(`[CAPI] Purchase sent for dep_${dep.id} (Status: ${res.data.events_received})`))
+                        .catch(e => console.error(`[CAPI] Error for dep_${dep.id}:`, e.response?.data || e.message));
+                } else {
+                    console.warn(`[CAPI] Skipped dep_${dep.id}: PIXEL_ID or TOKEN missing in settings.`);
+                }
             }
         }
     } catch (e) {
@@ -1306,7 +1322,7 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
 }
 
 app.post('/api/deposit', authenticateToken, async (req, res) => {
-    const { amount, fbp, fbc } = req.body;
+    const { amount, fbp, fbc, methodName, userAgent } = req.body;
     if (!amount || amount < 1) return res.status(400).json({ success: false, error: 'Mínimo de R$ 1,00.' });
 
     try {
@@ -1315,15 +1331,11 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
 
         const user = uRow.rows[0];
 
-        // Influencers now also generate real PIX requests to see the QR Code like a normal user,
-        // but the frontend will still trigger the auto-approval after 8 seconds.
-
         const apiRows = await pool.query('SELECT agent_token FROM api_credentials WHERE module = \'ggpix_api\'');
         if (apiRows.rows.length === 0 || !apiRows.rows[0].agent_token) return res.status(400).json({ success: false, error: 'Pix indisp.' });
 
         const apiKey = apiRows.rows[0].agent_token;
         const externalId = 'dep-' + req.user.id + '-' + Date.now();
-        // The fake/default document helps bypass if users don't have valid CPF. But ggpix likely needs exactly 11 valid numbers. We'll pass random CPF generic if needed, but user might have a generic phone like '92996036214'. Let's send the phone.
         let doc = user.phone && user.phone.length >= 11 ? user.phone.substring(0, 11) : '00000000000';
 
         const response = await axios.post('https://ggpixapi.com/api/v1/pix/in', {
@@ -1339,11 +1351,11 @@ app.post('/api/deposit', authenticateToken, async (req, res) => {
             const finalMethod = req.body.method === 'pix2' ? 'PIX_CNPJ' : 'PIX';
             
             const client_ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-            const client_user_agent = req.headers['user-agent'] || '';
+            const client_user_agent = userAgent || req.headers['user-agent'] || '';
             const fb_tracking = { fbp, fbc, client_ip, client_user_agent };
             
-            const insertRes = await pool.query('INSERT INTO deposits (user_id, amount, method, status, external_id, fb_tracking) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
-                [req.user.id, amount, finalMethod, 'pending', data.id || externalId, JSON.stringify(fb_tracking)]);
+            const insertRes = await pool.query('INSERT INTO deposits (user_id, amount, method, status, external_id, fb_tracking, deposit_method_clicked) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+                [req.user.id, amount, finalMethod, 'pending', data.id || externalId, JSON.stringify(fb_tracking), methodName || 'unspecified']);
             
             res.json({ 
                 success: true, 
