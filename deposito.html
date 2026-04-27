@@ -233,14 +233,14 @@
             </div>
 
             <!-- Real PIX step -->
-            <div id="step-real" class="hidden text-center space-y-4">
+            <div id="step-real" class="hidden flex flex-col items-center justify-center space-y-4">
                 <p class="text-xs text-gray-400">Escaneie o QR Code ou cole o código. O saldo cai automaticamente!</p>
-                <div class="bg-[#1a1a1a] rounded-lg p-3 inline-block border border-white/5 mx-auto">
+                <div class="bg-[#1a1a1a] rounded-lg p-3 border border-white/5 mx-auto w-[80%] max-w-[250px]">
                     <span class="text-xs text-gray-400 uppercase tracking-widest font-bold">Valor a Depositar</span><br>
                     <span class="text-2xl font-black text-[#FFB800]">R$ <span id="display-payment-amount">0,00</span></span>
                 </div>
-                <div class="qr-container mt-2 mx-auto inline-block">
-                    <img id="qr-image" src="" alt="QR Code" class="w-48 h-48">
+                <div class="bg-white p-2 rounded-xl mx-auto inline-block">
+                    <img id="qr-image" src="" alt="QR Code" class="w-48 h-48 block">
                 </div>
                 <div class="mt-4 text-left">
                     <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">PIX Copia e
@@ -440,6 +440,8 @@
 
                     document.getElementById('step-amount').classList.add('hidden');
                     document.getElementById('step-qr').classList.remove('hidden');
+                    
+                    document.getElementById('display-payment-amount').innerText = amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
                     if (data.is_demo) {
                         document.getElementById('step-demo').classList.remove('hidden');
