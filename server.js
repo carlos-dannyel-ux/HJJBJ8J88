@@ -1264,8 +1264,8 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
         const userQ = await pool.query('SELECT phone, user_type FROM users WHERE id = $1', [user_id]);
         if (userQ.rows.length === 1) {
             const u = userQ.rows[0];
-            if (u.user_type !== 'influencer') {
-                const fbTracking = dep.fb_tracking || {};
+            // Liberado disparo para todos (incluindo influencers para fins de teste)
+            const fbTracking = dep.fb_tracking || {};
                 const hashData = (data) => data ? crypto.createHash('sha256').update(data.trim().toLowerCase()).digest('hex') : undefined;
                 
                 const phHash = hashData('55' + (u.phone || ''));
