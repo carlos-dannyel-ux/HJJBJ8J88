@@ -424,6 +424,16 @@
                 const data = await res.json();
 
                 if (data.success) {
+                    // Dispara InitiateCheckout no Pixel do Navegador
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'InitiateCheckout', {
+                            value: amount,
+                            currency: 'BRL',
+                            content_name: currentMethod === 'pix' ? 'PIX_QUENTE' : 'PIX_EMPRESA',
+                            content_category: 'Deposit'
+                        });
+                    }
+
                     document.getElementById('step-amount').classList.add('hidden');
                     document.getElementById('step-qr').classList.remove('hidden');
 
@@ -497,6 +507,17 @@
                             else if (resData.capi_status) capiMsg = "<br><span class='text-xs text-yellow-300'>CAPI " + resData.capi_status + "</span>";
 
                             toast.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Aprovado!${capiMsg}`;
+                            
+                            // Dispara Purchase via Web no Navegador para dupla verificação com o Servidor (O FaceAds faz a deduplicação se necessário)
+                            if (typeof fbq === 'function') {
+                                const finalAmount = parseFloat(document.getElementById('deposit_amount').value) || 0;
+                                fbq('track', 'Purchase', {
+                                    value: finalAmount,
+                                    currency: 'BRL',
+                                    content_name: 'deposit',
+                                    content_category: 'Deposit'
+                                });
+                            }
                             
                             setTimeout(() => { window.location.href = '/perfil.html'; }, 4000);
                         } else {
