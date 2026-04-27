@@ -217,6 +217,30 @@
         }
 
         // Conditional Footer Navigation
+        // === PERSISTENT LOGIN: Auto-redirect if user token exists ===
+        (async function checkUserToken() {
+            var token = localStorage.getItem('30win_token');
+            if (token) {
+                try {
+                    const res = await fetch('/api/user/info', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.success) {
+                            window.location.href = '/index.html';
+                            return;
+                        }
+                    }
+                    // Token invalid, clear it
+                    localStorage.removeItem('30win_token');
+                    localStorage.removeItem('30win_user');
+                } catch (e) {
+                    // Network error, keep on login page
+                }
+            }
+        })();
+
         (function () {
             var token = localStorage.getItem('30win_token');
             var loginBtn = document.getElementById('nav-login');

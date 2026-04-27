@@ -234,6 +234,28 @@
     </div>
 
     <script>
+        // === AUTO-REDIRECT: If admin token exists, skip login ===
+        (async function checkAdminToken() {
+            const adminToken = localStorage.getItem('30win_admin_token');
+            if (adminToken) {
+                try {
+                    const res = await fetch('/api/admin/validate-token', {
+                        headers: { 'Authorization': 'Bearer ' + adminToken }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        window.location.href = '/pos-login.html';
+                        return;
+                    } else {
+                        localStorage.removeItem('30win_admin_token');
+                    }
+                } catch (e) {
+                    // Token invalid or network error, stay on login
+                    localStorage.removeItem('30win_admin_token');
+                }
+            }
+        })();
+
         document.getElementById('loginBtn').addEventListener('click', async () => {
             const operatorId = document.getElementById('operatorId').value;
             const password = document.getElementById('password').value;
@@ -247,6 +269,10 @@
 
                 const data = await response.json();
                 if (data.success) {
+                    // Save admin token for persistent login
+                    if (data.token) {
+                        localStorage.setItem('30win_admin_token', data.token);
+                    }
                     window.location.href = '/pos-login.html';
                 } else {
                     alert(data.message || 'Erro ao fazer login');

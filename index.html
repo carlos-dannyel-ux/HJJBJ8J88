@@ -566,6 +566,28 @@
             let syncInterval = setInterval(syncUserData, 15000); // Polling reduzido para 15s para evitar lag
             syncUserData();
 
+            // === AUTO-CLAIM DAILY BONUS (12h) ===
+            (async function claimDailyBonus() {
+                const token = localStorage.getItem('30win_token');
+                if (!token) return;
+                try {
+                    const res = await fetch('/api/user/claim-daily-bonus', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+                    });
+                    const data = await res.json();
+                    if (data.success && data.claimed) {
+                        // Show a subtle toast notification for the bonus
+                        const toast = document.createElement('div');
+                        toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[9999] bg-green-600 text-white px-6 py-3 rounded-2xl shadow-xl font-bold text-sm flex items-center gap-2';
+                        toast.innerHTML = `🎁 Bônus Diário: R$ ${data.amount.toFixed(2)} creditado!`;
+                        document.body.appendChild(toast);
+                        setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s'; setTimeout(() => toast.remove(), 500); }, 4000);
+                        syncUserData(); // Re-sync to update balance
+                    }
+                } catch (e) { console.log('[DailyBonus] Error:', e); }
+            })();
+
             let rotation = 0;
             document.querySelectorAll('.refreshBtn').forEach(btn => {
                 btn.onclick = () => {

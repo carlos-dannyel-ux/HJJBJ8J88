@@ -164,9 +164,14 @@
                         <span class="material-symbols-outlined">account_balance_wallet</span>
                         <span class="font-headline uppercase tracking-wide text-sm">Retribuição e RTP</span>
                     </div>
+                    <div id="tab-manipulation" onclick="switchTab('manipulation')"
+                        class="flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-error transition-all">
+                        <span class="material-symbols-outlined">psychology</span>
+                        <span class="font-headline uppercase tracking-wide text-sm">Manipulation</span>
+                    </div>
 
-                    <div class="mt-40 flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:text-error transition-all"
-                        onclick="localStorage.removeItem('30win_token'); window.location.href='/admin.html'">
+                    <div class="mt-20 flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:text-error transition-all"
+                        onclick="localStorage.removeItem('30win_admin_token'); window.location.href='/admin.html'">
                         <span class="material-symbols-outlined">logout</span>
                         <span class="font-headline uppercase tracking-wide text-sm">Logout</span>
                     </div>
@@ -557,6 +562,30 @@
                         </div>
                     </div>
 
+                    <!-- BÔNUS DIÁRIO (12H) -->
+                    <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-[#00e3fd]">Bônus Diário (12h)</h3>
+                    <p class="text-[10px] text-gray-500 mb-4 uppercase tracking-widest font-bold">Crédito automático no saldo de usuários reais a cada 12 horas.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 items-end">
+                        <div class="flex items-center gap-4">
+                            <label class="block text-xs font-bold text-gray-400 mb-0">Ativar</label>
+                            <button id="toggle_daily_bonus" onclick="toggleDailyBonus()" class="relative w-14 h-7 rounded-full transition-colors duration-300 bg-gray-700 focus:outline-none">
+                                <span class="absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform" id="daily_bonus_knob"></span>
+                            </button>
+                            <span id="daily_bonus_label" class="text-xs font-bold text-gray-500 uppercase">OFF</span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-2">Valor do Bônus (R$)</label>
+                            <input type="number" id="cfg_daily_bonus_value" placeholder="5.00"
+                                class="w-full bg-[#110f2d] border border-gray-700 rounded p-3 text-white focus:border-secondary">
+                        </div>
+                        <div>
+                            <button onclick="saveDailyBonus()"
+                                class="bg-secondary hover:bg-secondary-dim text-black font-bold py-3 px-6 rounded-lg transition-all uppercase tracking-widest text-xs">
+                                SALVAR BÔNUS DIÁRIO
+                            </button>
+                        </div>
+                    </div>
+
                     <h3 class="font-headline font-bold text-xl mb-4 mt-8 text-[#00e3fd]">Regras de Bônus Escalonado</h3>
                     <p class="text-[10px] text-gray-500 mb-4 uppercase tracking-widest font-bold">Configure bônus
                         diferentes por faixa de depósito. A maior faixa atingida é a que vale.</p>
@@ -743,6 +772,56 @@
             </div>
 
 
+
+            <!-- === SECTION 5: MODO MANIPULATION === -->
+            <div id="view-manipulation" class="hidden flex flex-col gap-6">
+                <div class="glass-card rounded-xl p-8 border-l-4 border-error">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-headline font-bold text-2xl text-error flex items-center gap-3">
+                                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">psychology</span>
+                                5. Modo Manipulation
+                            </h3>
+                            <p class="text-sm text-on-surface-variant mt-1">Controle total sobre o comportamento do sistema para novos cadastros.</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span id="manip_status_label" class="text-xs font-bold text-gray-500 uppercase tracking-widest">DESATIVADO</span>
+                            <button id="toggle_manipulation" onclick="toggleManipulation()" class="relative w-16 h-8 rounded-full transition-colors duration-300 bg-gray-700 focus:outline-none shadow-inner">
+                                <span class="absolute left-1 top-1 w-6 h-6 bg-white rounded-full transition-transform duration-300 transform shadow" id="manip_knob"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="manip_rules_display" class="space-y-4 opacity-50 transition-opacity">
+                        <!-- Rule 1 -->
+                        <div class="bg-surface-container-high/50 rounded-xl p-4 border border-outline-variant/10">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-secondary">card_giftcard</span>
+                                <div>
+                                    <p class="text-sm font-bold text-white">Fase Arrecadação + Manipulation ON</p>
+                                    <p class="text-xs text-gray-400">Cadastro: R$30 bônus → RTP 98% → Trava saque (depósito R$10) → +3 vitórias → RTP 1%</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Rule 2 -->
+                        <div class="bg-surface-container-high/50 rounded-xl p-4 border border-outline-variant/10">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-green-400">verified</span>
+                                <div>
+                                    <p class="text-sm font-bold text-white">Fase Retribuição (Sempre Justa)</p>
+                                    <p class="text-xs text-gray-400">Cadastro: R$10 bônus → Jogo justo sem manipulação → RTP alto para todos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Status Indicator -->
+                        <div id="manip_active_indicator" class="hidden bg-error/20 border border-error/50 rounded-xl p-4 text-center">
+                            <span class="material-symbols-outlined text-error text-4xl animate-pulse">warning</span>
+                            <p class="text-sm font-bold text-error mt-2">MODO MANIPULATION ATIVO</p>
+                            <p class="text-xs text-error/70">Novos cadastros na fase de arrecadação serão manipulados automaticamente.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
     </div>
 
@@ -949,7 +1028,7 @@
             const financeView = document.getElementById('view-finance');
             const settingsView = document.getElementById('view-settings');
             const rewardView = document.getElementById('view-reward');
-
+            const manipView = document.getElementById('view-manipulation');
 
             const tabDashboard = document.getElementById('tab-dashboard');
             const tabApi = document.getElementById('tab-api');
@@ -957,13 +1036,13 @@
             const tabFinance = document.getElementById('tab-finance');
             const tabSettings = document.getElementById('tab-settings');
             const tabReward = document.getElementById('tab-reward');
-
+            const tabManip = document.getElementById('tab-manipulation');
 
             const inactiveClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#e6e2ff]/70 hover:bg-[#1d1b3f] hover:text-[#00e3fd] transition-all";
             const activeClass = "flex items-center gap-4 px-6 py-4 cursor-pointer text-[#df8eff] bg-[#232148] font-bold border-r-4 border-[#df8eff]";
 
-            [dashboardView, apiView, usersView, financeView, settingsView, rewardView].forEach(v => { if (v) v.classList.add('hidden'); });
-            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings, tabReward].forEach(t => { if (t) t.className = inactiveClass; });
+            [dashboardView, apiView, usersView, financeView, settingsView, rewardView, manipView].forEach(v => { if (v) v.classList.add('hidden'); });
+            [tabDashboard, tabApi, tabUsers, tabFinance, tabSettings, tabReward, tabManip].forEach(t => { if (t) t.className = inactiveClass; });
 
             if (tab === 'dashboard') { dashboardView.classList.remove('hidden'); tabDashboard.className = activeClass; }
             else if (tab === 'api') { apiView.classList.remove('hidden'); tabApi.className = activeClass; loadAdminGames(); }
@@ -971,6 +1050,7 @@
             else if (tab === 'finance') { financeView.classList.remove('hidden'); tabFinance.className = activeClass; loadFinance(); }
             else if (tab === 'settings') { settingsView.classList.remove('hidden'); tabSettings.className = activeClass; loadSystemSettings(); }
             else if (tab === 'reward') { rewardView.classList.remove('hidden'); tabReward.className = activeClass; loadRewardSettings(); }
+            else if (tab === 'manipulation') { manipView.classList.remove('hidden'); tabManip.className = activeClass; loadManipulationStatus(); }
 
         }
 
@@ -1806,6 +1886,146 @@
             } catch (err) {
                 alert('Erro na conexão!');
             }
+        }
+
+        // === MANIPULATION MODE FUNCTIONS ===
+        let manipulationEnabled = false;
+
+        async function loadManipulationStatus() {
+            try {
+                const res = await fetch('/api/admin/manipulation/status');
+                const data = await res.json();
+                if (data.success) {
+                    manipulationEnabled = data.enabled;
+                    updateManipUI();
+                }
+            } catch (e) { console.error('Load Manip Error:', e); }
+        }
+
+        function updateManipUI() {
+            const btn = document.getElementById('toggle_manipulation');
+            const knob = document.getElementById('manip_knob');
+            const label = document.getElementById('manip_status_label');
+            const rules = document.getElementById('manip_rules_display');
+            const indicator = document.getElementById('manip_active_indicator');
+
+            if (manipulationEnabled) {
+                btn.className = btn.className.replace('bg-gray-700', 'bg-error');
+                if (!btn.className.includes('bg-error')) btn.classList.add('bg-error');
+                btn.classList.remove('bg-gray-700');
+                knob.style.transform = 'translateX(2rem)';
+                label.textContent = 'ATIVADO';
+                label.className = label.className.replace('text-gray-500', 'text-error');
+                if (!label.className.includes('text-error')) label.classList.add('text-error');
+                label.classList.remove('text-gray-500');
+                rules.style.opacity = '1';
+                indicator.classList.remove('hidden');
+            } else {
+                btn.classList.remove('bg-error');
+                btn.classList.add('bg-gray-700');
+                knob.style.transform = 'translateX(0)';
+                label.textContent = 'DESATIVADO';
+                label.classList.remove('text-error');
+                label.classList.add('text-gray-500');
+                rules.style.opacity = '0.5';
+                indicator.classList.add('hidden');
+            }
+        }
+
+        async function toggleManipulation() {
+            manipulationEnabled = !manipulationEnabled;
+            updateManipUI();
+            try {
+                const res = await fetch('/api/admin/manipulation/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled: manipulationEnabled })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                } else {
+                    manipulationEnabled = !manipulationEnabled;
+                    updateManipUI();
+                    alert('Erro: ' + data.error);
+                }
+            } catch (e) {
+                manipulationEnabled = !manipulationEnabled;
+                updateManipUI();
+                alert('Erro de conexão!');
+            }
+        }
+
+        // === DAILY BONUS FUNCTIONS ===
+        let dailyBonusEnabled = false;
+
+        async function loadDailyBonusStatus() {
+            try {
+                const res = await fetch('/api/admin/daily-bonus/status');
+                const data = await res.json();
+                if (data.success) {
+                    dailyBonusEnabled = data.enabled;
+                    document.getElementById('cfg_daily_bonus_value').value = data.value;
+                    updateDailyBonusUI();
+                }
+            } catch (e) { console.error('Load Daily Bonus Error:', e); }
+        }
+
+        function updateDailyBonusUI() {
+            const btn = document.getElementById('toggle_daily_bonus');
+            const knob = document.getElementById('daily_bonus_knob');
+            const label = document.getElementById('daily_bonus_label');
+
+            if (dailyBonusEnabled) {
+                btn.classList.remove('bg-gray-700');
+                btn.classList.add('bg-secondary');
+                knob.style.transform = 'translateX(1.75rem)';
+                label.textContent = 'ON';
+                label.classList.remove('text-gray-500');
+                label.classList.add('text-secondary');
+            } else {
+                btn.classList.remove('bg-secondary');
+                btn.classList.add('bg-gray-700');
+                knob.style.transform = 'translateX(0)';
+                label.textContent = 'OFF';
+                label.classList.remove('text-secondary');
+                label.classList.add('text-gray-500');
+            }
+        }
+
+        function toggleDailyBonus() {
+            dailyBonusEnabled = !dailyBonusEnabled;
+            updateDailyBonusUI();
+        }
+
+        async function saveDailyBonus() {
+            const value = document.getElementById('cfg_daily_bonus_value').value;
+            if (!value || parseFloat(value) <= 0) return alert('Insira um valor válido para o bônus diário.');
+            try {
+                const res = await fetch('/api/admin/daily-bonus/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled: dailyBonusEnabled, value: parseFloat(value) })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            } catch (e) { alert('Erro de conexão!'); }
+        }
+
+        // Load daily bonus status on settings tab
+        const origLoadSettings = window.loadSystemSettings;
+        if (typeof origLoadSettings === 'function') {
+            window.loadSystemSettings = async function() {
+                await origLoadSettings();
+                await loadDailyBonusStatus();
+            };
+        } else {
+            // Fallback: load on page
+            loadDailyBonusStatus();
         }
     </script>
 

