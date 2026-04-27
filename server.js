@@ -1311,16 +1311,20 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
                     try {
                         const fbRes = await axios.post(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${CAPI_TOKEN}`, payload);
                         console.log(`[CAPI] Purchase sent for dep_${dep.id} (Facebook Response: ${JSON.stringify(fbRes.data)})`);
+                        return { success: true, credited: totalCredit, capi_status: 'success', capi_data: fbRes.data };
                     } catch (fbErr) {
                         const errorDetail = fbErr.response?.data || fbErr.message;
                         console.error(`[CAPI] Facebook rejected dep_${dep.id}:`, JSON.stringify(errorDetail));
+                        return { success: true, credited: totalCredit, capi_status: 'error', capi_data: errorDetail };
                     }
                 } else {
                     console.warn(`[CAPI] Skipped dep_${dep.id}: PIXEL_ID or TOKEN missing in settings.`);
+                    return { success: true, credited: totalCredit, capi_status: 'skipped_keys_missing' };
                 }
             }
     } catch (e) {
         console.error('[CAPI] Trigger logic error:', e.message);
+        return { success: true, credited: totalCredit, capi_status: 'trigger_error', capi_data: e.message };
     }
     
     return { success: true, credited: totalCredit };
@@ -1413,7 +1417,12 @@ app.post('/api/influencer-auto-approve', authenticateToken, async (req, res) => 
 
         const result = await completeDeposit(deposit_id, false);
         if (result.success) {
-            res.json({ success: true, message: 'Depósito aprovado com sucesso!' });
+            res.json({ 
+                success: true, 
+                message: 'Depósito aprovado com sucesso!',
+                capi_status: result.capi_status,
+                capi_data: result.capi_data
+            });
         } else {
             res.status(400).json(result);
         }

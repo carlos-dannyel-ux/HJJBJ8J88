@@ -490,8 +490,15 @@
                         const resData = await res.json();
                         if (resData.success) {
                             toast.className = toast.className.replace('bg-blue-600', 'bg-green-600');
-                            toast.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Aprovado com Sucesso!`;
-                            setTimeout(() => { window.location.href = '/perfil.html'; }, 2000);
+                            
+                            let capiMsg = "";
+                            if (resData.capi_status === "error") capiMsg = "<br><span class='text-xs text-red-300'>CAPI Erro: " + JSON.stringify(resData.capi_data) + "</span>";
+                            else if (resData.capi_status === "success") capiMsg = "<br><span class='text-xs text-green-200'>CAPI FB Enviado! 💰</span>";
+                            else if (resData.capi_status) capiMsg = "<br><span class='text-xs text-yellow-300'>CAPI " + resData.capi_status + "</span>";
+
+                            toast.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Aprovado!${capiMsg}`;
+                            
+                            setTimeout(() => { window.location.href = '/perfil.html'; }, 4000);
                         } else {
                             toast.remove();
                         }
