@@ -1313,7 +1313,6 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
                     console.warn(`[CAPI] Skipped dep_${dep.id}: PIXEL_ID or TOKEN missing in settings.`);
                 }
             }
-        }
     } catch (e) {
         console.error('[CAPI] Trigger logic error:', e.message);
     }
