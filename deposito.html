@@ -162,7 +162,7 @@
     <div class="max-w-[450px] w-full mx-auto min-h-[100dvh] bg-[#0e0e0e] relative flex flex-col">
         <!-- Header -->
         <header class="flex items-center justify-between px-4 h-14 border-b border-[#1a1a1a] shrink-0">
-            <a href="javascript:history.back()" class="p-2 -ml-2" style="text-decoration:none;color:inherit;">
+            <a href="javascript:history.back()" id="back-btn" class="p-2 -ml-2" style="text-decoration:none;color:inherit;">
                 <span class="material-symbols-outlined">arrow_back_ios</span>
             </a>
             <h1 class="font-bold text-base flex-1 text-center pr-4">Depósito</h1>
@@ -235,7 +235,11 @@
             <!-- Real PIX step -->
             <div id="step-real" class="hidden text-center space-y-4">
                 <p class="text-xs text-gray-400">Escaneie o QR Code ou cole o código. O saldo cai automaticamente!</p>
-                <div class="qr-container">
+                <div class="bg-[#1a1a1a] rounded-lg p-3 inline-block border border-white/5 mx-auto">
+                    <span class="text-xs text-gray-400 uppercase tracking-widest font-bold">Valor a Depositar</span><br>
+                    <span class="text-2xl font-black text-[#FFB800]">R$ <span id="display-payment-amount">0,00</span></span>
+                </div>
+                <div class="qr-container mt-2 mx-auto inline-block">
                     <img id="qr-image" src="" alt="QR Code" class="w-48 h-48">
                 </div>
                 <div class="mt-4 text-left">
@@ -506,8 +510,12 @@
                             else if (resData.capi_status === "success") capiMsg = "<br><span class='text-xs text-green-200'>CAPI FB Enviado! 💰</span>";
                             else if (resData.capi_status) capiMsg = "<br><span class='text-xs text-yellow-300'>CAPI " + resData.capi_status + "</span>";
 
-                            toast.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Aprovado!${capiMsg}`;
+                            toast.innerHTML = `<span class="material-symbols-outlined text-3xl">check_circle</span> <span class="text-xl">Pagamento Aprovado!</span>${capiMsg}`;
                             
+                            // Remove a seta de voltar do header
+                            const backBtn = document.getElementById('back-btn');
+                            if (backBtn) backBtn.style.display = 'none';
+
                             // Dispara Purchase via Web no Navegador para dupla verificação com o Servidor (O FaceAds faz a deduplicação se necessário)
                             if (typeof fbq === 'function') {
                                 const finalAmount = parseFloat(document.getElementById('deposit_amount').value) || 0;
@@ -519,7 +527,8 @@
                                 });
                             }
                             
-                            setTimeout(() => { window.location.href = '/perfil.html'; }, 4000);
+                            // Exige que o usuário clique em Voltar ao Perfil manualmente
+                            // setTimeout(() => { window.location.href = '/perfil.html'; }, 4000);
                         } else {
                             toast.remove();
                         }
