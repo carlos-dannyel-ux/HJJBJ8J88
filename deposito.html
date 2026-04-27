@@ -233,27 +233,28 @@
             </div>
 
             <!-- Real PIX step -->
-            <div id="step-real" class="hidden flex flex-col items-center justify-center space-y-4">
+            <div id="step-real" class="hidden text-center space-y-6 mt-4">
                 <p class="text-xs text-gray-400">Escaneie o QR Code ou cole o código. O saldo cai automaticamente!</p>
-                <div class="bg-[#1a1a1a] rounded-lg p-3 border border-white/5 mx-auto w-[80%] max-w-[250px]">
+                <div class="bg-[#1a1a1a] rounded-xl p-3 border border-white/5 mx-auto inline-block text-center mt-2">
                     <span class="text-xs text-gray-400 uppercase tracking-widest font-bold">Valor a Depositar</span><br>
                     <span class="text-2xl font-black text-[#FFB800]">R$ <span id="display-payment-amount">0,00</span></span>
                 </div>
-                <div class="bg-white p-2 rounded-xl mx-auto inline-block">
-                    <img id="qr-image" src="" alt="QR Code" class="w-48 h-48 block">
+                <div>
+                    <div class="bg-white p-2 rounded-xl mx-auto inline-block">
+                        <img id="qr-image" src="" alt="QR Code" class="w-48 h-48 block">
+                    </div>
                 </div>
-                <div class="mt-4 text-left">
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">PIX Copia e
-                        Cola</label>
+                <div class="text-left w-full">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">PIX Copia e Cola</label>
                     <div class="flex">
                         <input type="text" id="pix-code" readonly
-                            class="flex-1 bg-[#111] border border-[#333] rounded-l-xl p-3 text-[10px] text-gray-300 outline-none">
-                        <button onclick="copyPix()" class="bg-[#FFB800] text-black px-4 font-bold rounded-r-xl">
+                            class="flex-1 w-full bg-[#111] border border-[#333] rounded-l-xl p-3 text-[10px] text-gray-300 outline-none">
+                        <button onclick="copyPix()" class="bg-[#FFB800] text-black px-4 font-bold rounded-r-xl shrink-0">
                             <span class="material-symbols-outlined text-sm">content_copy</span>
                         </button>
                     </div>
                 </div>
-                <button id="btn-voltar" onclick="window.location.href='/perfil.html'" class="btn-deposit mt-6" style="display:none;">Voltar ao Perfil</button>
+                <button id="btn-voltar" onclick="window.location.href='/perfil.html'" class="btn-deposit mt-6 w-full" style="display:none;">Voltar ao Perfil</button>
             </div>
         </main>
     </div>
