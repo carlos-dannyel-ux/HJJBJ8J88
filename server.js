@@ -1301,10 +1301,12 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
                                 value: baseAmount,
                                 content_name: dep.deposit_method_clicked || 'deposit',
                                 content_category: 'Deposit'
-                            },
-                            ...(TEST_CODE ? { test_event_code: TEST_CODE } : {})
-                        }]
+                            }
+                        }],
+                        ...(TEST_CODE ? { test_event_code: TEST_CODE } : {})
                     };
+
+                    console.log(`[CAPI] Sending Purchase payload:`, JSON.stringify(payload));
 
                     axios.post(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${CAPI_TOKEN}`, payload)
                         .then(res => console.log(`[CAPI] Purchase sent for dep_${dep.id} (Status: ${res.data.events_received})`))
