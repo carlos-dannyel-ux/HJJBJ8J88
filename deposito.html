@@ -254,7 +254,15 @@
                         </button>
                     </div>
                 </div>
-                <button id="btn-voltar" onclick="window.location.href='/perfil.html'" class="btn-deposit mt-6 w-full" style="display:none;">Voltar ao Perfil</button>
+                <div id="payment-success-msg" style="display: none;" class="flex-col items-center justify-center mt-6 mb-4">
+                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-2 animate-bounce">
+                        <circle cx="32" cy="32" r="30" fill="#00e676" fill-opacity="0.1" stroke="#00e676" stroke-width="2"/>
+                        <circle cx="32" cy="32" r="24" fill="#00e676" fill-opacity="0.2"/>
+                        <path d="M18 32L28 42L46 24" stroke="#00e676" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h2 class="text-xl font-black text-[#00e676] uppercase tracking-tighter">Pagamento Aprovado</h2>
+                </div>
+                <button id="btn-voltar" onclick="window.location.href='/perfil.html'" class="btn-deposit w-full" style="display:none;">Voltar ao Perfil</button>
             </div>
         </main>
     </div>
@@ -280,7 +288,12 @@
             const existing = document.getElementById('toast-container');
             if (existing) existing.remove();
 
-            const icons = { success: '✅', error: '❌', info: '💡', warning: '⚠️' };
+            const icons = { 
+                success: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`, 
+                error: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`, 
+                info: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00bcd4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`, 
+                warning: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffb800" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>` 
+            };
             const toast = document.createElement('div');
             toast.id = 'toast-container';
             toast.className = `fixed top-1/2 left-1/2 z-[9999] max-w-[400px] w-[90%] p-6 rounded-2xl bg-[#0e0e0e] border-2 border-white text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-4 transition-all duration-500`;
@@ -488,6 +501,8 @@
 
                                         const returnBtn = document.getElementById('btn-voltar');
                                         if (returnBtn) returnBtn.style.display = 'block';
+                                        const successMsg = document.getElementById('payment-success-msg');
+                                        if (successMsg) successMsg.style.display = 'flex';
 
                                         if (typeof fbq === 'function') {
                                             const finalAmount = parseFloat(document.getElementById('deposit_amount').value) || 0;
@@ -564,6 +579,8 @@
                             // Exibe o botão de Voltar ao Perfil
                             const returnBtn = document.getElementById('btn-voltar');
                             if (returnBtn) returnBtn.style.display = 'block';
+                            const successMsg = document.getElementById('payment-success-msg');
+                            if (successMsg) successMsg.style.display = 'flex';
 
                             // Dispara Purchase via Web no Navegador para dupla verificação com o Servidor (O FaceAds faz a deduplicação se necessário)
                             if (typeof fbq === 'function') {
