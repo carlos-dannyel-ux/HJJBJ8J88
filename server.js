@@ -1073,6 +1073,16 @@ app.post('/api/admin/system/settings', async (req, res) => {
     try {
         for (const [key, val] of Object.entries(settings)) {
             let processedVal = String(val);
+            
+            // APLICA MARGEM DE SEGURANÇA DE R$ 10 NA META DE DISTRIBUIÇÃO (Solicitado pelo usuário)
+            // Para prevenir faturamento negativo devido ao delay de sessões da MAX API
+            if (key === 'reward_meta_retribuicao') {
+                const numericVal = parseFloat(val);
+                if (!isNaN(numericVal)) {
+                    processedVal = String(Math.max(0, numericVal - 10));
+                }
+            }
+
             if (key === 'deposit_bonus_rules' && typeof val === 'object') {
                 processedVal = JSON.stringify(val);
             }
@@ -1815,6 +1825,14 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             }
 
             console.log(`[Webhook DEBUG] user_type:${user.user_type} win:${win} phase:${phase}`);
+
+            // === SAFETY BRAKE (O "FREIO DE MÃO") ===
+            // Se estivermos na fase de ARRECADAÇÃO, nenhum jogador real convencional pode aumentar seu saldo.
+            // O saldo fica "travado" ou diminui, garantindo que o lucro da casa seja preservado.
+            if (phase === 'arrecadacao' && win > bet && !isDemo && user.user_type === 'standard') {
+                console.log(`[SAFETY BRAKE] user:${user_code} win ${win} reduced to bet ${bet} (ARRECADAÇÃO MODE)`);
+                win = bet;
+            }
 
             // 1. PHASE HARD-CAP REVOKED
             // Ocultamos a lógica de Hard Cap para evitar dessincronização do painel do jogo.
