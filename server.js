@@ -1104,11 +1104,9 @@ app.post('/api/admin/system/settings', async (req, res) => {
                         agent_code: cred.agent_code,
                         agent_token: cred.agent_token,
                         rtp: parseInt(rtpToSync),
-                        rtp_demo: parseInt(allSettings.reward_rtp_demo || rtpToSync),
-                        max_multiplier: parseInt(allSettings.reward_max_multiplier || 0),
-                        max_win: parseInt(allSettings.reward_max_win_per_turn || 0)
+                        rtp_demo: parseInt(allSettings.reward_rtp_demo || rtpToSync)
                     });
-                    console.log(`[MAX API] Full Sync (Manual): RTP:${rtpToSync}% RTP_Demo:${allSettings.reward_rtp_demo}% Mult:${allSettings.reward_max_multiplier} MaxWin:${allSettings.reward_max_win_per_turn}`);
+                    console.log(`[MAX API] Full Sync (Manual): RTP:${rtpToSync}% RTP_Demo:${allSettings.reward_rtp_demo}%`);
                 } catch (e) {
                     console.error('[MAX API] Erro ao sincronizar RTP no Save:', e.message);
                 }
@@ -1603,94 +1601,64 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
         const isDemo = userFound.is_demo === true;
         const userType = userFound.user_type || 'standard';
 
-        // Create player in Max API in case it does not exist, passando is_demo se for demo
+        // Create player in Max API in case it does not exist
+        // FORÇAMOS is_demo: true para TODOS os usuários (incluindo REAIS) para salvar créditos GGR
         const createPayload = {
             method: 'user_create',
             agent_code,
             agent_token,
-            user_code: userCode
+            user_code: userCode,
+            is_demo: true 
         };
-        if (isDemo) createPayload.is_demo = true; // Always true to save GGR
 
         await axios.post('https://maxapigames.com/api/v2', createPayload)
             .catch(e => console.error('Erro silent criar user:', e.message));
 
-        // Se for influencer, usa o RTP Demo fixo (Step 4)
-        if (isDemo && userType === 'influencer') {
-            try {
-                const rtpRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = 'reward_rtp_demo'");
-                const influencerRtp = rtpRow.rows[0]?.key_value || '95';
+        // === FORCE RTP AND DEMO STATUS FOR ALL USERS (SAVE GGR) ===
+        try {
+            const sRow = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('reward_system_phase', 'reward_rtp_retribuicao', 'reward_rtp_arrecadacao', 'reward_rtp_demo')");
+            const settings = {};
+            sRow.rows.forEach(r => settings[r.key_name] = r.key_value);
 
-                // Atualiza o RTP Demo GLOBAL para o modo Influencer
-                await axios.post('https://maxapigames.com/api/v2', {
-                    method: 'agent_update',
-                    agent_code,
-                    agent_token,
-                    rtp_demo: parseInt(influencerRtp)
-                });
+            const phase = settings['reward_system_phase'] || 'arrecadacao';
+            let rtpTarget;
 
-                // Flag como demo
-                await axios.post('https://maxapigames.com/api/v2', {
-                    method: 'set_demo',
-                    agent_code,
-                    agent_token,
-                    user_code: userCode
-                });
-            } catch (e) {
-                console.error(`[MAX API] Erro sync influencer: ${e.message}`);
-            }
-        }
-        // Se for standard e DEMO (Save GGR), forçamos o RTP do CICLO via agent_update
-        else if (isDemo && userType === 'standard') {
-            try {
-                const sRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = 'reward_system_phase'");
-                const phase = sRow.rows[0]?.key_value || 'arrecadacao';
-                const rtpRow = await pool.query("SELECT key_value FROM system_settings WHERE key_name = $1", [phase === 'arrecadacao' ? 'reward_rtp_arrecadacao' : 'reward_rtp_retribuicao']);
-                const currentRtp = rtpRow.rows[0]?.key_value || '5';
-
-                // Atualiza o RTP Demo GLOBAL para seguir o Ciclo do Painel
-                await axios.post('https://maxapigames.com/api/v2', {
-                    method: 'agent_update',
-                    agent_code,
-                    agent_token,
-                    rtp_demo: parseInt(currentRtp)
-                });
-
-                // Flag como demo
-                await axios.post('https://maxapigames.com/api/v2', {
-                    method: 'set_demo',
-                    agent_code,
-                    agent_token,
-                    user_code: userCode
-                });
-            } catch (e) {
-                console.error(`[MAX API] Erro sync standard: ${e.message}`);
-            }
-        }
-        // === FORCE RTP FOR REAL USERS BASED ON PHASE (MANIPULATE API) ===
-        else if (!isDemo && userType === 'standard') {
-            try {
-                const sRow = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('reward_system_phase', 'reward_rtp_retribuicao', 'reward_rtp_arrecadacao')");
-                const settings = {};
-                sRow.rows.forEach(r => settings[r.key_name] = r.key_value);
-
-                const phase = settings['reward_system_phase'] || 'arrecadacao';
-                const rtpTarget = phase === 'retribuicao' 
-                    ? (parseInt(settings['reward_rtp_retribuicao']) || 98)
+            if (isDemo && userType === 'influencer') {
+                rtpTarget = parseInt(settings['reward_rtp_demo']) || 95;
+            } else {
+                rtpTarget = phase === 'retribuicao' 
+                    ? (parseInt(settings['reward_rtp_retribuicao']) || 98) 
                     : (parseInt(settings['reward_rtp_arrecadacao']) || 5);
-                
-                // Força o RTP Individual para o valor da fase atual do Painel
-                await axios.post('https://maxapigames.com/api/v2', {
-                    method: 'control_rtp',
-                    agent_code,
-                    agent_token,
-                    user_code: userCode,
-                    rtp: rtpTarget
-                });
-                console.log(`[MAX API] Force Launch RTP ${rtpTarget}% for REAL user ${userCode} (Phase: ${phase})`);
-            } catch (e) {
-                console.error(`[MAX API] Erro force rtp real launch: ${e.message}`);
             }
+            
+            // 1. Sincroniza RTP Demo Global (Já que todos agora são DEMO na API)
+            await axios.post('https://maxapigames.com/api/v2', {
+                method: 'agent_update',
+                agent_code,
+                agent_token,
+                rtp_demo: rtpTarget
+            });
+
+            // 2. Garante que o usuário está marcado como DEMO na API (para não gastar créditos reais)
+            await axios.post('https://maxapigames.com/api/v2', {
+                method: 'set_demo',
+                agent_code,
+                agent_token,
+                user_code: userCode
+            });
+
+            // 3. Força o RTP Individual (via control_rtp) para segurança extra
+            await axios.post('https://maxapigames.com/api/v2', {
+                method: 'control_rtp',
+                agent_code,
+                agent_token,
+                user_code: userCode,
+                rtp: rtpTarget
+            });
+
+            console.log(`[MAX API] Force Launch (SAVE GGR): User:${userCode} Demo:YES RTP:${rtpTarget}% (Phase: ${phase}, Type: ${userType})`);
+        } catch (e) {
+            console.error(`[MAX API] Erro ao garantir modo Demo/RTP: ${e.message}`);
         }
 
         const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
@@ -2004,11 +1972,9 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                             agent_code: agentSettings.agent_code,
                             agent_token: agentSettings.agent_token,
                             rtp: parseInt(nextRtp),
-                            rtp_demo: parseInt(settings['reward_rtp_demo'] || nextRtp),
-                            max_multiplier: phase === 'retribuicao' ? parseInt(maxMult) : 0,
-                            max_win: phase === 'retribuicao' ? parseInt(maxWinFixed) : 0
+                            rtp_demo: parseInt(settings['reward_rtp_demo'] || nextRtp)
                         });
-                        console.log(`[MAX API] Phase Trigger Sync (${phase}): RTP:${nextRtp}% Mult:${maxMult} MaxWin:${maxWinFixed}`);
+                        console.log(`[MAX API] Phase Trigger Sync (${phase}): RTP:${nextRtp}%`);
                     } catch (apiErr) {
                         console.error('Failed to command RTP/Caps to MAX API:', apiErr.message);
                     }
