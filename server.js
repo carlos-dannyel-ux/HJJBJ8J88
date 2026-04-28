@@ -1893,6 +1893,26 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             // 2. Cycle Logic (INCLUDE STANDARD DEMO USERS)
             if (!isDemo || user.user_type === 'standard') {
                 let phase = settings['reward_system_phase'] || 'arrecadacao';
+
+                // === RESET MANIPULATION IN RETRIBUIÇÃO PHASE ===
+                // Se a fase global é de retribuição, garantimos que o usuário não esteja preso 
+                // em um RTP individual baixo (losing) de uma fase de arrecadação anterior.
+                if (phase === 'retribuicao' && user.manipulation_status !== 'none') {
+                    await pool.query("UPDATE users SET manipulation_status = 'none', is_manipulated = false, manipulated_matches = 0 WHERE id = $1", [userId]);
+                    try {
+                        const userCode = `30win_user_${userId}`;
+                        await axios.post('https://maxapigames.com/api/v2', {
+                            method: 'control_rtp',
+                            agent_code: agentSettings.agent_code,
+                            agent_token: agentSettings.agent_token,
+                            user_code: userCode,
+                            rtp: 0 // Reseta para o padrão do agente (98% nesta fase)
+                        });
+                        console.log(`[REWARD PHASE] Reset individual RTP for ${userCode} to FAIR MODE`);
+                    } catch (e) {
+                         console.error('[REWARD PHASE] Erro ao resetar RTP:', e.message);
+                    }
+                }
                 const metaArrecadacao = parseFloat(settings['reward_meta_arrecadacao']) || 1000.00;
                 const metaRetribuicao = parseFloat(settings['reward_meta_retribuicao']) || 500.00;
                 let currentArrecadacao = parseFloat(settings['reward_current_arrecadacao']) || 0.00;
