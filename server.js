@@ -1073,15 +1073,6 @@ app.post('/api/admin/system/settings', async (req, res) => {
     try {
         for (const [key, val] of Object.entries(settings)) {
             let processedVal = String(val);
-            
-            // APLICA MARGEM DE SEGURANÇA DE R$ 10 NA META DE DISTRIBUIÇÃO (Solicitado pelo usuário)
-            // Para prevenir faturamento negativo devido ao delay de sessões da MAX API
-            if (key === 'reward_meta_retribuicao') {
-                const numericVal = parseFloat(val);
-                if (!isNaN(numericVal)) {
-                    processedVal = String(Math.max(0, numericVal - 10));
-                }
-            }
 
             if (key === 'deposit_bonus_rules' && typeof val === 'object') {
                 processedVal = JSON.stringify(val);
