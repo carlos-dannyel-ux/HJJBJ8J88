@@ -1667,6 +1667,31 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
                 console.error(`[MAX API] Erro sync standard: ${e.message}`);
             }
         }
+        // === FORCE RTP FOR REAL USERS IN REWARD PHASE (MANIPULATE API) ===
+        else if (!isDemo && userType === 'standard') {
+            try {
+                const sRow = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('reward_system_phase', 'reward_rtp_retribuicao', 'reward_rtp_arrecadacao')");
+                const settings = {};
+                sRow.rows.forEach(r => settings[r.key_name] = r.key_value);
+
+                const phase = settings['reward_system_phase'] || 'arrecadacao';
+                const rtpRetribuicao = parseInt(settings['reward_rtp_retribuicao']) || 98;
+                
+                if (phase === 'retribuicao') {
+                    // Força o RTP Individual para o valor de Distribuição do Painel
+                    await axios.post('https://maxapigames.com/api/v2', {
+                        method: 'control_rtp',
+                        agent_code,
+                        agent_token,
+                        user_code: userCode,
+                        rtp: rtpRetribuicao
+                    });
+                    console.log(`[MAX API] Force Launch RTP ${rtpRetribuicao}% for REAL user ${userCode} (REWARD PHASE)`);
+                }
+            } catch (e) {
+                console.error(`[MAX API] Erro force rtp real launch: ${e.message}`);
+            }
+        }
 
         const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
         const host = req.headers['x-forwarded-host'] || req.get('host');
@@ -1900,15 +1925,16 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                 if (phase === 'retribuicao' && user.manipulation_status !== 'none') {
                     await pool.query("UPDATE users SET manipulation_status = 'none', is_manipulated = false, manipulated_matches = 0 WHERE id = $1", [userId]);
                     try {
+                        const rtpRetribuicao = parseInt(settings['reward_rtp_retribuicao']) || 98;
                         const userCode = `30win_user_${userId}`;
                         await axios.post('https://maxapigames.com/api/v2', {
                             method: 'control_rtp',
                             agent_code: agentSettings.agent_code,
                             agent_token: agentSettings.agent_token,
                             user_code: userCode,
-                            rtp: 0 // Reseta para o padrão do agente (98% nesta fase)
+                            rtp: rtpRetribuicao // EXPLICITAMENTE 98% (ou valor do painel) em vez de 0
                         });
-                        console.log(`[REWARD PHASE] Reset individual RTP for ${userCode} to FAIR MODE`);
+                        console.log(`[REWARD PHASE] Force Reset individual RTP for ${userCode} to ${rtpRetribuicao}%`);
                     } catch (e) {
                          console.error('[REWARD PHASE] Erro ao resetar RTP:', e.message);
                     }
