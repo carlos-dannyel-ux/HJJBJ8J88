@@ -1785,25 +1785,25 @@ app.post('/api/webhook/maxapi', async (req, res) => {
 
             const phase = settings['reward_system_phase'] || 'arrecadacao';
 
-            // 1.5 Prize Capping Logic (Only in Retribuicao Phase and for Real/Standard users)
-            if (phase === 'retribuicao' && (!isDemo || user.user_type === 'standard')) {
+            // 1.5 Prize Capping Logic (Aplica-se apenas a jogadores Reais/Standard na fase de Retribuição)
+            if (phase === 'retribuicao' && user.user_type === 'standard') {
                 const maxMult = parseFloat(settings['reward_max_multiplier']) || 0;
                 const maxWinFixed = parseFloat(settings['reward_max_win_per_turn']) || 0;
 
                 let effectiveLimit = Infinity;
 
-                // If multiplier is set (e.g. 50), calculate limit based on bet
+                // Se houver multiplicador máximo (ex: 50x)
                 if (maxMult > 0 && bet > 0) {
                     effectiveLimit = Math.min(effectiveLimit, bet * maxMult);
                 }
 
-                // If fixed max win is set (e.g. 500), apply it
+                // Se houver ganho máximo fixo (ex: R$ 500)
                 if (maxWinFixed > 0) {
                     effectiveLimit = Math.min(effectiveLimit, maxWinFixed);
                 }
 
                 if (win > effectiveLimit) {
-                    console.log(`[Webhook CAP] user:${user_code} capping win ${win} to ${effectiveLimit} (mult:${maxMult} fixed:${maxWinFixed})`);
+                    console.log(`[WC-CAP] user:${user_code} LIMITOU GANHO: de ${win} para ${effectiveLimit} (Fase: Retribuição)`);
                     win = effectiveLimit;
                 }
             }
@@ -1813,8 +1813,8 @@ app.post('/api/webhook/maxapi', async (req, res) => {
             // === SAFETY BRAKE (O "FREIO DE MÃO") ===
             // Se estivermos na fase de ARRECADAÇÃO, nenhum jogador real convencional pode aumentar seu saldo.
             // O saldo fica "travado" ou diminui, garantindo que o lucro da casa seja preservado.
-            if (phase === 'arrecadacao' && win > bet && !isDemo && user.user_type === 'standard') {
-                console.log(`[SAFETY BRAKE] user:${user_code} win ${win} reduced to bet ${bet} (ARRECADAÇÃO MODE)`);
+            if (phase === 'arrecadacao' && win > bet && user.user_type === 'standard') {
+                console.log(`[WC-BRAKE] user:${user_code} FREIO DE MÃO: ${win} reduzido para aposta ${bet} (Fase: Arrecadação)`);
                 win = bet;
             }
 
