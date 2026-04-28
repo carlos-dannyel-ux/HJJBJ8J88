@@ -1105,8 +1105,8 @@ app.post('/api/admin/system/settings', async (req, res) => {
                         agent_token: cred.agent_token,
                         rtp: parseInt(rtpToSync),
                         rtp_demo: parseInt(allSettings.reward_rtp_demo || rtpToSync),
-                        max_win_multiplier: parseInt(allSettings.reward_max_multiplier || 0),
-                        max_win_amount: parseInt(allSettings.reward_max_win_per_turn || 0)
+                        max_multiplier: parseInt(allSettings.reward_max_multiplier || 0),
+                        max_win: parseInt(allSettings.reward_max_win_per_turn || 0)
                     });
                     console.log(`[MAX API] Full Sync (Manual): RTP:${rtpToSync}% RTP_Demo:${allSettings.reward_rtp_demo}% Mult:${allSettings.reward_max_multiplier} MaxWin:${allSettings.reward_max_win_per_turn}`);
                 } catch (e) {
@@ -1667,7 +1667,7 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
                 console.error(`[MAX API] Erro sync standard: ${e.message}`);
             }
         }
-        // === FORCE RTP FOR REAL USERS IN REWARD PHASE (MANIPULATE API) ===
+        // === FORCE RTP FOR REAL USERS BASED ON PHASE (MANIPULATE API) ===
         else if (!isDemo && userType === 'standard') {
             try {
                 const sRow = await pool.query("SELECT key_name, key_value FROM system_settings WHERE key_name IN ('reward_system_phase', 'reward_rtp_retribuicao', 'reward_rtp_arrecadacao')");
@@ -1675,19 +1675,19 @@ app.post('/api/games/launch', authenticateToken, async (req, res) => {
                 sRow.rows.forEach(r => settings[r.key_name] = r.key_value);
 
                 const phase = settings['reward_system_phase'] || 'arrecadacao';
-                const rtpRetribuicao = parseInt(settings['reward_rtp_retribuicao']) || 98;
+                const rtpTarget = phase === 'retribuicao' 
+                    ? (parseInt(settings['reward_rtp_retribuicao']) || 98)
+                    : (parseInt(settings['reward_rtp_arrecadacao']) || 5);
                 
-                if (phase === 'retribuicao') {
-                    // Força o RTP Individual para o valor de Distribuição do Painel
-                    await axios.post('https://maxapigames.com/api/v2', {
-                        method: 'control_rtp',
-                        agent_code,
-                        agent_token,
-                        user_code: userCode,
-                        rtp: rtpRetribuicao
-                    });
-                    console.log(`[MAX API] Force Launch RTP ${rtpRetribuicao}% for REAL user ${userCode} (REWARD PHASE)`);
-                }
+                // Força o RTP Individual para o valor da fase atual do Painel
+                await axios.post('https://maxapigames.com/api/v2', {
+                    method: 'control_rtp',
+                    agent_code,
+                    agent_token,
+                    user_code: userCode,
+                    rtp: rtpTarget
+                });
+                console.log(`[MAX API] Force Launch RTP ${rtpTarget}% for REAL user ${userCode} (Phase: ${phase})`);
             } catch (e) {
                 console.error(`[MAX API] Erro force rtp real launch: ${e.message}`);
             }
@@ -2005,8 +2005,8 @@ app.post('/api/webhook/maxapi', async (req, res) => {
                             agent_token: agentSettings.agent_token,
                             rtp: parseInt(nextRtp),
                             rtp_demo: parseInt(settings['reward_rtp_demo'] || nextRtp),
-                            max_win_multiplier: phase === 'retribuicao' ? parseInt(maxMult) : 0,
-                            max_win_amount: phase === 'retribuicao' ? parseInt(maxWinFixed) : 0
+                            max_multiplier: phase === 'retribuicao' ? parseInt(maxMult) : 0,
+                            max_win: phase === 'retribuicao' ? parseInt(maxWinFixed) : 0
                         });
                         console.log(`[MAX API] Phase Trigger Sync (${phase}): RTP:${nextRtp}% Mult:${maxMult} MaxWin:${maxWinFixed}`);
                     } catch (apiErr) {
